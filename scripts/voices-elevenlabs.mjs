@@ -240,7 +240,9 @@ export function elevenlabs(env = process.env) {
         model = FALLBACK_MODEL
         continue
       }
-      if (said.includes('quota') || res.status === 402) throw new QuotaError(e.message || 'Character quota exceeded')
+      if (said.includes('quota')) throw new QuotaError(`${e.status || res.status}: ${e.message || 'character quota exceeded'}`)
+      if (res.status === 402)
+        throw new FatalError(`ElevenLabs refused this request on the current plan (HTTP 402: ${e.status || ''} ${e.message || ''}). Library voices may need a paid plan for API use; see docs/voices.md.`)
       if (res.status === 401 || res.status === 403) throw new FatalError(`ElevenLabs refused the key (HTTP ${res.status}: ${e.status || e.message}). Check the ELEVENLABS_API_KEY secret and its Text to Speech permission.`)
       if (said.includes('voice_not_found') || (res.status === 404 && said.includes('voice')))
         throw new FatalError(`Voice ${voiceId} was not found in the account. Add it first (--add-voice) or fix the ELEVENLABS_VOICE_* variable.`)

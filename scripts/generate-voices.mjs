@@ -431,7 +431,7 @@ async function runFull() {
     } catch {
       /* ignore */
     }
-    notice(`Stopped at the monthly ElevenLabs character limit after ${made} new clips; ${left} clips are still to make.${when} Run this workflow again after the reset (a monthly schedule does it automatically).`)
+    notice(`Stopped at the monthly ElevenLabs character limit after ${made} new clips (${quota?.message ?? 'quota'}); ${left} clips are still to make.${when} Run this workflow again after the reset (a monthly schedule does it automatically).`)
   }
   if (fatal) {
     console.error(fatal.message)
