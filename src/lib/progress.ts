@@ -57,20 +57,34 @@ export function learnerLevel(totalXp: number) {
 // ------------------------------------------------------------- spaced repetition (Leitner)
 const BOX_DAYS = [0, 1, 2, 4, 7, 15, 30]
 
+/** Memory with the day it was last promoted, so a word climbs at most one box per day. */
+type Mem = Memory & { lastPromotedDay?: string }
+
+/** True if an id is something Govori can teach again (a word, phrase, letter or reading word). */
+const schedulable = (id: string) => !id.includes('+') && !!study(id)
+
 export async function updateMemory(itemId: string, correct: boolean, firstTry: boolean) {
-  if (itemId.includes('+')) return // match exercises cover several items; logged, not scheduled
+  // Match rounds and conversation lines are logged, not scheduled.
+  if (!schedulable(itemId)) return
   const now = Date.now()
-  const m: Memory = (await db.memory.get(itemId)) ?? { itemId, box: 0, due: now, seen: 0, correct: 0, wrong: 0, lastSeen: now, learnedAt: now }
+  const today = localDay()
+  const m: Mem = (await db.memory.get(itemId)) ?? { itemId, box: 0, due: now, seen: 0, correct: 0, wrong: 0, lastSeen: now, learnedAt: now }
   m.seen++
   m.lastSeen = now
   if (correct) {
     m.correct++
-    if (firstTry) m.box = Math.min(6, m.box + 1)
+    // Promote only when the item was due and not already promoted today; drilling it
+    // five times in one lesson must not hide it for a month.
+    if (firstTry && m.due <= now && m.lastPromotedDay !== today) {
+      m.box = Math.min(6, m.box + 1)
+      m.lastPromotedDay = today
+      m.due = now + BOX_DAYS[m.box] * dayMs
+    }
   } else {
     m.wrong++
     m.box = Math.max(0, m.box - 2)
+    m.due = now + BOX_DAYS[m.box] * dayMs
   }
-  m.due = now + BOX_DAYS[m.box] * dayMs
   await db.memory.put(m)
 }
 
@@ -79,7 +93,7 @@ export async function dueItems(limit = 12, filter?: (id: string) => boolean): Pr
   const all = await db.memory.toArray()
   const now = Date.now()
   return all
-    .filter((m) => (!filter || filter(m.itemId)) && (m.due <= now || m.wrong > m.correct))
+    .filter((m) => schedulable(m.itemId) && (!filter || filter(m.itemId)) && (m.due <= now || m.wrong > m.correct))
     .sort((a, b) => a.box - b.box || a.due - b.due)
     .slice(0, limit)
     .map((m) => m.itemId)
@@ -91,7 +105,16 @@ export async function reviewPool(trackId: TrackId | null, exclude: string[], lim
   return ids.slice(0, limit)
 }
 
-export const learnedCount = () => db.memory.count()
+const isWord = (id: string) => {
+  const k = study(id)?.kind
+  return k === 'word' || k === 'phrase'
+}
+
+/** Words and phrases met so far (letters, reading words and conversation lines don't count). */
+export async function learnedCount(): Promise<number> {
+  const ids = (await db.memory.toCollection().primaryKeys()) as string[]
+  return ids.filter(isWord).length
+}
 
 /** Items answered wrongly in the last 14 days that have not been answered right since. */
 export async function recentMistakes(limit = 12): Promise<string[]> {
@@ -99,12 +122,12 @@ export async function recentMistakes(limit = 12): Promise<string[]> {
   const events = await db.events.where('ts').above(since).toArray()
   const last = new Map<string, boolean>()
   for (const e of events.sort((a, b) => a.ts - b.ts)) if (!e.itemId.includes('+') && e.exType !== 'dialogue') last.set(e.itemId, e.correct)
-  return [...last.entries()].filter(([, ok]) => !ok).map(([id]) => id).slice(-limit)
+  return [...last.entries()].filter(([id, ok]) => !ok && schedulable(id)).map(([id]) => id).slice(-limit)
 }
 
 /** Ids of everything learned (words and phrases), for the speed round. */
 export async function learnedWordIds(): Promise<string[]> {
-  return (await db.memory.toArray()).map((m) => m.itemId).filter((id) => !id.startsWith('az.') && !id.includes('.r'))
+  return ((await db.memory.toCollection().primaryKeys()) as string[]).filter(isWord)
 }
 
 // ------------------------------------------------------------- lesson progress

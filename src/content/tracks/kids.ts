@@ -8,9 +8,9 @@ export const kids: Track = {
   emoji: '🧒',
   items: [
     // ---- Unit 1: Hungry & thirsty
-    { id: 'kids.voda', kind: 'word', bg: 'вода', tr: 'vodá', en: 'water', emoji: '💧' },
-    { id: 'kids.mlyako', kind: 'word', bg: 'мляко', tr: 'mlyáko', en: 'milk', emoji: '🥛' },
-    { id: 'kids.hlyab', kind: 'word', bg: 'хляб', tr: 'hlyab', en: 'bread', emoji: '🍞' },
+    { id: 'kids.voda', kind: 'word', bg: 'столче', tr: 'stólche', en: 'little chair', emoji: '🪑', alt: ['high chair', 'chair', 'small chair', 'stool'] },
+    { id: 'kids.mlyako', kind: 'word', bg: 'вилица', tr: 'vílitsa', en: 'fork', emoji: '🍴', alt: ['a fork'] },
+    { id: 'kids.hlyab', kind: 'word', bg: 'лъжица', tr: 'lăzhítsa', en: 'spoon', emoji: '🥄', alt: ['a spoon'] },
     { id: 'kids.yabalka', kind: 'word', bg: 'ябълка', tr: 'yábălka', en: 'apple', emoji: '🍎' },
     { id: 'kids.banan', kind: 'word', bg: 'банан', tr: 'banán', en: 'banana', emoji: '🍌' },
 
@@ -39,13 +39,13 @@ export const kids: Track = {
     { id: 'kids.prikazka', kind: 'word', bg: 'приказка', tr: 'príkazka', en: 'story', emoji: '📖', alt: ['fairy tale', 'fairytale', 'bedtime story', 'tale'], note: 'A приказка is a fairy tale or bedtime story.' },
     { id: 'kids.meche', kind: 'word', bg: 'мече', tr: 'méche', en: 'teddy bear', emoji: '🧸', alt: ['teddy', 'little bear', 'bear'], note: 'мечка is a bear; мече is a little, cuddly one.' },
     { id: 'kids.san', kind: 'word', bg: 'сън', tr: 'săn', en: 'sleep', emoji: '😴', alt: ['dream', 'a dream'], note: 'Сън means both sleep and a dream.' },
-    { id: 'kids.nosht', kind: 'word', bg: 'нощ', tr: 'nosht', en: 'night', emoji: '🌙' },
+    { id: 'kids.nosht', kind: 'word', bg: 'одеяло', tr: 'odeyálo', en: 'blanket', emoji: '🛌', alt: ['a blanket', 'duvet', 'the blanket'] },
 
     { id: 'kids.vreme-za-banya', kind: 'phrase', bg: 'Време е за баня.', tr: 'vréme e za bánya', en: "It's time for a bath", emoji: '🛁', alt: ['it is time for a bath', 'time for a bath', 'bath time'] },
     { id: 'kids.izmiy-si-zabite', kind: 'phrase', bg: 'Измий си зъбите.', tr: 'izmíy si zắbite', en: 'Brush your teeth', emoji: '🪥', alt: ['wash your teeth', 'go brush your teeth'], note: 'Bulgarians "wash" their teeth rather than brush them.' },
     { id: 'kids.pishka-li-ti-se', kind: 'phrase', bg: 'Пишка ли ти се?', tr: 'píshka li ti se', en: 'Do you need to pee?', emoji: '🚽', alt: ['do you need a wee', 'do you need the toilet', 'do you need to go to the toilet'], note: 'The everyday way to ask little kids. They will answer: Пишка ми се! (I need to pee!)' },
     { id: 'kids.vreme-za-lyagane', kind: 'phrase', bg: 'Време е за лягане.', tr: 'vréme e za lyágane', en: "It's bedtime", emoji: '🛏️', alt: ['it is bedtime', 'time for bed', 'it is time for bed', "it's time for bed", 'bedtime'] },
-    { id: 'kids.leka-nosht', kind: 'phrase', bg: 'Лека нощ!', tr: 'léka nosht', en: 'Good night!', emoji: '🌙', alt: ['good night', 'goodnight', 'night night'], note: 'Literally "light night".' },
+    { id: 'kids.leka-nosht', kind: 'phrase', bg: 'Заспивай, слънчице.', tr: 'zaspívay, slắnchitse', en: 'Go to sleep, sunshine.', emoji: '😴', alt: ['go to sleep sunshine', 'sleep sunshine', 'go to sleep', 'time to sleep sunshine'], note: 'Слънчице (little sun) works for a boy or a girl.' },
     { id: 'kids.sladki-sanishta', kind: 'phrase', bg: 'Сладки сънища!', tr: 'sládki sắnishta', en: 'Sweet dreams!', emoji: '💤', alt: ['sweet dreams'] },
 
     // ---- Unit 3: Play & outside
@@ -105,21 +105,21 @@ export const kids: Track = {
     { id: 'kids.vzemi-si-ranitsata', kind: 'phrase', bg: 'Вземи си раницата.', tr: 'vzemí si ránitsata', en: 'Take your backpack', emoji: '🚪', alt: ['grab your backpack', 'take your bag', 'get your backpack', 'take your school bag'] },
     { id: 'kids.priyaten-den', kind: 'phrase', bg: 'Приятен ден!', tr: 'priyáten den', en: 'Have a nice day!', emoji: '🌞', alt: ['have a nice day', 'have a good day'] },
     { id: 'kids.shte-te-vzema', kind: 'phrase', bg: 'Ще те взема след училище.', tr: 'shte te vzéma sled uchílishte', en: "I'll pick you up after school", emoji: '🚗', alt: ['i will pick you up after school', 'i will collect you after school', "i'll collect you after school"], note: 'ще + verb is the future: ще те взема, "I will take you".' },
-    { id: 'kids.kak-mina-denyat', kind: 'phrase', bg: 'Как мина денят?', tr: 'kak mína denyát', en: 'How was your day?', emoji: '💬', alt: ['how was the day', 'how did the day go', 'how did your day go'] },
+    { id: 'kids.kak-mina-denyat', kind: 'phrase', bg: 'Как беше в училище?', tr: 'kak béshe v uchílishte', en: 'How was school?', emoji: '🏫', alt: ['how was school today', 'how was it at school', 'how was school'] },
     { id: 'kids.kakvo-pravi-v-gradinata', kind: 'phrase', bg: 'Какво прави днес в градината?', tr: 'kakvó právi dnes v gradínata', en: 'What did you do at kindergarten today?', emoji: '🖌️', alt: ['what did you do in kindergarten today', 'what did you do at nursery today', 'what did you do at preschool today'], note: 'Here прави is the past tense: "what did you do".' },
 
     // ---- Unit 6: Big feelings
-    { id: 'kids.tazhen', kind: 'word', bg: 'тъжен', tr: 'tắzhen', en: 'sad', emoji: '😢', note: 'Talking to a girl: тъжна.' },
-    { id: 'kids.yadosan', kind: 'word', bg: 'ядосан', tr: 'yadósan', en: 'angry', emoji: '😠', alt: ['cross', 'mad'], note: 'To a girl: ядосана.' },
+    { id: 'kids.tazhen', kind: 'word', bg: 'сърдит', tr: 'sărdít', en: 'grumpy', emoji: '😤', alt: ['cross', 'sulky', 'in a huff'], note: 'To a girl: сърдита.' },
+    { id: 'kids.yadosan', kind: 'word', bg: 'отегчен', tr: 'otegchén', en: 'bored', emoji: '🥱', alt: ['fed up'], note: 'To a girl: отегчена.' },
     { id: 'kids.uplashen', kind: 'word', bg: 'уплашен', tr: 'upláshen', en: 'scared', emoji: '😨', alt: ['afraid', 'frightened'], note: 'To a girl: уплашена.' },
-    { id: 'kids.shtastliv', kind: 'word', bg: 'щастлив', tr: 'shtastlív', en: 'happy', emoji: '😊', note: 'To a girl: щастлива.' },
+    { id: 'kids.shtastliv', kind: 'word', bg: 'весел', tr: 'vésel', en: 'cheerful', emoji: '😄', alt: ['happy', 'merry', 'jolly'], note: 'To a girl: весела.' },
     { id: 'kids.salzi', kind: 'word', bg: 'сълзи', tr: 'sălzí', en: 'tears', emoji: '😭' },
 
     { id: 'kids.spokoyno', kind: 'word', bg: 'Спокойно.', tr: 'spokóyno', en: 'Calm down', emoji: '🧘', alt: ['easy', 'take it easy', 'calm', 'stay calm'], note: 'Literally "calmly". Softer than an order.' },
     { id: 'kids.dishay-dalboko', kind: 'phrase', bg: 'Дишай дълбоко.', tr: 'díshay dălbóko', en: 'Take a deep breath', emoji: '🌬️', alt: ['breathe deeply', 'deep breaths', 'take deep breaths', 'breathe deep'] },
     { id: 'kids.ne-plachi', kind: 'phrase', bg: 'Не плачи.', tr: 'ne plachí', en: "Don't cry", emoji: '🤍', alt: ['dont cry', 'do not cry'] },
-    { id: 'kids.vsichko-e-nared', kind: 'phrase', bg: 'Всичко е наред.', tr: 'vsíchko e naréd', en: "Everything's okay", emoji: '👌', alt: ['everything is okay', 'everything is fine', "it's okay", 'its okay', 'it is okay', "everything's fine", 'everything is alright', 'all is well'] },
-    { id: 'kids.tuk-sam', kind: 'phrase', bg: 'Тук съм.', tr: 'tuk săm', en: "I'm here", emoji: '💞', alt: ['i am here'] },
+    { id: 'kids.vsichko-e-nared', kind: 'phrase', bg: 'Всичко ще бъде наред.', tr: 'vsíchko shte bắde naréd', en: 'Everything will be okay.', emoji: '🤗', alt: ['everything will be ok', 'everything will be okay', 'everything will be fine', 'it will be okay', 'it will be ok', "it'll be okay"] },
+    { id: 'kids.tuk-sam', kind: 'phrase', bg: 'Гушни ме.', tr: 'gúshni me', en: 'Give me a hug.', emoji: '🤗', alt: ['give me a hug', 'hug me', 'cuddle me'] },
 
     { id: 'kids.zashto-plachesh', kind: 'phrase', bg: 'Защо плачеш?', tr: 'zashtó pláchesh', en: 'Why are you crying?', emoji: '🥺', alt: ['why do you cry'] },
     { id: 'kids.yadosan-li-si', kind: 'phrase', bg: 'Ядосан ли си?', tr: 'yadósan li si', en: 'Are you angry? (to a boy)', emoji: '😤', alt: ['are you angry', 'are you cross', 'are you mad'] },
@@ -130,7 +130,7 @@ export const kids: Track = {
 
     // ---- Unit 7: Games, stories & songs
     { id: 'kids.igra', kind: 'word', bg: 'игра', tr: 'igrá', en: 'game', emoji: '🧩', alt: ['play'] },
-    { id: 'kids.krienitsa', kind: 'word', bg: 'криеница', tr: 'krienítsa', en: 'hide-and-seek', emoji: '🙈', alt: ['hide and seek'], note: "The seeker shouts: Който не се е скрил, аз не съм виновен! (If you're not hidden, it's not my fault!)" },
+    { id: 'kids.krienitsa', kind: 'word', bg: 'криеница', tr: 'kriénitsa', en: 'hide-and-seek', emoji: '🙈', alt: ['hide and seek'], note: "The seeker shouts: Който не се е скрил, аз не съм виновен! (If you're not hidden, it's not my fault!)" },
     { id: 'kids.pesen', kind: 'word', bg: 'песен', tr: 'pésen', en: 'song', emoji: '🎵' },
     { id: 'kids.knizhka', kind: 'word', bg: 'книжка', tr: 'knízhka', en: 'book', emoji: '📚', alt: ['little book', 'picture book', 'kids book'], note: 'Книга is a book; книжка is the small, kid-sized kind.' },
     { id: 'kids.risunka', kind: 'word', bg: 'рисунка', tr: 'risúnka', en: 'drawing', emoji: '🎨', alt: ['picture', 'a drawing'] },
@@ -405,7 +405,7 @@ export const kids: Track = {
       lines: [
         { who: 'daughter', bg: 'Скучно ми е.', tr: 'skúchno mi e', en: "I'm bored." },
         { who: 'me', bg: 'Хайде да рисуваме!', tr: 'háyde da risúvame', en: "Let's draw!", wrong: ['Хайде на масата!', 'Време е за баня.'] },
-        { who: 'daughter', bg: 'Не, искам да играем на криеница!', tr: 'ne, ískam da igráem na krienítsa', en: 'No, I want to play hide-and-seek!' },
+        { who: 'daughter', bg: 'Не, искам да играем на криеница!', tr: 'ne, ískam da igráem na kriénitsa', en: 'No, I want to play hide-and-seek!' },
         { who: 'me', bg: 'Добре! Скрий се, аз броя!', tr: 'dobré! skriy se, az broyá', en: "Okay! Hide, I'm counting!", wrong: ['Добре! Облечи си якето!', 'Добре! Измий си зъбите!'] },
         { who: 'daughter', bg: 'Сега приказка! Приказка!', tr: 'segá príkazka! príkazka', en: 'Now a story! A story!' },
         { who: 'me', bg: 'Коя книжка искаш?', tr: 'koyá knízhka ískash', en: 'Which book do you want?', wrong: ['Коя топка искаш?', 'Къде те боли?'] },

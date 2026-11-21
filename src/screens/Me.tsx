@@ -9,14 +9,14 @@ import { allItemIds, study, trackById, tracks } from '../content/index.ts'
 import { planWeek } from '../content/plan.ts'
 import type { TrackId } from '../content/types.ts'
 import { hasBulgarianVoice, sfx, speak } from '../lib/audio.ts'
-import { db } from '../lib/db.ts'
+import { db, getKV } from '../lib/db.ts'
+import { exportAll } from '../lib/exportData.ts'
+import { readBackup, restoreBackup, type Backup, type BackupSummary } from '../lib/importData.ts'
 import { learnerLevel, liveStreak } from '../lib/progress.ts'
 import { GITHUB_ACTION_URL, GITHUB_SECRET_URL, disableReminders, enableReminders, getReminderCode, reminderStatus, type ReminderStatus } from '../lib/push.ts'
 import { useApp, type Profile } from '../lib/store.ts'
 import './me.css'
 
-// exportData lives in another module that may land later; load it lazily and tolerate its absence.
-const exporters = import.meta.glob<{ exportData: () => Promise<unknown> }>('../lib/exportData.ts')
 
 const GOALS = [
   { xp: 20, label: '5 min' },
@@ -543,21 +543,64 @@ function AppearanceSection() {
   )
 }
 
+const BACKUP_EVERY_MS = 30 * 86_400_000
+
 function DataSection() {
+  const startedAt = useApp((s) => s.profile.startedAt)
   const [confirm, setConfirm] = useState(false)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
-  const loadExport = exporters['../lib/exportData.ts']
+  const [lastExport, setLastExport] = useState<number | null>(null)
+  const [hasData, setHasData] = useState(false)
+  const [pending, setPending] = useState<{ backup: Backup; summary: BackupSummary } | null>(null)
+  const [restoring, setRestoring] = useState(false)
+
+  useEffect(() => {
+    let live = true
+    Promise.all([getKV<number | null>('lastExport', null), db.sessions.count()]).then(([at, n]) => {
+      if (!live) return
+      setLastExport(at)
+      setHasData(n > 0)
+    })
+    return () => {
+      live = false
+    }
+  }, [])
+
+  // A gentle monthly nudge: iOS can clear a web app's data when the phone is short of space.
+  const since = lastExport ?? startedAt
+  const nudge = hasData && Date.now() - since > BACKUP_EVERY_MS
 
   async function doExport() {
     setMsg('')
-    if (!loadExport) return setMsg('Export is not available yet.')
     try {
-      const mod = await loadExport()
-      await mod.exportData()
+      const outcome = await exportAll()
+      if (outcome !== 'cancelled') setLastExport(Date.now())
     } catch (e) {
       if (e instanceof Error && e.name === 'AbortError') return
       setMsg('Could not export. Try again.')
+    }
+  }
+
+  async function pickBackup(file: File | undefined) {
+    setMsg('')
+    if (!file) return
+    try {
+      setPending(await readBackup(file))
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : 'That file could not be read.')
+    }
+  }
+
+  async function doRestore() {
+    if (!pending) return
+    setRestoring(true)
+    try {
+      await restoreBackup(pending.backup)
+      window.location.reload()
+    } catch {
+      setRestoring(false)
+      setMsg('Restoring failed. Your progress is unchanged. Try again.')
     }
   }
 
@@ -567,13 +610,59 @@ function DataSection() {
     window.location.reload()
   }
 
+  const fmt = (d: Date) => d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+
   return (
     <Section icon={<IconUser />} tone="home" title="Your data">
-      <Row label="Export everything" hint="Every answer, session and setting as a JSON file, for backups or analysis">
+      {nudge && (
+        <div className="me-backup-nudge" role="note">
+          <p className="me-setup-title">Back up your progress</p>
+          <p className="me-row-hint">
+            {lastExport ? `Your last backup was on ${fmt(new Date(lastExport))}.` : "You haven't made a backup yet."} Your progress lives only on this phone, and iOS
+            can clear app data when storage runs low. Save a copy to Files or iCloud once a month.
+          </p>
+          <button type="button" className="gv-btn gv-btn--sm gv-tone-gold" onClick={() => void doExport()}>
+            Back up now
+          </button>
+        </div>
+      )}
+      <Row label="Export everything" hint={lastExport ? `Last backup ${fmt(new Date(lastExport))}. Every answer, session and setting as a JSON file.` : 'Every answer, session and setting as a JSON file, for backups or analysis'}>
         <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => void doExport()}>
           Export
         </button>
       </Row>
+      <Row label="Import a backup" hint="Restore progress from a Govori export. Her recordings stay as they are.">
+        <label className="gv-btn gv-btn--quiet gv-btn--sm me-file">
+          Import
+          <input
+            id="me-import-file"
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            onChange={(e) => {
+              void pickBackup(e.target.files?.[0])
+              e.target.value = ''
+            }}
+          />
+        </label>
+      </Row>
+      {pending && (
+        <div className="me-danger" role="alert">
+          <p className="me-setup-title">Replace your progress with this backup?</p>
+          <p className="me-row-hint">
+            Backup from {fmt(pending.summary.exportedAt)}: {pending.summary.lessons} lessons, {pending.summary.memory} words and letters, {pending.summary.events} answers.
+            Everything on this phone now will be replaced.
+          </p>
+          <div className="me-danger-actions">
+            <button type="button" className="gv-btn gv-btn--sm gv-tone-pine" onClick={() => void doRestore()} disabled={restoring}>
+              {restoring ? 'Restoring…' : 'Restore backup'}
+            </button>
+            <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => setPending(null)} disabled={restoring}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
       {msg && <p className="me-error">{msg}</p>}
       {!confirm ? (
         <Row label="Reset progress" hint="Start again from zero. Her recordings stay.">

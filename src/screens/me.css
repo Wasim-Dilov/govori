@@ -157,3 +157,9 @@
 @media (max-width: 360px) {
   .me-focus-grid { grid-template-columns: 1fr; }
 }
+
+/* Backup nudge and import */
+.me-backup-nudge { display: grid; gap: var(--space-2); justify-items: start; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--gold-soft); border: 2px solid var(--gold); color: var(--ink); }
+.me-backup-nudge .me-row-hint { color: var(--ink); }
+.me-file { position: relative; cursor: pointer; }
+.me-file:focus-within { box-shadow: 0 var(--ledge-md) 0 var(--tone-deep), var(--focus-ring); }

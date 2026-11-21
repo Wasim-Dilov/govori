@@ -9,8 +9,18 @@ import { SessionScreen } from './screens/Session.tsx'
 import { CompleteScreen } from './screens/Complete.tsx'
 import { TabBar } from './components/TabBar.tsx'
 import { Mascot } from './components/Mascot.tsx'
+import { Toast } from './components/Toast.tsx'
 
 export default function App() {
+  return (
+    <>
+      <Screens />
+      <Toast />
+    </>
+  )
+}
+
+function Screens() {
   const ready = useApp((s) => s.ready)
   const screen = useApp((s) => s.screen)
   const init = useApp((s) => s.init)

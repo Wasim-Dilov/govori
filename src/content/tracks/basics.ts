@@ -38,8 +38,8 @@ export const basics: Track = {
     { id: 'basics.zhaden', kind: 'word', bg: 'жаден', tr: 'zháden', en: 'thirsty', emoji: '🥤', f: { bg: 'жадна', tr: 'zhádna' } },
     { id: 'basics.umoren', kind: 'word', bg: 'уморен', tr: 'umorén', en: 'tired', emoji: '😴', alt: ['sleepy', 'exhausted'], f: { bg: 'уморена', tr: 'umoréna' } },
     { id: 'basics.voda', kind: 'word', bg: 'вода', tr: 'vodá', en: 'water', emoji: '💧' },
-    { id: 'basics.hlyab', kind: 'word', bg: 'хляб', tr: 'hlyab', en: 'bread', emoji: '🍞', note: 'There is bread on the table at almost every Bulgarian meal.' },
-    { id: 'basics.kafe', kind: 'word', bg: 'кафе', tr: 'kafé', en: 'coffee', emoji: '☕', note: 'Stress on the end: ka-FE. It also means a café.' },
+    { id: 'basics.hlyab', kind: 'word', bg: 'ям', tr: 'yam', en: 'I eat', emoji: '🍽️', alt: ['eat', 'i am eating', "i'm eating", 'im eating'], note: 'Ям is "I eat"; ядеш is "you eat".' },
+    { id: 'basics.kafe', kind: 'word', bg: 'пия', tr: 'píya', en: 'I drink', emoji: '🥤', alt: ['drink', 'i am drinking', "i'm drinking", 'im drinking'], note: 'Пия is "I drink"; пиеш is "you drink".' },
 
     { id: 'basics.kak-si', kind: 'phrase', bg: 'Как си?', tr: 'kak si', en: 'How are you?', emoji: '🙂', alt: ['how are you', "how're you"], note: 'To one person you know. To her parents: Как сте?' },
     { id: 'basics.dobre-sam', kind: 'phrase', bg: 'Добре съм.', tr: 'dobré săm', en: "I'm fine.", emoji: '😌', alt: ["i'm fine", 'i am fine', 'im fine', "i'm good", 'i am good', 'im good', "i'm ok", "i'm okay", "i'm well", 'i am well'] },
@@ -82,9 +82,9 @@ export const basics: Track = {
 
     { id: 'basics.kolko-struva', kind: 'phrase', bg: 'Колко струва?', tr: 'kólko strúva', en: 'How much is it?', emoji: '💰', alt: ['how much is it', 'how much does it cost', 'how much', 'what does it cost'] },
     { id: 'basics.kolko-e-chasat', kind: 'phrase', bg: 'Колко е часът?', tr: 'kólko e chasắt', en: 'What time is it?', emoji: '🕐', alt: ['what time is it', "what's the time", 'what is the time'] },
-    { id: 'basics.oshte-pet-minuti', kind: 'phrase', bg: 'Още пет минути!', tr: 'óshte pet minúti', en: 'Five more minutes!', emoji: '⏳', alt: ['five more minutes', '5 more minutes', 'five minutes more', 'another five minutes'], note: 'What every child (and husband) says in the morning.' },
+    { id: 'basics.oshte-pet-minuti', kind: 'phrase', bg: 'Колко време?', tr: 'kólko vréme', en: 'How long?', emoji: '⏳', alt: ['how long', 'how much time', 'for how long'] },
     { id: 'basics.dve-kafeta', kind: 'phrase', bg: 'Две кафета, моля.', tr: 'dve kaféta, mólya', en: 'Two coffees, please.', emoji: '✌️', alt: ['two coffees please', '2 coffees please', 'two coffees'], note: 'Кафе becomes кафета in the plural.' },
-    { id: 'basics.kade-si', kind: 'phrase', bg: 'Къде си?', tr: 'kădé si', en: 'Where are you?', emoji: '📍', alt: ['where are you'] },
+    { id: 'basics.kade-si', kind: 'word', bg: 'Защо?', tr: 'zashtó', en: 'Why?', emoji: '🤔', alt: ['why'] },
     { id: 'basics.koga', kind: 'word', bg: 'Кога?', tr: 'kogá', en: 'When?', emoji: '📅', alt: ['when'], bgAlt: ['кога'] },
 
     // ---------------------------------------------------------------- Unit 5: Days and plans
@@ -119,11 +119,11 @@ export const basics: Track = {
     { id: 'basics.hubav', kind: 'word', bg: 'хубав', tr: 'húbav', en: 'nice', emoji: '🌈', alt: ['good', 'lovely', 'beautiful', 'pretty'] },
     { id: 'basics.losh', kind: 'word', bg: 'лош', tr: 'losh', en: 'bad', emoji: '🙁', alt: ['awful'] },
 
-    { id: 'basics.kak-mina-denyat', kind: 'phrase', bg: 'Как мина денят?', tr: 'kak mína dényat', en: 'How was your day?', emoji: '🌇', alt: ['how was your day', 'how was the day', 'how did the day go', "how was today"], note: 'Ask her this every evening. Literally "how did the day pass?"' },
+    { id: 'basics.kak-mina-denyat', kind: 'phrase', bg: 'Как мина денят?', tr: 'kak mína denyát', en: 'How was your day?', emoji: '🌇', alt: ['how was your day', 'how was the day', 'how did the day go', "how was today"], note: 'Ask her this every evening. Literally "how did the day pass?"' },
     { id: 'basics.beshe-hubav-den', kind: 'phrase', bg: 'Беше хубав ден.', tr: 'béshe húbav den', en: 'It was a nice day.', emoji: '🥰', alt: ['it was a nice day', 'it was a good day', 'it was a lovely day', 'a nice day', 'it was nice'] },
-    { id: 'basics.denyat-beshe-truden', kind: 'phrase', bg: 'Денят беше труден.', tr: 'dényat béshe trúden', en: 'The day was hard.', emoji: '😫', alt: ['the day was hard', 'the day was difficult', 'it was a hard day', 'it was a tough day', 'the day was tough'], note: 'Ден becomes денят: -ят is "the" for words like this.' },
+    { id: 'basics.denyat-beshe-truden', kind: 'phrase', bg: 'Денят беше труден.', tr: 'denyát béshe trúden', en: 'The day was hard.', emoji: '😫', alt: ['the day was hard', 'the day was difficult', 'it was a hard day', 'it was a tough day', 'the day was tough'], note: 'Ден becomes денят: -ят is "the" for words like this.' },
     { id: 'basics.mnogo-sam-zaet-dnes', kind: 'phrase', bg: 'Много съм зает днес.', tr: 'mnógo săm zaét dnes', en: "I'm very busy today.", emoji: '⏱️', alt: ["i'm very busy today", 'i am very busy today', 'im very busy today', "i'm really busy today", "i'm so busy today"], f: { bg: 'Много съм заета днес.', tr: 'mnógo săm zaéta dnes' } },
-    { id: 'basics.zashto-si-tazhna', kind: 'phrase', bg: 'Защо си тъжна?', tr: 'zashtó si tắzhna', en: 'Why are you sad?', emoji: '🥺', alt: ['why are you sad', 'why so sad', "why're you sad"], note: 'Тъжна is the feminine form, because you are asking her.' },
+    { id: 'basics.zashto-si-tazhna', kind: 'phrase', bg: 'Какво стана?', tr: 'kakvó stána', en: 'What happened?', emoji: '🤔', alt: ['what happened', "what's happened", 'whats happened'] },
     { id: 'basics.vsichko-e-nared', kind: 'phrase', bg: 'Всичко е наред.', tr: 'vsíchko e naréd', en: "Everything's OK.", emoji: '✅', alt: ["everything's ok", 'everything is ok', 'everything is okay', "everything's fine", 'everything is fine', 'everything is alright', "it's all good"], note: 'Your go-to reassurance. Literally "everything is in order".' },
 
     // ---------------------------------------------------------------- Unit 7: Where is it?
@@ -381,9 +381,9 @@ export const basics: Track = {
       scene: 'You come home from work. Your wife looks sad.',
       emoji: '🤗',
       lines: [
-        { who: 'wife', bg: 'Здравей. Как мина денят?', tr: 'zdravéy. kak mína dényat', en: 'Hi. How was your day?' },
+        { who: 'wife', bg: 'Здравей. Как мина денят?', tr: 'zdravéy. kak mína denyát', en: 'Hi. How was your day?' },
         { who: 'me', bg: 'Беше хубав ден. А ти защо си тъжна?', tr: 'béshe húbav den. a ti zashtó si tắzhna', en: 'It was a nice day. But why are you sad?', wrong: ['Денят беше лош. Лека нощ.', 'Много съм зает. Довиждане.'] },
-        { who: 'wife', bg: 'Денят беше труден. Много работа.', tr: 'dényat béshe trúden. mnógo rabóta', en: 'The day was hard. Lots of work.' },
+        { who: 'wife', bg: 'Денят беше труден. Много работа.', tr: 'denyát béshe trúden. mnógo rabóta', en: 'The day was hard. Lots of work.' },
         { who: 'me', bg: 'Ела тук. Всичко е наред.', tr: 'elá tuk. vsíchko e naréd', en: "Come here. Everything's OK.", wrong: ['Ядосан съм. Чао.', 'Нямам време сега.'] },
         { who: 'wife', bg: 'Благодаря ти. Сега съм по-спокойна.', tr: 'blagodaryá ti. segá săm po-spokóyna', en: 'Thank you. Now I feel calmer.' },
         { who: 'me', bg: 'Почивай. Аз правя кафе.', tr: 'pochívay. az právya kafé', en: "Rest. I'll make coffee.", wrong: ['Ти правиш кафе. Аз почивам.', 'Утре съм зает. Чао.'] },

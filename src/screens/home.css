@@ -233,3 +233,13 @@
 .focus-plan__text strong { font: 700 15px/20px var(--font-text); }
 .focus-plan__text span { font: 600 13px/18px var(--font-text); color: var(--ink-muted); }
 .focus-plan__emoji { font-size: 20px; }
+
+/* level stars beside a level-up suggestion */
+.home-today__stars { display: inline-flex; gap: 2px; margin-left: 6px; vertical-align: -2px; }
+.home-today__stars i {
+  width: 14px; height: 14px; background: var(--line-strong);
+  -webkit-mask: var(--motif-star) center / contain no-repeat; mask: var(--motif-star) center / contain no-repeat;
+}
+.home-today__stars i.on { background: var(--gold); }
+.home-today__stars i.next { background: var(--tone, var(--rose)); opacity: 0.55; }
+.home-today__chip svg { width: 20px; height: 20px; }

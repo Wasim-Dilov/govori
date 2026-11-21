@@ -98,11 +98,12 @@ function wordExercise(type: ExerciseType, item: StudyItem, pool: StudyItem[]): E
     case 'mc_bg_en':
       return { type, item, options: options(item, pool), cards: !isPhrase }
     case 'mc_en_bg':
-      return { type, item, options: options(item, pool), cards: !isPhrase && Math.random() < 0.5 }
+      // Bulgarian-only options: pictures would give the answer away.
+      return { type, item, options: options(item, pool), cards: false }
     case 'listen_mc':
       return { type, item, options: options(item, pool) }
     case 'build':
-      return tilesFor(item).length >= 2 ? buildEx(item, pool) : { type: 'mc_en_bg', item, options: options(item, pool), cards: true }
+      return tilesFor(item).length >= 2 ? buildEx(item, pool) : { type: 'mc_en_bg', item, options: options(item, pool), cards: false }
     case 'type_bg':
     case 'listen_type':
     case 'speak':
@@ -194,12 +195,16 @@ export function buildPractice(ids: string[], speaker: Speaker, weakTypes: Exerci
   const items = ids.map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x)
   const words = items.filter((i) => i.kind === 'word' || i.kind === 'phrase')
   const letters = items.filter((i) => i.kind === 'letter')
+  const reading = items.filter((i) => i.kind === 'reading')
   const pool = poolAround(words.map((w) => w.id), speaker, 'words')
   const letterPool = poolAround(letters.map((l) => l.id), speaker, 'letters')
+  // Reading words are practised by reading (choose the Latin form) or by ear.
+  const readPool = [...reading, ...pool.filter((p) => p.kind === 'word')]
   const prefer: ExerciseType[] = ['mc_en_bg', 'listen_mc', 'type_bg', 'build', 'listen_type', ...weakTypes, ...weakTypes]
   const ex: Exercise[] = []
   for (const it of words.slice(0, 10)) ex.push(wordExercise(rand(prefer), it, pool))
   for (const l of letters.slice(0, 4)) ex.push({ type: rand(['letter_sound', 'sound_letter'] as const), item: l, options: options(l, letterPool) })
+  for (const r of reading.slice(0, 4)) ex.push({ type: rand(['read_word', 'listen_mc'] as const), item: r, options: options(r, readPool) })
   if (words.length >= 4) ex.splice(3, 0, { type: 'match', items: shuffle(words).slice(0, 5), letters: false })
   return { lesson: null, kind: 'practice', level: 0, exercises: spread(ex).slice(0, 14), newItems: [] }
 }

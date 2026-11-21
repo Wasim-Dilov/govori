@@ -2,7 +2,11 @@ name: Daily reminder
 
 on:
   schedule:
-    # 17:30 UTC = 19:30 in Sofia in winter (20:30 in summer). GitHub may run it a few minutes late.
+    # Two runs so the reminder lands at 19:30 Sofia time all year:
+    # 16:30 UTC is 19:30 in summer (UTC+3), 17:30 UTC is 19:30 in winter (UTC+2).
+    # The script sends from whichever run matches today's clock and skips the other.
+    # GitHub may start a run a few minutes late; that's fine.
+    - cron: '30 16 * * *'
     - cron: '30 17 * * *'
   workflow_dispatch:
 
@@ -34,6 +38,11 @@ jobs:
       - name: Send reminder
         env:
           GOVORI_PUSH: ${{ secrets.GOVORI_PUSH }}
+          # Local hour of the reminder and your time zone. Change these with the cron lines above.
+          REMINDER_HOUR: '19'
+          REMINDER_TZ: Europe/Sofia
+          # Which cron started this run (empty for "Run workflow", which always sends).
+          TRIGGER_CRON: ${{ github.event.schedule }}
         # Copied next to its node_modules so the ES module import of web-push resolves.
         run: |
           cp scripts/send-reminder.mjs "$RUNNER_TEMP/push/send-reminder.mjs"

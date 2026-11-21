@@ -106,13 +106,13 @@ export const love: Track = {
 
     // L2 Eyes, hair, smile
     {
-      id: 'love.ochi', kind: 'word', bg: 'очи', tr: 'óchi', en: 'eyes', emoji: '👀',
+      id: 'love.ochi', kind: 'word', bg: 'очи', tr: 'ochí', en: 'eyes', emoji: '👀',
       note: 'Plural of око (eye), which is irregular.',
     },
     { id: 'love.kosa', kind: 'word', bg: 'коса', tr: 'kosá', en: 'hair', emoji: '💇‍♀️' },
     { id: 'love.usmivka', kind: 'word', bg: 'усмивка', tr: 'usmívka', en: 'smile', emoji: '😊' },
     { id: 'love.roklya', kind: 'word', bg: 'рокля', tr: 'róklya', en: 'dress', emoji: '👗' },
-    { id: 'love.dnes', kind: 'word', bg: 'днес', tr: 'dnes', en: 'today', emoji: '📅' },
+    { id: 'love.dnes', kind: 'word', bg: 'устни', tr: 'ustní', en: 'lips', emoji: '💋', alt: ['your lips', 'mouth'] },
 
     // L3 You're beautiful
     {
@@ -130,7 +130,7 @@ export const love: Track = {
       note: '-та on the end means "the": усмивка → усмивката. ти after it means "your".',
     },
     {
-      id: 'love.imash-krasivi-ochi', kind: 'phrase', bg: 'Имаш красиви очи', tr: 'ímash krasívi óchi', en: 'You have beautiful eyes', emoji: '👀',
+      id: 'love.imash-krasivi-ochi', kind: 'phrase', bg: 'Имаш красиви очи', tr: 'ímash krasívi ochí', en: 'You have beautiful eyes', emoji: '👀',
     },
     {
       id: 'love.roklyata-ti-e-prekrasna', kind: 'phrase', bg: 'Роклята ти е прекрасна', tr: 'róklyata ti e prekrásna', en: 'Your dress is gorgeous', emoji: '👗',
@@ -151,10 +151,7 @@ export const love: Track = {
       id: 'love.pregradka', kind: 'word', bg: 'прегръдка', tr: 'pregrắdka', en: 'hug', emoji: '🤗',
       alt: ['cuddle', 'embrace'],
     },
-    {
-      id: 'love.kafe', kind: 'word', bg: 'кафе', tr: 'kafé', en: 'coffee', emoji: '☕',
-      note: 'Bringing her кафе in bed scores serious points.',
-    },
+    { id: 'love.kafe', kind: 'word', bg: 'будилник', tr: 'budílnik', en: 'alarm clock', emoji: '⏰', alt: ['alarm', 'the alarm', 'an alarm clock'] },
 
     // L2 Sweet texts
     {
@@ -185,10 +182,7 @@ export const love: Track = {
       id: 'love.leka-nosht-lyubov-moya', kind: 'phrase', bg: 'Лека нощ, любов моя', tr: 'léka nosht, lyubóv móya', en: 'Good night, my love', emoji: '🌙',
       alt: ['goodnight my love', 'good night love'],
     },
-    {
-      id: 'love.sladki-sanishta', kind: 'phrase', bg: 'Сладки сънища', tr: 'sládki sắnishta', en: 'Sweet dreams', emoji: '💤',
-      note: 'Works at bedtime for her and for the kids.',
-    },
+    { id: 'love.sladki-sanishta', kind: 'phrase', bg: 'Сънувай ме.', tr: 'sănúvay me', en: 'Dream of me.', emoji: '💭', alt: ['dream of me', 'dream about me'], note: 'A sweet last text of the night.' },
     {
       id: 'love.mislya-za-teb', kind: 'phrase', bg: 'Мисля за теб', tr: 'míslya za teb', en: "I'm thinking of you", emoji: '💭',
       alt: ['i am thinking of you', 'i am thinking about you', 'im thinking about you', 'i think of you', 'thinking of you', 'i think about you'],
@@ -226,10 +220,7 @@ export const love: Track = {
     },
 
     // L2 Going out
-    {
-      id: 'love.vecherya', kind: 'word', bg: 'вечеря', tr: 'vechérya', en: 'dinner', emoji: '🍽️',
-      alt: ['supper'],
-    },
+    { id: 'love.vecherya', kind: 'word', bg: 'ресторант', tr: 'restoránt', en: 'restaurant', emoji: '🍽️', alt: ['a restaurant', 'the restaurant'] },
     {
       id: 'love.sreshta', kind: 'word', bg: 'среща', tr: 'sréshta', en: 'date', emoji: '🕯️',
       alt: ['meeting'],
@@ -280,20 +271,13 @@ export const love: Track = {
     // ---------------------------------------------------------- Unit 5: Plans and surprises
     // L1 Surprises
     { id: 'love.iznenada', kind: 'word', bg: 'изненада', tr: 'iznenáda', en: 'surprise', emoji: '🎉' },
-    {
-      id: 'love.podarak', kind: 'word', bg: 'подарък', tr: 'podárăk', en: 'present', emoji: '🎁',
-      alt: ['gift'],
-    },
+    { id: 'love.podarak', kind: 'word', bg: 'пръстен', tr: 'prắsten', en: 'ring', emoji: '💍', alt: ['a ring', 'the ring'] },
     {
       id: 'love.tsvetya', kind: 'word', bg: 'цветя', tr: 'tsvetyá', en: 'flowers', emoji: '💐',
       note: 'Bring an odd number of flowers. Even numbers are for funerals in Bulgaria.',
     },
     { id: 'love.uikend', kind: 'word', bg: 'уикенд', tr: 'uikénd', en: 'weekend', emoji: '🗓️' },
-    {
-      id: 'love.pochivka', kind: 'word', bg: 'почивка', tr: 'pochívka', en: 'holiday', emoji: '🏖️',
-      alt: ['vacation', 'rest', 'break'],
-      note: 'Means both a rest and a holiday away.',
-    },
+    { id: 'love.pochivka', kind: 'word', bg: 'пътуване', tr: 'pătúvane', en: 'trip', emoji: '✈️', alt: ['journey', 'a trip', 'travel', 'travelling'] },
 
     // L2 Going places
     { id: 'love.bileti', kind: 'word', bg: 'билети', tr: 'biléti', en: 'tickets', emoji: '🎟️' },
@@ -301,15 +285,8 @@ export const love: Track = {
       id: 'love.kino', kind: 'word', bg: 'кино', tr: 'kíno', en: 'cinema', emoji: '🎬',
       alt: ['movies', 'the movies', 'the cinema', 'movie theater', 'movie theatre'],
     },
-    {
-      id: 'love.more', kind: 'word', bg: 'море', tr: 'moré', en: 'sea', emoji: '🌊',
-      alt: ['the sea', 'seaside', 'the seaside'],
-      note: 'На море means "to the seaside". For Bulgarians that means the Black Sea.',
-    },
-    {
-      id: 'love.planina', kind: 'word', bg: 'планина', tr: 'planiná', en: 'mountain', emoji: '🏔️',
-      alt: ['mountains', 'the mountains'],
-    },
+    { id: 'love.more', kind: 'word', bg: 'театър', tr: 'teátăr', en: 'theatre', emoji: '🎭', alt: ['theater', 'the theatre', 'the theater', 'a play'] },
+    { id: 'love.planina', kind: 'word', bg: 'концерт', tr: 'kontsért', en: 'concert', emoji: '🎵', alt: ['a concert', 'the concert', 'gig'] },
     {
       id: 'love.dovechera', kind: 'word', bg: 'довечера', tr: 'dovéchera', en: 'tonight', emoji: '🌆',
       alt: ['this evening', 'later tonight'],
@@ -356,11 +333,7 @@ export const love: Track = {
       id: 'love.vina', kind: 'word', bg: 'вина', tr: 'viná', en: 'fault', emoji: '🙇',
       alt: ['guilt', 'blame'],
     },
-    {
-      id: 'love.spokoyno', kind: 'word', bg: 'спокойно', tr: 'spokóyno', en: 'calm down', emoji: '😌',
-      alt: ['calmly', 'calm', 'easy', 'take it easy'],
-      note: 'Said softly, it calms things down. Said sharply, it does the opposite.',
-    },
+    { id: 'love.spokoyno', kind: 'word', bg: 'търпение', tr: 'tărpénie', en: 'patience', emoji: '🧘', alt: ['be patient'], note: 'Имай търпение с мен: be patient with me.' },
     {
       id: 'love.slusham', kind: 'word', bg: 'слушам', tr: 'slúsham', en: "I'm listening", emoji: '👂',
       alt: ['i am listening', 'i listen'],
@@ -373,10 +346,7 @@ export const love: Track = {
       alt: ['next to you', 'beside you', 'with you'],
     },
     { id: 'love.pomosht', kind: 'word', bg: 'помощ', tr: 'pómosht', en: 'help', emoji: '🤲' },
-    {
-      id: 'love.umorena', kind: 'word', bg: 'уморена', tr: 'umoréna', en: 'tired', emoji: '😴',
-      note: 'The feminine form, for talking about her. About a man: уморен.',
-    },
+    { id: 'love.umorena', kind: 'word', bg: 'силна', tr: 'sílna', en: 'strong', emoji: '💪', alt: ['you are strong'], note: 'Ти си много силна: you are very strong.' },
     {
       id: 'love.tazhna', kind: 'word', bg: 'тъжна', tr: 'tắzhna', en: 'sad', emoji: '😢',
       note: 'The feminine form. About a man: тъжен.',
@@ -419,11 +389,7 @@ export const love: Track = {
     { id: 'love.svatba', kind: 'word', bg: 'сватба', tr: 'svátba', en: 'wedding', emoji: '💒' },
     { id: 'love.semeystvo', kind: 'word', bg: 'семейство', tr: 'seméystvo', en: 'family', emoji: '👨‍👩‍👧‍👦' },
     { id: 'love.badeshte', kind: 'word', bg: 'бъдеще', tr: 'bắdeshte', en: 'future', emoji: '🔮' },
-    {
-      id: 'love.detsa', kind: 'word', bg: 'деца', tr: 'detsá', en: 'children', emoji: '🧒',
-      alt: ['kids'],
-      note: 'The plural of дете (child) is irregular.',
-    },
+    { id: 'love.detsa', kind: 'word', bg: 'дом', tr: 'dom', en: 'home', emoji: '🏡', alt: ['house', 'our home'] },
 
     // L2 Thank you
     {
@@ -593,7 +559,7 @@ export const love: Track = {
         { who: 'wife', bg: 'Как изглеждам?', tr: 'kak izglézhdam', en: 'How do I look?' },
         { who: 'me', bg: 'Много си красива днес!', tr: 'mnógo si krasíva dnes', en: 'You look very beautiful today!', wrong: ['Днес е много студено.', 'Имам много работа днес.'] },
         { who: 'wife', bg: 'Наистина ли? Роклята е нова.', tr: 'naístina li? róklyata e nóva', en: 'Really? The dress is new.' },
-        { who: 'me', bg: 'Роклята ти е прекрасна. И имаш красиви очи.', tr: 'róklyata ti e prekrásna. i ímash krasívi óchi', en: 'Your dress is gorgeous. And you have beautiful eyes.', wrong: ['Кафето ти е студено.', 'Къде са ключовете?'] },
+        { who: 'me', bg: 'Роклята ти е прекрасна. И имаш красиви очи.', tr: 'róklyata ti e prekrásna. i ímash krasívi ochí', en: 'Your dress is gorgeous. And you have beautiful eyes.', wrong: ['Кафето ти е студено.', 'Къде са ключовете?'] },
         { who: 'wife', bg: 'Ти си най-сладкият мъж!', tr: 'ti si nay-sládkiyat măzh', en: 'You are the sweetest husband!' },
         { who: 'me', bg: 'Обичам усмивката ти.', tr: 'obícham usmívkata ti', en: 'I love your smile.', wrong: ['Обичам сладолед.', 'Обичам футбол.'] },
         { who: 'daughter', bg: 'Тате, хайде! Баба ни чака!', tr: 'táte, háyde! bába ni cháka', en: 'Dad, come on! Grandma is waiting for us!' },
@@ -677,13 +643,13 @@ export const love: Track = {
       scene: 'You argued about something silly. Now it is very quiet in the kitchen.',
       emoji: '🕊️',
       lines: [
-        { who: 'wife', bg: 'Не искам да говоря.', tr: 'ne ískam da govórya', en: "I don't want to talk." },
+        { who: 'wife', bg: 'Не искам да говоря.', tr: 'ne ískam da govoryá', en: "I don't want to talk." },
         { who: 'me', bg: 'Добре. Тук съм, когато си готова.', tr: 'dobré. tuk săm, kogáto si gotóva', en: "OK. I'm here when you're ready.", wrong: ['Добре. Отивам на футбол.', 'Добре. Какво има за вечеря?'] },
         { who: 'wife', bg: 'Ти никога не ме слушаш!', tr: 'ti níkoga ne me slúshash', en: 'You never listen to me!' },
         { who: 'me', bg: 'Права си. Вината е моя. Прости ми.', tr: 'práva si. vináta e móya. prostí mi', en: "You're right. It's my fault. Forgive me.", wrong: ['Права си. Вината е на майка ти.', 'Хубаво е времето днес.'] },
         { who: 'wife', bg: 'Добре... И аз съжалявам.', tr: 'dobré... i az săzhalyávam', en: "OK... I'm sorry too." },
         { who: 'me', bg: 'Да не се караме повече. Винаги съм до теб.', tr: 'da ne se kárame póveche. vínagi săm do teb', en: "Let's not fight anymore. I'm always here for you.", wrong: ['Да гледаме мач довечера.', 'Да не ядем повече торта.'] },
-        { who: 'wife', bg: 'Ела тук. Прегръдка?', tr: 'éla tuk. pregrắdka', en: 'Come here. A hug?' },
+        { who: 'wife', bg: 'Ела тук. Прегръдка?', tr: 'elá tuk. pregrắdka', en: 'Come here. A hug?' },
       ],
       questions: [
         { q: 'What does your wife say you never do?', options: ['Cook dinner', 'Listen to her', 'Call her mother'], answer: 1 },
@@ -701,7 +667,7 @@ export const love: Track = {
         { who: 'wife', bg: 'Виж тази снимка от сватбата!', tr: 'vizh tázi snímka ot svátbata', en: 'Look at this photo from the wedding!' },
         { who: 'me', bg: 'Помниш ли как се запознахме?', tr: 'pómnish li kak se zapoznáhme', en: 'Do you remember how we met?', wrong: ['Помниш ли къде са ключовете?', 'Знаеш ли колко е часът?'] },
         { who: 'wife', bg: 'Разбира се! На кафе в София. Ти не знаеше нито дума на български.', tr: 'razbíra se! na kafé v sófiya. ti ne znáeshe níto dúma na bắlgarski', en: "Of course! Over coffee in Sofia. You didn't know a single word of Bulgarian." },
-        { who: 'me', bg: 'А сега говоря малко! Благодаря ти за всичко.', tr: 'a segá govórya málko! blagodaryá ti za vsíchko', en: 'And now I speak a little! Thank you for everything.', wrong: ['А сега съм на работа. Чао!', 'А сега искам сладолед.'] },
+        { who: 'me', bg: 'А сега говоря малко! Благодаря ти за всичко.', tr: 'a segá govoryá málko! blagodaryá ti za vsíchko', en: 'And now I speak a little! Thank you for everything.', wrong: ['А сега съм на работа. Чао!', 'А сега искам сладолед.'] },
         { who: 'wife', bg: 'Горда съм с теб.', tr: 'górda săm s teb', en: "I'm proud of you." },
         { who: 'me', bg: 'Ти си най-хубавото нещо в живота ми. Искам да остарея с теб.', tr: 'ti si nay-húbavoto néshto v zhivóta mi. ískam da ostaréya s teb', en: "You're the best thing in my life. I want to grow old with you.", wrong: ['Ти си моята тъща.', 'Искам да спя на дивана.'] },
         { who: 'wife', bg: 'Обичам нашето семейство. Честита годишнина, скъпи!', tr: 'obícham násheto seméystvo. chestíta godíshnina, skắpi', en: 'I love our family. Happy anniversary, darling!' },

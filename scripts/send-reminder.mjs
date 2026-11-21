@@ -4,6 +4,33 @@
 // The notification text itself is chosen on the phone by the service worker.
 import * as webpush from 'web-push'
 
+// ---- Daylight saving: the workflow runs at two UTC times; only the one that
+// matches REMINDER_HOUR in REMINDER_TZ today sends. A manual run always sends.
+const tz = process.env.REMINDER_TZ || 'Europe/Sofia'
+const wantHour = Number(process.env.REMINDER_HOUR ?? 19)
+const trigger = (process.env.TRIGGER_CRON ?? '').trim()
+
+/** Minutes the time zone is ahead of UTC right now (e.g. 180 for Sofia in summer). */
+function offsetMinutes(timeZone, date = new Date()) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', { timeZone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+      .formatToParts(date)
+      .map((p) => [p.type, p.value]),
+  )
+  const local = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute)
+  return Math.round((local - Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes())) / 60000)
+}
+
+if (trigger) {
+  const cronHour = Number(trigger.split(/\s+/)[1])
+  const offsetH = offsetMinutes(tz) / 60
+  const localHourOfRun = (((cronHour + offsetH) % 24) + 24) % 24
+  if (Number.isFinite(cronHour) && localHourOfRun !== wantHour) {
+    console.log(`Skipping this run: "${trigger}" is ${localHourOfRun}:xx in ${tz} today; the reminder goes out from the run at ${wantHour}:xx.`)
+    process.exit(0)
+  }
+}
+
 const code = (process.env.GOVORI_PUSH ?? '').trim()
 if (!code) {
   console.log('No GOVORI_PUSH secret set yet, so there is nobody to remind. See docs/reminders.md.')

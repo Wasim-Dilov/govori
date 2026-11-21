@@ -9,6 +9,10 @@ import './styles/base.css'
 import App from './App.tsx'
 import { useApp } from './lib/store.ts'
 import { db } from './lib/db.ts'
+import { unlockAudio } from './lib/audio.ts'
+
+// Unlock speech and sound on the very first touch (iOS needs a user gesture).
+window.addEventListener('pointerdown', unlockAudio, { once: true, capture: true })
 
 // Dev-only handles for testing in the browser console and Playwright.
 if (import.meta.env.DEV) Object.assign(window, { __app: useApp, __db: db })

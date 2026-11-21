@@ -164,7 +164,17 @@ export function SessionScreen() {
     return () => window.removeEventListener('keydown', onKey)
   }, [step, checked, pending, onCheck, onComplete, advance])
 
-  const progress = useMemo(() => (steps.length ? idx / steps.length : 0), [idx, steps.length])
+  // Never let the bar slide backwards when a missed exercise is queued again.
+  const shown = useRef(0)
+  const progress = useMemo(() => {
+    shown.current = Math.max(shown.current, steps.length ? idx / steps.length : 0)
+    return shown.current
+  }, [idx, steps.length])
+
+  // Nothing to show (should not happen, but never leave a blank screen).
+  useEffect(() => {
+    if (session && !steps.length) quit()
+  }, [session, steps.length, quit])
 
   if (!session || !step) return null
   const common = { setAnswer: setPending, checked: checked ? { correct: checked.correct } : null, complete: onComplete, translit: profile.translit, speaking: profile.speaking }
@@ -176,9 +186,13 @@ export function SessionScreen() {
         <button type="button" className="session__close" onClick={() => setConfirmQuit(true)} aria-label="Leave lesson">
           <IconClose />
         </button>
-        <div className="gv-progress session__progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
-          <div className="gv-progress__fill" style={{ width: `${Math.max(4, progress * 100)}%` }} />
-        </div>
+        {session.plan.kind === 'story' ? (
+          <p className="session__storytitle t-body-strong">{session.plan.lesson?.title}</p>
+        ) : (
+          <div className="gv-progress session__progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+            <div className="gv-progress__fill" style={{ width: `${Math.max(4, progress * 100)}%` }} />
+          </div>
+        )}
         {isSpeed ? (
           <span className="session__timer t-stat" aria-label="Time">
             {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}

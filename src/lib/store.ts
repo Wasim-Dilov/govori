@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { trackById, type Speaker } from '../content/index.ts'
 import type { TrackId } from '../content/types.ts'
 import { planWeek } from '../content/plan.ts'
-import { setSfx } from './audio.ts'
+import { setSfx, unlockAudio } from './audio.ts'
 import { getKV, localDay, setKV, type LessonProgress, type Summary } from './db.ts'
 import { buildLesson, buildMistakes, buildPractice, buildSpeedRound, type LessonPlan } from './engine.ts'
 import {
@@ -85,6 +85,8 @@ interface State {
   screen: Screen
   /** The track shown on the home path. */
   viewTrack: TrackId
+  /** A short message shown at the bottom of the screen for a few seconds. */
+  toast: { id: number; text: string } | null
 
   init(): Promise<void>
   refresh(): Promise<void>
@@ -101,6 +103,7 @@ interface State {
   startSpeedRound(): Promise<void>
   finish(stats: { correct: number; total: number }): Promise<void>
   quitSession(): void
+  showToast(text: string): void
 }
 
 function applyTheme(theme: Profile['theme']) {
@@ -127,6 +130,7 @@ export const useApp = create<State>((set, get) => ({
   mistakesCount: 0,
   screen: { name: 'home' },
   viewTrack: 'azbuka',
+  toast: null,
 
   async init() {
     const profile = { ...DEFAULT_PROFILE, ...(await getKV<Partial<Profile>>('profile', {})) }
@@ -182,32 +186,41 @@ export const useApp = create<State>((set, get) => ({
   },
 
   async startLesson(lessonId, level) {
+    unlockAudio()
     const { profile } = get()
     const trackId = lessonId.split('.')[0] as TrackId
     const review = await reviewPool(trackId === 'azbuka' ? null : trackId, [], 3)
-    const plan = buildLesson(lessonId, level, profile.speaker, review)
-    get().go({ name: 'session', plan, trackId, sessionId: newSessionId(), start: Date.now() })
+    let plan: LessonPlan
+    try {
+      plan = buildLesson(lessonId, level, profile.speaker, review)
+    } catch {
+      return get().showToast("That lesson couldn't be opened. Try another one.")
+    }
+    startPlan(plan, trackId, "That lesson has nothing to practise yet.")
   },
 
   async startPractice() {
+    unlockAudio()
     const ids = await dueItems(12)
-    const fallback = ids.length >= 4 ? ids : [...ids, ...(await learnedWordIds())].slice(0, 12)
-    if (!fallback.length) return
+    const fallback = ids.length >= 4 ? ids : [...new Set([...ids, ...(await learnedWordIds())])].slice(0, 12)
+    if (!fallback.length) return get().showToast('Nothing to review yet. Finish a lesson first.')
     // Lean on the skills the learner finds hardest.
     const weak = weakTypes(await db.events.where('ts').above(Date.now() - 30 * 86_400_000).toArray())
-    get().go({ name: 'session', plan: buildPractice(fallback, get().profile.speaker, weak), trackId: get().viewTrack, sessionId: newSessionId(), start: Date.now() })
+    startPlan(buildPractice(fallback, get().profile.speaker, weak), get().viewTrack, 'Nothing to review yet. Finish a lesson first.')
   },
 
   async startMistakes() {
+    unlockAudio()
     const ids = await recentMistakes(12)
-    if (!ids.length) return
-    get().go({ name: 'session', plan: buildMistakes(ids, get().profile.speaker), trackId: get().viewTrack, sessionId: newSessionId(), start: Date.now() })
+    if (!ids.length) return get().showToast('No mistakes to fix. Nice work.')
+    startPlan(buildMistakes(ids, get().profile.speaker), get().viewTrack, 'No mistakes to fix. Nice work.')
   },
 
   async startSpeedRound() {
+    unlockAudio()
     const ids = await learnedWordIds()
-    if (ids.length < 5) return
-    get().go({ name: 'session', plan: buildSpeedRound(ids, get().profile.speaker), trackId: get().viewTrack, sessionId: newSessionId(), start: Date.now() })
+    if (ids.length < 5) return get().showToast('Learn at least 5 words to unlock the speed round.')
+    startPlan(buildSpeedRound(ids, get().profile.speaker), get().viewTrack, 'Learn at least 5 words to unlock the speed round.')
   },
 
   async finish({ correct, total }) {
@@ -234,7 +247,22 @@ export const useApp = create<State>((set, get) => ({
     void get().refresh()
     get().go({ name: 'home' })
   },
+
+  showToast(text) {
+    const id = Date.now()
+    set({ toast: { id, text } })
+    setTimeout(() => {
+      if (get().toast?.id === id) set({ toast: null })
+    }, 3200)
+  },
 }))
+
+/** Open a session, or explain why there is nothing to do instead of showing an empty screen. */
+function startPlan(plan: LessonPlan, trackId: TrackId, emptyMessage: string) {
+  const { go, showToast } = useApp.getState()
+  if (!plan.exercises.length) return showToast(emptyMessage)
+  go({ name: 'session', plan, trackId, sessionId: newSessionId(), start: Date.now() })
+}
 
 /** Track metadata helper for screens. */
 export const trackMeta = (id: TrackId) => trackById.get(id)!

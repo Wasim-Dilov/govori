@@ -31,7 +31,8 @@ const urlCache = new Map<string, string>()
 
 /** Say something in Bulgarian. Uses a recording for that item if one exists (e.g. his wife's voice). */
 export async function speak(text: string, opts: { slow?: boolean; itemId?: string } = {}): Promise<void> {
-  stopSpeaking()
+  // WebKit can drop an utterance queued in the same tick as cancel(); give it a beat.
+  if (halt()) await new Promise((r) => setTimeout(r, 60))
   if (opts.itemId) {
     const rec = await db.recordings.get(opts.itemId).catch(() => undefined)
     if (rec) {
@@ -64,11 +65,53 @@ export async function speak(text: string, opts: { slow?: boolean; itemId?: strin
   })
 }
 
+/** Stops whatever is playing. */
 export function stopSpeaking() {
-  if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel()
+  halt()
+}
+
+/** Stops playback; returns true if speech had to be cancelled. */
+function halt(): boolean {
+  let cancelled = false
+  if (typeof speechSynthesis !== 'undefined' && (speechSynthesis.speaking || speechSynthesis.pending)) {
+    speechSynthesis.cancel()
+    cancelled = true
+  }
   if (currentAudio) {
     currentAudio.pause()
     currentAudio = null
+  }
+  return cancelled
+}
+
+let unlocked = false
+/**
+ * iOS only lets a page speak or play sound after something was started inside a tap.
+ * Call this synchronously from a tap handler (it is also wired to the first touch).
+ */
+export function unlockAudio() {
+  if (unlocked) return
+  unlocked = true
+  try {
+    if (typeof speechSynthesis !== 'undefined') {
+      const u = new SpeechSynthesisUtterance(' ')
+      u.volume = 0
+      u.lang = 'bg-BG'
+      speechSynthesis.speak(u)
+    }
+  } catch {
+    /* no speech on this device */
+  }
+  try {
+    const c = ac()
+    // A silent one-sample buffer fully unlocks WebAudio on older iOS.
+    const buf = c.createBuffer(1, 1, 22050)
+    const src = c.createBufferSource()
+    src.buffer = buf
+    src.connect(c.destination)
+    src.start(0)
+  } catch {
+    /* no WebAudio */
   }
 }
 

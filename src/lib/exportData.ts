@@ -1,6 +1,6 @@
 // Exports everything Govori has logged on this phone as one JSON file, for backup
 // or later analysis. Audio recordings and the reminder keys are left out on purpose.
-import { db, localDay } from './db.ts'
+import { db, localDay, setKV } from './db.ts'
 
 /** kv keys that must never leave the phone (the reminder private key lives under "push"). */
 const PRIVATE_KV = new Set(['push'])
@@ -35,6 +35,7 @@ export async function exportAll(): Promise<ExportOutcome> {
   if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
     try {
       await navigator.share({ files: [file], title: 'Govori data', text: 'My Govori learning data' })
+      await markExported()
       return 'shared'
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return 'cancelled'
@@ -49,7 +50,17 @@ export async function exportAll(): Promise<ExportOutcome> {
   a.click()
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 2000)
+  await markExported()
   return 'downloaded'
+}
+
+/** Remember when the last backup was made, for the monthly reminder in Me. */
+async function markExported() {
+  try {
+    await setKV('lastExport', Date.now())
+  } catch {
+    /* not critical */
+  }
 }
 
 /** Alias used by the Me screen. */

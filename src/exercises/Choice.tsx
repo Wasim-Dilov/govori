@@ -51,7 +51,21 @@ export function ChoiceExercise({ ex, setAnswer, checked, translit }: ExercisePro
     return 'is-dim'
   }
 
-  const cards = (ex.type === 'mc_bg_en' || ex.type === 'mc_en_bg') && ex.cards
+  // Picture cards only when the answer is English; English-to-Bulgarian options are text only.
+  const cards = ex.type === 'mc_bg_en' && ex.cards
+
+  // Keys 1-4 pick an answer (matches the number badges).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const n = Number(e.key)
+      if (checked || !Number.isInteger(n) || n < 1 || n > ex.options.length) return
+      const t = e.target as HTMLElement | null
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return
+      choose(ex.options[n - 1])
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
 
   return (
     <div className="ex">
@@ -136,7 +150,7 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
         <>
           <Prompt>How do you say this in Bulgarian?</Prompt>
           <div className="ex-hero ex-hero--en">
-            {!ex.cards && <span className="ex-emoji">{item.emoji}</span>}
+            <span className="ex-emoji">{item.emoji}</span>
             <span className="t-card-title">{item.en}</span>
           </div>
         </>

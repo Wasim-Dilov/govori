@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type Ref } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useApp, trackMeta } from '../lib/store.ts'
-import { learnedWordIds, lessonStates, nextLesson, practicedToday, trackCompletion, xpToday, yesterday, type NodeState } from '../lib/progress.ts'
+import { learnedWordIds, lessonStates, practicedToday, trackCompletion, xpToday, yesterday, type NodeState } from '../lib/progress.ts'
+import { suggestNext, todayMeta, type TodayMeta } from '../lib/suggest.ts'
+import { db, getKV, localDay, setKV } from '../lib/db.ts'
 import { dialogueById, maxLevel, study, tracks, unitById, type LessonView, type TrackView } from '../content/index.ts'
 import { planWeek } from '../content/plan.ts'
 import { TopBar, GoalRing } from '../components/TopBar.tsx'
@@ -20,6 +22,10 @@ export function HomeScreen() {
   const [sheetLesson, setSheetLesson] = useState<LessonView | null>(null)
   const track = trackMeta(viewTrack)
 
+  useEffect(() => {
+    void protectStorage()
+  }, [])
+
   return (
     <div className="screen home">
       <TopBar onOpenFocus={() => setFocusOpen(true)} />
@@ -33,6 +39,22 @@ export function HomeScreen() {
   )
 }
 
+/**
+ * Ask iOS to keep Govori's data even when the phone runs low on space. Asked once on first
+ * launch; if it was refused, asked again after a week. The answer is kept in kv "persist".
+ */
+async function protectStorage() {
+  try {
+    if (!navigator.storage?.persist) return
+    const prev = await getKV<{ granted: boolean; at: number } | null>('persist', null)
+    if (prev && (prev.granted || Date.now() - prev.at < 7 * 86_400_000)) return
+    const granted = (await navigator.storage.persisted?.()) || (await navigator.storage.persist())
+    await setKV('persist', { granted, at: Date.now() })
+  } catch {
+    /* storage API unavailable: nothing to do */
+  }
+}
+
 // ------------------------------------------------------------- Today
 
 function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
@@ -40,27 +62,65 @@ function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
   const focus = useApp((s) => s.focus)
   const summary = useApp((s) => s.summary)
   const progress = useApp((s) => s.progress)
+  const dueCount = useApp((s) => s.dueCount)
+  const mistakesCount = useApp((s) => s.mistakesCount)
+  const learned = useApp((s) => s.learned)
   const startLesson = useApp((s) => s.startLesson)
   const startPractice = useApp((s) => s.startPractice)
+  const startMistakes = useApp((s) => s.startMistakes)
+  const startSpeedRound = useApp((s) => s.startSpeedRound)
   const setViewTrack = useApp((s) => s.setViewTrack)
   const reduce = useReducedMotion()
+  const [today, setToday] = useState<TodayMeta>({ sessionsToday: 0, lastWasNew: false })
+  const [words, setWords] = useState(0)
+
+  // What happened today decides whether to offer something new or a level-up.
+  useEffect(() => {
+    let live = true
+    db.sessions
+      .where('day')
+      .equals(localDay())
+      .toArray()
+      .then((rows) => live && setToday(todayMeta(rows)))
+      .catch(() => {})
+    learnedWordIds().then((ids) => live && setWords(ids.length))
+    return () => {
+      live = false
+    }
+  }, [progress, learned])
 
   const week = planWeek(profile.startedAt)
   const plan = focus.track === 'plan'
   const trackId = focus.track === 'plan' ? week.focus : focus.track
   const track = trackMeta(trackId)
-  const next = nextLesson(track, progress)
+  const next = suggestNext(track, progress, today)
   const xp = xpToday(summary)
   const goal = profile.dailyGoal
-  const started = next ? (progress[next.lesson.id]?.level ?? 0) > 0 : false
-  const label = !next ? 'Review this track' : next.lesson.kind === 'story' ? 'Play the conversation' : started ? `Continue · level ${next.level}` : 'Start next lesson'
   const eyebrow = plan ? `Week ${week.week} of 12` : focus.scope === 'day' ? 'Your focus today' : 'Your focus this week'
   const also = plan && week.also ? trackMeta(week.also) : null
 
+  // When the track is finished: review what's due, else a speed round, else fix mistakes.
+  const review = !next ? (dueCount > 0 ? 'practice' : words >= 5 ? 'speed' : mistakesCount > 0 ? 'mistakes' : null) : null
+  const label = next
+    ? next.reason === 'levelup'
+      ? `Level up · level ${next.level}`
+      : next.reason === 'story'
+        ? 'Play the conversation'
+        : 'Start next lesson'
+    : review === 'practice'
+      ? 'Review this track'
+      : review === 'speed'
+        ? 'Play a speed round'
+        : review === 'mistakes'
+          ? 'Fix my mistakes'
+          : 'All caught up here'
+
   const go = () => {
     sfx.tap()
-    if (next) void startLesson(next.lesson.id, next.level)
-    else void startPractice()
+    if (next) return void startLesson(next.lesson.id, next.level)
+    if (review === 'practice') return void startPractice()
+    if (review === 'speed') return void startSpeedRound()
+    if (review === 'mistakes') return void startMistakes()
   }
 
   return (
@@ -90,19 +150,57 @@ function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
         </GoalRing>
       </div>
       <p className="home-today__goal">{plan ? week.goal : track.tagline}</p>
-      {next && (
+      {next ? (
         <p className="home-today__next">
           <span className="home-today__chip" aria-hidden="true">
-            {track.emoji}
+            {next.reason === 'story' ? <IconChat /> : track.emoji}
+          </span>
+          {next.reason === 'levelup' ? (
+            <span>
+              Level up: <strong>{next.lesson.title}</strong> · level {next.level}
+              <span className="home-today__stars" role="img" aria-label={`${next.level - 1} of 3 levels done`}>
+                {[1, 2, 3].map((n) => (
+                  <i key={n} className={n < next.level ? 'on' : n === next.level ? 'next' : ''} />
+                ))}
+              </span>
+            </span>
+          ) : next.reason === 'story' ? (
+            <span>
+              Conversation: <strong>{next.lesson.title}</strong>
+            </span>
+          ) : (
+            <span>
+              Next up: <strong>{next.lesson.title}</strong>
+            </span>
+          )}
+        </p>
+      ) : (
+        <p className="home-today__next">
+          <span className="home-today__chip" aria-hidden="true">
+            <IconCheck />
           </span>
           <span>
-            Next up: <strong>{next.lesson.title}</strong>
+            {review ? (
+              <>
+                You've finished <strong>{track.title}</strong>. Keep it fresh.
+              </>
+            ) : (
+              <>
+                All caught up here. <strong>Try another track</strong> to keep going.
+              </>
+            )}
           </span>
         </p>
       )}
-      <button type="button" className="gv-btn gv-btn--block home-today__go" onClick={go}>
-        {label}
-      </button>
+      {next || review ? (
+        <button type="button" className="gv-btn gv-btn--block home-today__go" onClick={go}>
+          {label}
+        </button>
+      ) : (
+        <button type="button" className="gv-btn gv-btn--block home-today__go" onClick={onChangeFocus}>
+          Try another track
+        </button>
+      )}
       <div className="home-today__foot">
         {also && (
           <button type="button" className="home-link" onClick={() => setViewTrack(also.id)}>
@@ -231,7 +329,6 @@ function Path({ track, onOpen }: { track: TrackView; onOpen: (l: LessonView) => 
   const reduce = useReducedMotion()
   const states = useMemo(() => lessonStates(track, progress), [track, progress])
   const currentRef = useRef<HTMLLIElement>(null)
-  const firstRun = useRef(true)
   const sleepy = summary.lastPracticeDay !== null && summary.lastPracticeDay < yesterday()
   const doneToday = practicedToday(summary)
   const completion = trackCompletion(track, progress)
@@ -240,12 +337,20 @@ function Path({ track, onOpen }: { track: TrackView; onOpen: (l: LessonView) => 
   useEffect(() => {
     const el = currentRef.current
     if (!el) return
-    if (firstRun.current) {
-      firstRun.current = false
-      // On first open the Today card leads. Once today's practice has started (or the current
-      // node is far down a track they've been working through after a session), bring the path to them.
-      if (!doneToday || currentIndex < 4) return
+    // The path scrolls to the current node only when the learner switches tracks. The last
+    // track handled lives in sessionStorage, so StrictMode's double effect run and remounts
+    // (coming back from a lesson) can't cause a jump. On first open the Today card leads,
+    // unless today's practice has started and the current node is far down the track.
+    const key = 'govori.path.track'
+    let prev: string | null = null
+    try {
+      prev = sessionStorage.getItem(key)
+      sessionStorage.setItem(key, track.id)
+    } catch {
+      /* private mode: fall through and treat as a first open */
     }
+    if (prev === track.id) return
+    if (prev === null && (!doneToday || currentIndex < 4)) return
     el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [track.id])

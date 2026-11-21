@@ -37,13 +37,25 @@ From now on it arrives every evening by itself.
 
 ## Changing the time
 
-The time is set in `.github/workflows/reminder.yml` on this line:
+The reminder arrives at 19:30 Sofia time all year round. The time lives in `.github/workflows/reminder.yml` in two places:
 
 ```yaml
-- cron: '30 17 * * *'
+    - cron: '30 16 * * *'
+    - cron: '30 17 * * *'
+...
+          REMINDER_HOUR: '19'
+          REMINDER_TZ: Europe/Sofia
 ```
 
-The two numbers are minutes and hours in UTC (GMT). `30 17` means 17:30 UTC, which is 19:30 in Sofia in winter and 20:30 in summer. For 18:00 Sofia time in winter, use `0 16 * * *`. Edit the file on github.com and commit. GitHub can run scheduled jobs a few minutes late, which is normal.
+GitHub's clock is UTC (GMT), and Sofia is 3 hours ahead of UTC in summer and 2 hours ahead in winter. That's why there are two cron lines: GitHub runs both, and Govori only sends from the one that matches the clocks today, so daylight saving never shifts your reminder.
+
+To pick another time:
+
+1. Set `REMINDER_HOUR` to the hour you want in Sofia, for example `'21'` for 21:00.
+2. Set the two cron lines to 3 hours and 2 hours earlier than that hour. In a cron line the first number is the minute and the second the hour (UTC). For 21:00 Sofia time use `'0 18 * * *'` and `'0 19 * * *'`.
+3. Edit the file on github.com and commit.
+
+If you live in another time zone, change `REMINDER_TZ` (for example `Europe/London`) and use the hours that are your summer and winter difference from UTC. GitHub can start scheduled runs a few minutes late, which is normal. One of the two runs always shows a short "Skipping this run" message in its log. That is expected.
 
 ## If reminders stop
 

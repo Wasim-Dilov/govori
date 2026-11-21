@@ -33,6 +33,9 @@ const LATIN_LETTER = /[A-Za-z]/
 /** Every word of 2+ syllables in a transliteration must carry an acute accent. */
 function checkStress(tr: string, where: string) {
   if (CYRILLIC.test(tr)) err(`${where}: transliteration contains Cyrillic: "${tr}"`)
+  // House style: all lowercase, no trailing punctuation (inner commas and ! stay).
+  if (/[A-ZÀ-ÞĂ]/.test(tr.normalize('NFC'))) err(`${where}: transliteration must be lowercase: "${tr}"`)
+  if (/[.?!…]\s*$/.test(tr)) err(`${where}: transliteration must not end with punctuation: "${tr}"`)
   const words = tr
     .normalize('NFD')
     .toLowerCase()
@@ -57,6 +60,42 @@ function checkBg(bg: string, where: string) {
 function checkStyle(text: string | undefined, where: string) {
   if (text && /[—§]/.test(text)) err(`${where}: contains an em dash or § sign: "${text}"`)
 }
+// ------------------------------------------------------------ Cross-track checks
+// The same Bulgarian word must carry the same stress everywhere.
+// Add a word here only if it truly has two stresses with two meanings (e.g. 'пара': пára steam / пaрá coin).
+const HOMOGRAPHS = new Set<string>([])
+const stressSeen = new Map<string, Map<string, string>>()
+const tokensBg = (s: string) => s.toLowerCase().replace(/[.,!?;:„“"«»…()]/g, ' ').split(/\s+/).filter(Boolean)
+const tokensTr = (s: string) => s.toLowerCase().replace(/[.,!?;:"«»…()]/g, ' ').split(/\s+/).filter(Boolean)
+function noteStress(bg: string, tr: string, where: string) {
+  const b = tokensBg(bg)
+  const t = tokensTr(tr)
+  if (b.length !== t.length) return
+  b.forEach((w, i) => {
+    const form = t[i].normalize('NFC')
+    if (!/\u0301/.test(form.normalize('NFD')) || HOMOGRAPHS.has(w)) return
+    const m = stressSeen.get(w) ?? new Map<string, string>()
+    stressSeen.set(w, m)
+    if (!m.has(form)) m.set(form, where)
+  })
+}
+function reportStress() {
+  const plain = (x: string) => x.normalize('NFD').replace(/\u0301/g, '').normalize('NFC')
+  for (const [w, forms] of stressSeen) {
+    const byPlain = new Map<string, string[]>()
+    for (const [form, where] of forms) byPlain.set(plain(form), [...(byPlain.get(plain(form)) ?? []), `${form} (${where})`])
+    for (const list of byPlain.values()) if (list.length > 1) warn(`"${w}" is stressed differently: ${list.join(' vs ')}`)
+  }
+}
+// The same Bulgarian taught in two tracks counts twice as "learned"; vary one of them.
+const bgAcross = new Map<string, string>()
+function noteCrossTrack(trackId: string, itemId: string, bg: string) {
+  const key = normBg(bg)
+  const prev = bgAcross.get(key)
+  if (prev && !prev.startsWith(`${trackId}.`)) warn(`${itemId}: same Bulgarian as ${prev} in another track ("${bg}")`)
+  else if (!prev) bgAcross.set(key, itemId)
+}
+
 const normBg = (s: string) => s.toLowerCase().replace(/[.,!?;:„“"«»…]/g, '').replace(/\s+/g, ' ').trim()
 
 const allIds = new Map<string, string>()
@@ -97,6 +136,7 @@ function validateAlphabet(a: Alphabet) {
     for (const k of ['tr', 'sound', 'mnemonic'] as const) if (!l[k]) err(`${where}: missing ${k}`)
     checkBg(l.example.bg, `${where} example`)
     checkStress(l.example.tr, `${where} example`)
+    noteStress(l.example.bg, l.example.tr, `${where} example`)
     if (!l.example.emoji || !l.example.en) err(`${where}: example needs en and emoji`)
     if (!l.example.bg.toLowerCase().includes(l.lower)) warn(`${where}: example "${l.example.bg}" does not contain ${l.lower}`)
   }
@@ -125,6 +165,7 @@ function validateAlphabet(a: Alphabet) {
       for (const w of lesson.reading) {
         checkBg(w.bg, `${where} reading "${w.bg}"`)
         checkStress(w.tr, `${where} reading "${w.bg}"`)
+        noteStress(w.bg, w.tr, where)
         if (!w.en || !w.emoji) err(`${where} reading "${w.bg}": needs en and emoji`)
         const unknown = [...w.bg.toLowerCase()].filter((c) => CYRILLIC.test(c) && !introduced.has(c))
         if (unknown.length) err(`${where} reading "${w.bg}": uses letters not yet introduced: ${[...new Set(unknown)].join(' ')}`)
@@ -161,12 +202,14 @@ function validateDialogues(t: Track) {
       if (!WHO.has(l.who)) err(`${lw}: unknown speaker "${l.who}"`)
       checkBg(l.bg, lw)
       checkStress(l.tr, lw)
+      noteStress(l.bg, l.tr, lw)
       if (!l.en) err(`${lw}: missing en`)
       checkStyle(l.en, lw)
       if (l.f) {
         if (l.who !== 'me') warn(`${lw}: f form on a line not spoken by "me"`)
         checkBg(l.f.bg, `${lw} (f)`)
         checkStress(l.f.tr, `${lw} (f)`)
+        noteStress(l.f.bg, l.f.tr, `${lw} (f)`)
         if (l.f.bg === l.bg) warn(`${lw}: f.bg is identical to bg`)
       }
       if (l.who === 'me') {
@@ -212,6 +255,8 @@ function validateTrack(t: Track, minUnits: number, target: number) {
     if (item.kind !== 'word' && item.kind !== 'phrase') err(`${where}: kind must be word or phrase`)
     checkBg(item.bg, where)
     checkStress(item.tr, where)
+    noteStress(item.bg, item.tr, where)
+    noteCrossTrack(t.id, item.id, item.bg)
     if (!item.en) err(`${where}: missing en`)
     if (!item.emoji) err(`${where}: missing emoji`)
     checkStyle(item.en, where)
@@ -219,6 +264,7 @@ function validateTrack(t: Track, minUnits: number, target: number) {
     if (item.f) {
       checkBg(item.f.bg, `${where} (f)`)
       checkStress(item.f.tr, `${where} (f)`)
+      noteStress(item.f.bg, item.f.tr, `${where} (f)`)
       if (item.f.bg === item.bg) warn(`${where}: f.bg is identical to bg`)
     }
     for (const a of item.alt ?? []) {
@@ -278,6 +324,7 @@ for (const tf of TRACK_FILES) {
   summary.push(`${track.id}: ${s.units} units, ${s.lessons} lessons, ${s.items} items, ${s.dialogues} dialogues`)
 }
 
+reportStress()
 console.log(summary.join('\n'))
 if (warnings.length) console.log(`\n${warnings.length} warning(s):\n- ${warnings.join('\n- ')}`)
 if (errors.length) {

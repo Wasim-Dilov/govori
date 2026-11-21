@@ -18,3 +18,4 @@
 
 .session__scrim { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; background: color-mix(in srgb, var(--ink) 45%, transparent); }
 .session__quit { width: 100%; max-width: 520px; display: grid; gap: var(--space-3); justify-items: center; text-align: center; }
+.session__storytitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-muted); }

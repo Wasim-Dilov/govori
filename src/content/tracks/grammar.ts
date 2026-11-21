@@ -39,7 +39,7 @@ export const grammar: Track = {
     { id: 'grammar.detsata', kind: 'word', bg: 'децата', tr: 'detsáta', en: 'the kids', emoji: '👧', alt: ['the children'], note: 'Plurals ending in -а add -та instead: деца, децата.' },
     { id: 'grammar.klyuchovete', kind: 'word', bg: 'ключовете', tr: 'klyuchovéte', en: 'the keys', emoji: '🔑' },
 
-    { id: 'grammar.kade-sa-klyuchovete', kind: 'phrase', bg: 'Къде са ключовете?', tr: 'kădé sa klyuchovéte', en: 'Where are the keys?', emoji: '🗝️', alt: ['where are the keys'] },
+    { id: 'grammar.kade-sa-klyuchovete', kind: 'phrase', bg: 'Къде е колата?', tr: 'kădé e koláta', en: "Where's the car?", emoji: '🚗', alt: ['where is the car', "where's the car", 'wheres the car'], note: 'кола (car) + -та = колата (the car).' },
     { id: 'grammar.kafeto-e-gotovo', kind: 'phrase', bg: 'Кафето е готово.', tr: 'kaféto e gotóvo', en: 'The coffee is ready.', emoji: '☕', alt: ["the coffee's ready", 'coffee is ready', "coffee's ready"], note: 'кафе is an it-word, so кафето, and готово matches it.' },
     { id: 'grammar.detsata-spyat', kind: 'phrase', bg: 'Децата спят.', tr: 'detsáta spyat', en: 'The kids are asleep.', emoji: '😴', alt: ['the kids are sleeping', 'the children are sleeping', 'the children are asleep', 'the kids sleep'] },
     { id: 'grammar.vecheryata-e-na-masata', kind: 'phrase', bg: 'Вечерята е на масата.', tr: 'vechéryata e na másata', en: 'Dinner is on the table.', emoji: '🍲', alt: ['the dinner is on the table', "dinner's on the table"], note: 'Bulgarian says "the dinner" where English says just "dinner".' },
@@ -53,7 +53,7 @@ export const grammar: Track = {
     { id: 'grammar.ne-e-problem', kind: 'phrase', bg: 'Не е проблем.', tr: 'ne e problém', en: 'No problem.', emoji: '👌', alt: ["it's not a problem", 'it is not a problem', 'not a problem', 'no problem'] },
 
     { id: 'grammar.iskash-li', kind: 'phrase', bg: 'Искаш ли?', tr: 'ískash li', en: 'Do you want some?', emoji: '🍫', alt: ['do you want', 'want some', 'would you like some', 'do you want some'], note: 'ли turns a sentence into a yes/no question. It goes right after the word you are asking about.' },
-    { id: 'grammar.gotova-li-si', kind: 'phrase', bg: 'Готова ли си?', tr: 'gotóva li si', en: 'Are you ready?', emoji: '👗', alt: ['are you ready'], note: 'To her, готова. To a man you would say готов ли си?' },
+    { id: 'grammar.gotova-li-si', kind: 'phrase', bg: 'Свободна ли си довечера?', tr: 'svobódna li si dovéchera', en: 'Are you free tonight?', emoji: '🗓️', alt: ['are you free tonight', 'are you free this evening'], note: 'Ли comes right after the word you are asking about: свободна ли си.' },
     { id: 'grammar.ima-li-mlyako', kind: 'phrase', bg: 'Има ли мляко?', tr: 'íma li mlyáko', en: 'Is there any milk?', emoji: '🥛', alt: ['is there milk', 'do we have milk', 'is there any milk', 'have we got milk', 'do we have any milk'] },
     { id: 'grammar.mozhe-li', kind: 'phrase', bg: 'Може ли?', tr: 'mózhe li', en: 'May I?', emoji: '🙏', alt: ['can i', 'may i', 'is it ok', 'is that ok', 'could i'], note: 'Handy everywhere: reaching for food, taking a seat, asking for the bill.' },
     { id: 'grammar.znaesh-li', kind: 'phrase', bg: 'Знаеш ли?', tr: 'znáesh li', en: 'Do you know?', emoji: '💡', alt: ['you know', 'do you know'] },
@@ -85,8 +85,8 @@ export const grammar: Track = {
 
     // ---------------------------------------------------------------- Unit 5: The future
     { id: 'grammar.shte', kind: 'word', bg: 'ще', tr: 'shte', en: 'will', emoji: '🔮', note: 'Put ще before the verb for the future: ще ям, ще ядеш. ще itself never changes.' },
-    { id: 'grammar.utre', kind: 'word', bg: 'утре', tr: 'útre', en: 'tomorrow', emoji: '📆' },
-    { id: 'grammar.dovechera', kind: 'word', bg: 'довечера', tr: 'dovéchera', en: 'tonight', emoji: '🌆', alt: ['this evening', 'later tonight'] },
+    { id: 'grammar.utre', kind: 'word', bg: 'догодина', tr: 'dogodína', en: 'next year', emoji: '🎆', alt: ['the next year'], note: 'Ще ходим в България догодина: we will go to Bulgaria next year.' },
+    { id: 'grammar.dovechera', kind: 'word', bg: 'по-късно', tr: 'po-kắsno', en: 'later', emoji: '⏰', alt: ['later on'], note: 'Ще ти се обадя по-късно: I will call you later.' },
     { id: 'grammar.shte-doyda', kind: 'phrase', bg: 'Ще дойда.', tr: 'shte dóyda', en: "I'll come.", emoji: '🚶', alt: ['i will come', "i'll be there", 'i will be there'] },
     { id: 'grammar.shte-vidim', kind: 'phrase', bg: 'Ще видим.', tr: 'shte vídim', en: "We'll see.", emoji: '👀', alt: ['we will see'] },
 
@@ -94,7 +94,7 @@ export const grammar: Track = {
     { id: 'grammar.nyama-da-zakasneya', kind: 'phrase', bg: 'Няма да закъснея.', tr: 'nyáma da zakăsnéya', en: "I won't be late.", emoji: '⏱️', alt: ['i will not be late'] },
     { id: 'grammar.shte-sgotvya-vecherya', kind: 'phrase', bg: 'Ще сготвя вечеря.', tr: 'shte sgótvya vechérya', en: "I'll cook dinner.", emoji: '🍝', alt: ['i will cook dinner', "i'll make dinner", 'i will make dinner'] },
     { id: 'grammar.shte-ti-se-obadya', kind: 'phrase', bg: 'Ще ти се обадя.', tr: 'shte ti se obádya', en: "I'll call you.", emoji: '📞', alt: ['i will call you', "i'll give you a call", "i'll phone you", 'i will phone you'] },
-    { id: 'grammar.utre-shte-vali', kind: 'phrase', bg: 'Утре ще вали.', tr: 'útre shte valí', en: "It'll rain tomorrow.", emoji: '🌧️', alt: ['it will rain tomorrow', 'tomorrow it will rain', "tomorrow it'll rain"] },
+    { id: 'grammar.utre-shte-vali', kind: 'phrase', bg: 'Утре ще ходим на море.', tr: 'útre shte hódim na moré', en: "Tomorrow we'll go to the seaside.", emoji: '🏖️', alt: ['tomorrow we will go to the seaside', "tomorrow we'll go to the sea", 'tomorrow we will go to the sea', "we'll go to the seaside tomorrow", 'we will go to the seaside tomorrow'] },
 
     { id: 'grammar.shte-se-varna-skoro', kind: 'phrase', bg: 'Ще се върна скоро.', tr: 'shte se vắrna skóro', en: "I'll be back soon.", emoji: '🔙', alt: ['i will be back soon', "i'll come back soon", 'i will come back soon'] },
     { id: 'grammar.dovechera-shte-gledame-film', kind: 'phrase', bg: 'Довечера ще гледаме филм.', tr: 'dovéchera shte glédame film', en: "Tonight we'll watch a film.", emoji: '🍿', alt: ['tonight we will watch a film', "we'll watch a film tonight", "we'll watch a movie tonight", 'tonight we will watch a movie', "tonight we'll watch a movie"] },
@@ -115,7 +115,7 @@ export const grammar: Track = {
     { id: 'grammar.sinat-mi', kind: 'word', bg: 'синът ми', tr: 'sinắt mi', en: 'my son', emoji: '👦', note: 'The exception: son keeps "the", синът ми.' },
     { id: 'grammar.dashterya-mi', kind: 'word', bg: 'дъщеря ми', tr: 'dăshteryá mi', en: 'my daughter', emoji: '👧' },
 
-    { id: 'grammar.tova-e-zhena-mi', kind: 'phrase', bg: 'Това е жена ми.', tr: 'tová e zhená mi', en: 'This is my wife.', emoji: '🥂', alt: ['this is my wife'] },
+    { id: 'grammar.tova-e-zhena-mi', kind: 'phrase', bg: 'Това е жена ми.', tr: 'tová e zhená mi', en: 'This is my wife.', emoji: '🥂', alt: ['this is my wife'], note: 'With family words the short form follows the noun: жена ми, майка ми, брат ми.' },
     { id: 'grammar.tova-e-moyata-kashta', kind: 'phrase', bg: 'Това е моята къща.', tr: 'tová e móyata kắshta', en: 'This is my house.', emoji: '🏡', alt: ['this is my home'], note: 'In front of a noun, the long form takes "the": моята къща, моят телефон.' },
     { id: 'grammar.kak-e-mayka-ti', kind: 'phrase', bg: 'Как е майка ти?', tr: 'kak e máyka ti', en: 'How is your mother?', emoji: '☎️', alt: ["how's your mother", "how's your mom", 'how is your mom', "how's your mum", 'how is your mum'], note: 'ти after the word means "your": майка ти, баща ти.' },
     { id: 'grammar.detsata-ni-rastat-barzo', kind: 'phrase', bg: 'Децата ни растат бързо.', tr: 'detsáta ni rastát bắrzo', en: 'Our kids are growing fast.', emoji: '📏', alt: ['our children are growing fast', 'our kids grow fast', 'our children grow up fast', 'our kids are growing up fast', 'our kids grow up fast'], note: 'ни after the word means "our".' },
@@ -271,7 +271,7 @@ export const grammar: Track = {
         { who: 'me', bg: 'Да, искам да гледам филм.', tr: 'da, ískam da glédam film', en: 'Yes, I want to watch a film.', wrong: ['Трябва да купим мляко.', 'Не мога да дойда.'] },
         { who: 'wife', bg: 'Но първо трябва да измием чиниите.', tr: 'no pắrvo tryábva da izmíem chiníite', en: 'But first we have to wash the dishes.' },
         { who: 'me', bg: 'Аз мога да измия чиниите.', tr: 'az móga da izmíya chiníite', en: 'I can wash the dishes.', wrong: ['Искам да спя.', 'Трябва да тръгвам.'] },
-        { who: 'wife', bg: 'Наистина? Благодаря! Тогава аз ще направя пуканки.', tr: 'naístina? blagodaryá! togáva az shte naprávya pukánki', en: "Really? Thanks! Then I'll make popcorn." },
+        { who: 'wife', bg: 'Наистина? Благодаря! Тогава аз ще направя пуканки.', tr: 'naístina? blagodaryá! togáva az shte naprávya púkanki', en: "Really? Thanks! Then I'll make popcorn." },
         { who: 'me', bg: 'Можеш ли да избереш филма?', tr: 'mózhesh li da izberésh fílma', en: 'Can you choose the film?', wrong: ['Можеш ли да ми помогнеш?', 'Не мога да дойда.'] },
         { who: 'wife', bg: 'Да, ще избера нещо романтично!', tr: 'da, shte izberá néshto romantíchno', en: "Yes, I'll pick something romantic!" },
       ],
