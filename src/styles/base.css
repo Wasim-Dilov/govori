@@ -1,0 +1,54 @@
+/* Govori base layout. Tokens in tokens.css, components in components.css. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  background: var(--linen);
+  color: var(--ink);
+  font: 500 17px/24px var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+#root { min-height: 100%; }
+button { font: inherit; color: inherit; }
+img, svg { max-width: 100%; }
+[hidden] { display: none !important; }
+/* Bulgarian always uses Rubik (standard Cyrillic forms); only the deliberate alternate glyph uses the Bulgarian style. */
+:lang(bg):not(.bgstyle-note__glyph) { font-family: var(--font-text) !important; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+
+/* The phone-width column everything lives in. */
+.app-shell { max-width: 520px; margin: 0 auto; min-height: 100dvh; position: relative; }
+
+/* A tab screen: clears the status bar at the top and the tab bar at the bottom. */
+.screen {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 104px);
+}
+
+/* The tab bar is fixed to the bottom of the column. */
+.tabbar-dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; }
+.tabbar-dock > .gv-tabbar { max-width: 520px; margin: 0 auto; }
+
+/* A full-screen flow (lesson, onboarding): header, scrolling body, footer. */
+.flow {
+  min-height: 100dvh; display: grid; grid-template-rows: auto 1fr auto;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+}
+.flow__pad { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.muted { color: var(--ink-muted); }
+.stack { display: grid; gap: var(--space-3); }
+.row { display: flex; align-items: center; gap: var(--space-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+/* Bulgarian-style letterform note on letter cards */
+.bgstyle-note { display: flex; align-items: center; gap: var(--space-3); text-align: left; font: 500 14px/19px var(--font-text); color: var(--ink-muted); background: var(--trk-azbuka-soft); border-radius: var(--radius-md); padding: var(--space-2) var(--space-3); width: 100%; }
+.bgstyle-note__glyph { font: 700 34px/1 var(--font-bgstyle); color: var(--ink); flex: none; min-width: 56px; text-align: center; }

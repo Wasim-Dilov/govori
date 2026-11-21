@@ -1,0 +1,20 @@
+.session { background: var(--linen); }
+.session__head { display: flex; align-items: center; gap: var(--space-3); min-height: 52px; position: sticky; top: 0; z-index: 5; background: var(--linen); padding-top: 4px; }
+.session__close { appearance: none; border: 0; background: none; color: var(--ink-muted); width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--radius-sm); cursor: pointer; flex: none; }
+.session__close svg { width: 26px; height: 26px; }
+.session__close:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.session__progress { flex: 1; }
+.session__combo { display: inline-flex; align-items: center; gap: 2px; color: var(--gold-ink); min-width: 48px; }
+.session__combo svg { width: 22px; height: 22px; }
+.session__timer { color: var(--ink); min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
+.session__body { overflow-x: hidden; }
+.session__retry { color: var(--rose-ink); background: var(--rose-soft); border-radius: var(--radius-full); padding: 4px 12px; display: inline-block; margin-top: var(--space-2); }
+
+.session__foot { position: sticky; bottom: 0; z-index: 6; }
+.session__actions { padding-block: var(--space-3) calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--linen) 75%, transparent); border-top: 2px solid var(--line); }
+.session__fbtext { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.session__fben { font: 600 14px/18px var(--font-text); opacity: 0.85; }
+.session__mascot { flex: none; margin: -24px -4px -8px 0; }
+
+.session__scrim { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; background: color-mix(in srgb, var(--ink) 45%, transparent); }
+.session__quit { width: 100%; max-width: 520px; display: grid; gap: var(--space-3); justify-items: center; text-align: center; }

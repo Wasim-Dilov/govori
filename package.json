@@ -1,0 +1,40 @@
+{
+  "name": "govori",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "tokens": "node scripts/build-tokens.mjs",
+    "validate": "node scripts/validate-content.ts",
+    "prebuild": "node scripts/build-tokens.mjs && node scripts/validate-content.ts",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource-variable/rubik": "^5.3.0",
+    "@fontsource-variable/sofia-sans": "^5.3.0",
+    "@fontsource-variable/unbounded": "^5.3.0",
+    "canvas-confetti": "^1.9.4",
+    "dexie": "^4.4.7",
+    "motion": "^14.14.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "workbox-core": "^7.4.1",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "oxlint": "^1.90.0",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.6",
+    "vite-plugin-pwa": "^2.0.0"
+  }
+}

@@ -1,0 +1,81 @@
+/* Щърко the stork. Transform origins are in the SVG's 200x200 viewBox units. */
+.gv-mascot { display: block; overflow: visible; flex: none; }
+.gv-mascot g, .gv-mascot ellipse, .gv-mascot rect, .gv-mascot path { transform-box: view-box; }
+
+.gv-mascot .m-root { transform-origin: 100px 188px; }
+.gv-mascot .m-shadow { transform-origin: 100px 191px; }
+.gv-mascot .m-head { transform-origin: 112px 114px; transition: transform 0.4s cubic-bezier(0.3, 1.5, 0.5, 1); }
+.gv-mascot .m-wing { transform-origin: 112px 118px; transition: transform 0.3s ease; }
+.gv-mascot .m-wing-back { transform-origin: 124px 112px; }
+.gv-mascot .m-eye { transform-origin: 131px 52px; }
+.gv-mascot .m-jaw { transform-origin: 142px 64px; }
+
+/* ---- static poses */
+.gv-mascot--sad .m-head { transform: rotate(16deg); }
+.gv-mascot--sad .m-wing { transform: rotate(5deg); }
+.gv-mascot--think .m-head { transform: rotate(-10deg); }
+.gv-mascot--sleep .m-head { transform: rotate(13deg); }
+.gv-mascot--cheer .m-jaw { transform: rotate(9deg); }
+
+/* ---- idle: gentle bob and a blink every few seconds */
+.gv-mascot--idle .m-root { animation: m-bob 2.6s ease-in-out infinite; }
+.gv-mascot--idle .m-eye,
+.gv-mascot--think .m-eye { animation: m-blink 4.4s infinite; }
+
+/* ---- happy: hop and flap */
+.gv-mascot--happy .m-root { animation: m-hop 0.8s cubic-bezier(0.3, 0.7, 0.4, 1) infinite; }
+.gv-mascot--happy .m-shadow { animation: m-shadow-hop 0.8s cubic-bezier(0.3, 0.7, 0.4, 1) infinite; }
+.gv-mascot--happy .m-wing { animation: m-flap 0.4s ease-in-out infinite alternate; }
+
+/* ---- cheer: big jumps, wings up, twinkling stitched stars */
+.gv-mascot--cheer .m-root { animation: m-jump 0.9s cubic-bezier(0.3, 0.7, 0.4, 1) infinite; }
+.gv-mascot--cheer .m-shadow { animation: m-shadow-jump 0.9s cubic-bezier(0.3, 0.7, 0.4, 1) infinite; }
+.gv-mascot--cheer .m-wing { animation: m-flap 0.3s ease-in-out infinite alternate; }
+.gv-mascot--cheer .m-wing-back { animation: m-flap-back 0.3s ease-in-out infinite alternate; }
+.gv-mascot .m-spark { transform-box: fill-box; transform-origin: center; animation: m-twinkle 1.2s ease-in-out infinite; }
+.gv-mascot .m-spark-2 { animation-delay: 0.4s; }
+.gv-mascot .m-spark-3 { animation-delay: 0.8s; }
+
+/* ---- sad: slow droop, a falling tear */
+.gv-mascot--sad .m-head { animation: m-droop 3.2s ease-in-out infinite alternate; }
+.gv-mascot .m-tear { animation: m-tear 2.2s ease-in infinite; }
+
+/* ---- think: tilt back and forth, dots appear one by one */
+.gv-mascot--think .m-head { animation: m-tilt 2.4s ease-in-out infinite alternate; }
+.gv-mascot .m-dot { animation: m-dots 1.8s steps(1) infinite; }
+.gv-mascot .m-dot-2 { animation-delay: 0.3s; }
+.gv-mascot .m-dot-3 { animation-delay: 0.6s; }
+
+/* ---- sleep: breathing and floating z's */
+.gv-mascot--sleep .m-root { animation: m-breathe 3.6s ease-in-out infinite; }
+.gv-mascot .m-z { transform-box: fill-box; transform-origin: center; animation: m-z 3s ease-out infinite; }
+.gv-mascot .m-z-2 { animation-delay: 1.5s; }
+
+@keyframes m-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes m-blink { 0%, 91%, 97%, 100% { transform: scaleY(1); } 94% { transform: scaleY(0.1); } }
+@keyframes m-hop {
+  0%, 100% { transform: translateY(0) scale(1.03, 0.96); }
+  40% { transform: translateY(-12px) scale(0.97, 1.03); }
+  70% { transform: translateY(-2px) scale(1, 1); }
+}
+@keyframes m-shadow-hop { 0%, 100% { transform: scale(1); opacity: 0.13; } 40% { transform: scale(0.75); opacity: 0.08; } }
+@keyframes m-jump {
+  0%, 100% { transform: translateY(0) scale(1.05, 0.94); }
+  45% { transform: translateY(-22px) scale(0.96, 1.05); }
+  75% { transform: translateY(-4px) scale(1, 1); }
+}
+@keyframes m-shadow-jump { 0%, 100% { transform: scale(1); opacity: 0.13; } 45% { transform: scale(0.6); opacity: 0.06; } }
+@keyframes m-flap { from { transform: rotate(-6deg); } to { transform: rotate(8deg); } }
+@keyframes m-flap-back { from { transform: rotate(6deg); } to { transform: rotate(-8deg); } }
+@keyframes m-twinkle { 0%, 100% { transform: scale(0.7) rotate(0deg); opacity: 0.6; } 50% { transform: scale(1.15) rotate(45deg); opacity: 1; } }
+@keyframes m-droop { from { transform: rotate(14deg); } to { transform: rotate(19deg); } }
+@keyframes m-tear { 0%, 20% { transform: translateY(0); opacity: 0; } 35% { opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
+@keyframes m-tilt { from { transform: rotate(-7deg); } to { transform: rotate(-13deg); } }
+@keyframes m-dots { 0% { opacity: 0; } 25% { opacity: 1; } 90% { opacity: 1; } }
+@keyframes m-breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.02, 1.035); } }
+@keyframes m-z { 0% { transform: translate(0, 6px) scale(0.6); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(8px, -10px) scale(1.1); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .gv-mascot *, .gv-mascot { animation: none !important; transition: none !important; }
+  .gv-mascot .m-tear, .gv-mascot .m-dot, .gv-mascot .m-z { opacity: 1; }
+}

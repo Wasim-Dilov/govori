@@ -1,0 +1,49 @@
+name: Daily reminder
+
+on:
+  schedule:
+    # 17:30 UTC = 19:30 in Sofia in winter (20:30 in summer). GitHub may run it a few minutes late.
+    - cron: '30 17 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: daily-reminder
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+          sparse-checkout-cone-mode: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install web-push
+        run: npm install --no-save --no-package-lock --prefix "$RUNNER_TEMP/push" web-push@4.0.0
+
+      - name: Send reminder
+        env:
+          GOVORI_PUSH: ${{ secrets.GOVORI_PUSH }}
+        # Copied next to its node_modules so the ES module import of web-push resolves.
+        run: |
+          cp scripts/send-reminder.mjs "$RUNNER_TEMP/push/send-reminder.mjs"
+          node "$RUNNER_TEMP/push/send-reminder.mjs"
+
+      # GitHub switches off scheduled workflows in public repos after 60 days
+      # without commits. Re-enabling it every run keeps the reminders going.
+      - name: Keep the schedule alive
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/reminder.yml/enable"

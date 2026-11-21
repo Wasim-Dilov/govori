@@ -1,0 +1,199 @@
+/* Govori — generated from tokens.json by scripts/build-tokens.mjs. Do not edit by hand. */
+:root, [data-theme="light"] {
+  --linen: #fff8f4;
+  --linen-raised: #ffffff;
+  --linen-sunk: #f7eae5;
+  --line: #eed9d2;
+  --line-strong: #ddc1b8;
+  --ink: #2a1a20;
+  --ink-muted: #6e5961;
+  --rose: #d12c4a;
+  --rose-deep: #9c1730;
+  --rose-soft: #ffe3e8;
+  --rose-ink: #a81c38;
+  --on-rose: #ffffff;
+  --pine: #11806a;
+  --pine-deep: #0a5e4e;
+  --pine-soft: #d9f4eb;
+  --pine-ink: #0a6654;
+  --on-pine: #ffffff;
+  --gold: #f5a623;
+  --gold-deep: #c27c00;
+  --gold-soft: #fff1d2;
+  --gold-ink: #8a5300;
+  --on-gold: #2a1a20;
+  --pick: #1f63bd;
+  --pick-soft: #e3eefc;
+  --pick-deep: #164a8e;
+  --trk-azbuka: #6e52d4;
+  --trk-azbuka-deep: #4c35a3;
+  --trk-azbuka-soft: #ece6fd;
+  --trk-basics: #2770d0;
+  --trk-basics-deep: #1b55a3;
+  --trk-basics-soft: #e3eefc;
+  --trk-kids: #dd5f18;
+  --trk-kids-deep: #a8430a;
+  --trk-kids-soft: #ffe8d9;
+  --trk-love: var(--rose);
+  --trk-love-deep: var(--rose-deep);
+  --trk-love-soft: var(--rose-soft);
+  --trk-home: #44811f;
+  --trk-home-deep: #2f5d13;
+  --trk-home-soft: #e6f3d9;
+  --trk-family: #a23c8a;
+  --trk-family-deep: #73255f;
+  --trk-family-soft: #f8e1f2;
+  --trk-grammar: #0b7a8f;
+  --trk-grammar-deep: #075665;
+  --trk-grammar-soft: #daf2f6;
+  --trk-out: #9a6c00;
+  --trk-out-deep: #6b4a00;
+  --trk-out-soft: #f8edcf;
+  --on-track: #ffffff;
+  --shadow-float: 0 12px 32px -8px #2a1a2033;
+  --focus-ring: 0 0 0 3px #fff8f4, 0 0 0 6px #2770d0;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --linen: #1a1115;
+    --linen-raised: #251a1f;
+    --linen-sunk: #120b0e;
+    --line: #3b2a31;
+    --line-strong: #54404a;
+    --ink: #f8edf0;
+    --ink-muted: #c3adb5;
+    --rose: #ff6680;
+    --rose-deep: #b8304a;
+    --rose-soft: #40161f;
+    --rose-ink: #ff8ea1;
+    --on-rose: #2a0a12;
+    --pine: #3ccfa4;
+    --pine-deep: #1f8f6f;
+    --pine-soft: #0f3329;
+    --pine-ink: #6be3c0;
+    --on-pine: #062a20;
+    --gold: #ffc247;
+    --gold-deep: #c98a10;
+    --gold-soft: #3a2a0c;
+    --gold-ink: #ffd27a;
+    --on-gold: #2a1a20;
+    --pick: #6aa8ff;
+    --pick-soft: #14243d;
+    --pick-deep: #3d78c9;
+    --trk-azbuka: #a68dff;
+    --trk-azbuka-deep: #6f57c9;
+    --trk-azbuka-soft: #231a40;
+    --trk-basics: #6aa8ff;
+    --trk-basics-deep: #3d78c9;
+    --trk-basics-soft: #14243d;
+    --trk-kids: #ff9a5c;
+    --trk-kids-deep: #c56a2f;
+    --trk-kids-soft: #3d2112;
+    --trk-love: var(--rose);
+    --trk-love-deep: var(--rose-deep);
+    --trk-love-soft: var(--rose-soft);
+    --trk-home: #8ccb5a;
+    --trk-home-deep: #5c9433;
+    --trk-home-soft: #1c2c10;
+    --trk-family: #e07bc8;
+    --trk-family-deep: #a84e92;
+    --trk-family-soft: #371430;
+    --trk-grammar: #4fd0e3;
+    --trk-grammar-deep: #2a93a3;
+    --trk-grammar-soft: #0e2c32;
+    --trk-out: #e8b84a;
+    --trk-out-deep: #a8801f;
+    --trk-out-soft: #33280c;
+    --on-track: #1a1115;
+    --shadow-float: 0 12px 32px -8px #000000cc;
+    --focus-ring: 0 0 0 3px #1a1115, 0 0 0 6px #6aa8ff;
+    color-scheme: dark;
+  }
+}
+[data-theme="dark"] {
+  --linen: #1a1115;
+  --linen-raised: #251a1f;
+  --linen-sunk: #120b0e;
+  --line: #3b2a31;
+  --line-strong: #54404a;
+  --ink: #f8edf0;
+  --ink-muted: #c3adb5;
+  --rose: #ff6680;
+  --rose-deep: #b8304a;
+  --rose-soft: #40161f;
+  --rose-ink: #ff8ea1;
+  --on-rose: #2a0a12;
+  --pine: #3ccfa4;
+  --pine-deep: #1f8f6f;
+  --pine-soft: #0f3329;
+  --pine-ink: #6be3c0;
+  --on-pine: #062a20;
+  --gold: #ffc247;
+  --gold-deep: #c98a10;
+  --gold-soft: #3a2a0c;
+  --gold-ink: #ffd27a;
+  --on-gold: #2a1a20;
+  --pick: #6aa8ff;
+  --pick-soft: #14243d;
+  --pick-deep: #3d78c9;
+  --trk-azbuka: #a68dff;
+  --trk-azbuka-deep: #6f57c9;
+  --trk-azbuka-soft: #231a40;
+  --trk-basics: #6aa8ff;
+  --trk-basics-deep: #3d78c9;
+  --trk-basics-soft: #14243d;
+  --trk-kids: #ff9a5c;
+  --trk-kids-deep: #c56a2f;
+  --trk-kids-soft: #3d2112;
+  --trk-love: var(--rose);
+  --trk-love-deep: var(--rose-deep);
+  --trk-love-soft: var(--rose-soft);
+  --trk-home: #8ccb5a;
+  --trk-home-deep: #5c9433;
+  --trk-home-soft: #1c2c10;
+  --trk-family: #e07bc8;
+  --trk-family-deep: #a84e92;
+  --trk-family-soft: #371430;
+  --trk-grammar: #4fd0e3;
+  --trk-grammar-deep: #2a93a3;
+  --trk-grammar-soft: #0e2c32;
+  --trk-out: #e8b84a;
+  --trk-out-deep: #a8801f;
+  --trk-out-soft: #33280c;
+  --on-track: #1a1115;
+  --shadow-float: 0 12px 32px -8px #000000cc;
+  --focus-ring: 0 0 0 3px #1a1115, 0 0 0 6px #6aa8ff;
+  color-scheme: dark;
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --ledge-sm: 3px;
+  --ledge-md: 5px;
+  --ledge-lg: 8px;
+  --font-display: "Unbounded Variable", "Unbounded", system-ui, sans-serif;
+  --font-text: "Rubik Variable", "Rubik", -apple-system, system-ui, sans-serif;
+  --font-bgstyle: "Sofia Sans Variable", "Sofia Sans", sans-serif;
+}
+.t-hero { font-family: var(--font-display); font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -0.02em; }
+.t-screen-title { font-family: var(--font-display); font-size: 26px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em; }
+.t-card-title { font-family: var(--font-display); font-size: 19px; line-height: 24px; font-weight: 700; }
+.t-stat { font-family: var(--font-display); font-size: 17px; line-height: 20px; font-weight: 700; }
+.t-letter { font-family: var(--font-text); font-size: 120px; line-height: 120px; font-weight: 800; }
+.t-bg-word { font-family: var(--font-text); font-size: 36px; line-height: 42px; font-weight: 800; }
+.t-prompt { font-family: var(--font-text); font-size: 22px; line-height: 28px; font-weight: 800; }
+.t-body { font-family: var(--font-text); font-size: 17px; line-height: 24px; font-weight: 500; }
+.t-body-strong { font-family: var(--font-text); font-size: 17px; line-height: 24px; font-weight: 700; }
+.t-label { font-family: var(--font-text); font-size: 15px; line-height: 18px; font-weight: 800; letter-spacing: 0.06em; }
+.t-caption { font-family: var(--font-text); font-size: 13px; line-height: 18px; font-weight: 600; }
+.t-bg-alt { font-family: var(--font-bgstyle); font-size: 56px; line-height: 60px; font-weight: 700; }
