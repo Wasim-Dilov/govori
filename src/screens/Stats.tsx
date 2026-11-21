@@ -19,8 +19,7 @@ import {
   type DayActivity,
   type Rate,
 } from '../lib/insights.ts'
-import { Mascot } from '../components/Mascot.tsx'
-import { IconFlame, IconFlameOff, IconShare, IconSpeaker, IconStar, IconTarget, IconBook, IconBolt } from '../components/Icons.tsx'
+import { IconChart, IconShare, IconSpeaker, IconStar, IconTarget } from '../components/Icons.tsx'
 import './stats.css'
 
 interface Data {
@@ -35,8 +34,20 @@ const dateLabel = (day: string, opts: Intl.DateTimeFormatOptions = { weekday: 's
   new Date(`${day}T12:00:00`).toLocaleDateString('en-GB', opts)
 
 const enter = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 260, damping: 26 } },
+  hidden: { opacity: 0, y: 6 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: [0.2, 0.8, 0.2, 1] as const } },
+}
+
+/** True once the page has scrolled past the large title, so the compact bar can take over. */
+function useScrolled(threshold = 44) {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > threshold)
+    on()
+    window.addEventListener('scroll', on, { passive: true })
+    return () => window.removeEventListener('scroll', on)
+  }, [threshold])
+  return scrolled
 }
 
 export function StatsScreen() {
@@ -46,6 +57,7 @@ export function StatsScreen() {
   const startMistakes = useApp((s) => s.startMistakes)
   const goTab = useApp((s) => s.goTab)
   const [data, setData] = useState<Data | null>(null)
+  const scrolled = useScrolled()
 
   useEffect(() => {
     let alive = true
@@ -63,49 +75,42 @@ export function StatsScreen() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="screen st-root">
-        <header className="st-head">
-          <h1 className="t-screen-title">Your progress</h1>
-          <p className="st-head__bg muted" lang="bg">
-            Напредък
-          </p>
+        <header className={`gv-navbar ${scrolled ? 'is-scrolled' : ''}`}>
+          <span className="gv-navbar__title" aria-hidden="true">
+            Stats
+          </span>
         </header>
+        <h1 className="gv-largetitle">Stats</h1>
 
-        <motion.div className="st-stack" initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.06 } } }}>
-          <motion.section variants={enter} className="gv-card st-level" aria-label="Your level">
-            <div className="st-level__badge gv-tone-gold" aria-hidden="true">
-              <span className="gv-star st-level__star" />
-              <span className="st-level__num">{level.level}</span>
-            </div>
-            <div className="st-level__text">
-              <p className="t-caption muted">Level {level.level}</p>
-              <p className="st-level__name" lang="bg">
-                {level.name.bg}
-              </p>
-              <p className="t-caption muted">{level.name.en}</p>
-            </div>
-            <div className="st-level__bar">
-              <div className="gv-progress gv-tone-gold" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(level.progress * 100)} aria-label="XP towards next level">
-                <motion.div className="gv-progress__fill" initial={{ width: 0 }} animate={{ width: `${Math.max(4, level.progress * 100)}%` }} transition={{ type: 'spring', stiffness: 120, damping: 20 }} />
-              </div>
-              <p className="t-caption muted">
-                {fmt(summary.totalXp - level.floor)} of {fmt(level.next - level.floor)} XP to level {level.level + 1}
-              </p>
-            </div>
+        {data === null ? null : empty ? (
+          <motion.section initial="hidden" animate="show" variants={enter} className="st-empty" aria-labelledby="st-empty-t">
+            <span className="st-empty__icon" aria-hidden="true">
+              <IconChart />
+            </span>
+            <h2 id="st-empty-t" className="t-title3">
+              No stats yet
+            </h2>
+            <p className="t-callout muted">Finish your first lesson to see your streak, the time of day you learn best and the words that trip you up.</p>
+            <button className="gv-btn" onClick={() => goTab('home')}>
+              Start learning
+            </button>
           </motion.section>
-
-          {data === null ? null : empty ? (
-            <motion.section variants={enter} className="gv-card st-empty">
-              <Mascot mood="sleep" size={128} />
-              <h2 className="t-card-title">No stats yet</h2>
-              <p className="muted">Finish your first lesson to see your stats here: your streak, your best time of day and the words that trip you up.</p>
-              <button className="gv-btn gv-btn--block" onClick={() => goTab('home')}>
-                Start learning
-              </button>
-            </motion.section>
-          ) : (
-            <Filled data={data} summaryStreak={liveStreak(summary)} longest={summary.longestStreak} totalXp={summary.totalXp} goal={summary.dailyGoal} speaker={profile.speaker} translit={profile.translit} mistakesCount={mistakesCount} onPractise={() => void startMistakes()} />
-          )}
-        </motion.div>
+        ) : (
+          <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.04 } } }}>
+            <Filled
+              data={data}
+              summaryStreak={liveStreak(summary)}
+              longest={summary.longestStreak}
+              totalXp={summary.totalXp}
+              goal={summary.dailyGoal}
+              level={level}
+              speaker={profile.speaker}
+              translit={profile.translit}
+              mistakesCount={mistakesCount}
+              onPractise={() => void startMistakes()}
+            />
+          </motion.div>
+        )}
       </div>
     </MotionConfig>
   )
@@ -119,12 +124,13 @@ function Filled(props: {
   longest: number
   totalXp: number
   goal: number
+  level: ReturnType<typeof learnerLevel>
   speaker: 'm' | 'f'
   translit: boolean
   mistakesCount: number
   onPractise: () => void
 }) {
-  const { data } = props
+  const { data, level } = props
   const words = data.memory.filter((m) => !m.itemId.startsWith('az.')).length
   const letters = data.memory.filter((m) => m.itemId.startsWith('az.') && !m.itemId.includes('.r')).length
   const info = useMemo(() => insights(data.events), [data.events])
@@ -137,31 +143,86 @@ function Filled(props: {
 
   return (
     <>
-      <motion.section variants={enter} className="st-tiles" aria-label="Totals">
-        <Tile icon={props.summaryStreak > 0 ? <IconFlame /> : <IconFlameOff />} value={fmt(props.summaryStreak)} unit={props.summaryStreak === 1 ? 'day' : 'days'} label="Current streak" />
-        <Tile icon={<IconBolt className="st-ico-gold" />} value={fmt(props.longest)} unit={props.longest === 1 ? 'day' : 'days'} label="Longest streak" />
-        <Tile icon={<IconBook className="st-ico-pick" />} value={fmt(words)} unit={`of ${fmt(totalItems)}`} label={`Words learned${letters ? `, ${letters} of ${alphabet.letters.length} letters` : ''}`} />
-        <Tile icon={<IconStar className="st-ico-gold" />} value={fmt(props.totalXp)} unit="XP" label="Total earned" />
+      <motion.section variants={enter} className="gv-section" aria-label="Summary">
+        <div className="gv-statgrid st-grid">
+          <Cell label="Streak" value={fmt(props.summaryStreak)} unit={props.summaryStreak === 1 ? 'day' : 'days'} accent={props.summaryStreak > 0} />
+          <Cell label="Longest streak" value={fmt(props.longest)} unit={props.longest === 1 ? 'day' : 'days'} />
+          <Cell label="Words learned" value={fmt(words)} unit={`of ${fmt(totalItems)}`} />
+          <Cell label="Total XP" value={fmt(props.totalXp)} unit="XP" />
+        </div>
+        {letters > 0 && (
+          <p className="gv-section-footer">
+            Plus {letters} of {alphabet.letters.length} Cyrillic letters.
+          </p>
+        )}
       </motion.section>
 
-      <motion.section variants={enter} className="gv-card st-insight" aria-label="What Щърко noticed">
-        <Mascot mood="think" size={84} className="st-insight__mascot" />
-        <div className="st-insight__body">
-          <h2 className="t-card-title">What I noticed</h2>
-          {info.needMore > 0 ? (
-            <p>
-              Answer {info.needMore} more {info.needMore === 1 ? 'question' : 'questions'} and I'll start spotting your patterns: when you learn best and which skills need love.
-            </p>
-          ) : info.sentences.length ? (
-            <ul className="st-insight__list">
-              {info.sentences.map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>You're steady across the board. No skill or time of day stands out yet.</p>
-          )}
+      <motion.section variants={enter} className="gv-section" aria-labelledby="st-level-t">
+        <h2 id="st-level-t" className="gv-section-header">
+          Level
+        </h2>
+        <div className="gv-list">
+          <div className="gv-row st-level">
+            <span className="gv-row__icon st-level__num" aria-hidden="true">
+              {level.level}
+            </span>
+            <div className="gv-row__body">
+              <span className="gv-row__title">
+                <span lang="bg">{level.name.bg}</span>
+              </span>
+              <span className="gv-row__subtitle">{level.name.en}</span>
+              <div className="gv-progress st-level__bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(level.progress * 100)} aria-label="XP towards the next level">
+                <motion.div className="gv-progress__fill" initial={{ width: 0 }} animate={{ width: `${Math.max(3, level.progress * 100)}%` }} transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }} />
+              </div>
+            </div>
+            <span className="gv-row__accessory st-level__xp">
+              {fmt(props.totalXp - level.floor)}/{fmt(level.next - level.floor)}
+            </span>
+          </div>
         </div>
+        <p className="gv-section-footer">
+          {fmt(level.next - props.totalXp)} XP to level {level.level + 1}.
+        </p>
+      </motion.section>
+
+      <motion.section variants={enter} className="gv-section" aria-labelledby="st-hl-t">
+        <h2 id="st-hl-t" className="gv-section-header">
+          Highlights
+        </h2>
+        <ul className="gv-list st-plain">
+          {info.needMore > 0 ? (
+            <li className="gv-row">
+              <span className="gv-row__icon" aria-hidden="true">
+                <IconChart />
+              </span>
+              <span className="gv-row__body">
+                <span className="gv-row__title st-wrap">
+                  Answer {info.needMore} more {info.needMore === 1 ? 'question' : 'questions'} to see your patterns: when you learn best and which skills need work.
+                </span>
+              </span>
+            </li>
+          ) : info.sentences.length ? (
+            info.sentences.map((s) => (
+              <li key={s} className="gv-row">
+                <span className="gv-row__icon" aria-hidden="true">
+                  {insightIcon(s)}
+                </span>
+                <span className="gv-row__body">
+                  <span className="gv-row__title st-wrap">{s}</span>
+                </span>
+              </li>
+            ))
+          ) : (
+            <li className="gv-row">
+              <span className="gv-row__icon" aria-hidden="true">
+                <IconStar />
+              </span>
+              <span className="gv-row__body">
+                <span className="gv-row__title st-wrap">You're steady across the board. No skill or time of day stands out yet.</span>
+              </span>
+            </li>
+          )}
+        </ul>
       </motion.section>
 
       <motion.div variants={enter}>
@@ -184,68 +245,68 @@ function Filled(props: {
         </motion.div>
       )}
 
-      <motion.section variants={enter} className="gv-card st-tough" aria-labelledby="st-tough-title">
-        <h2 id="st-tough-title" className="t-card-title">
+      <motion.section variants={enter} className="gv-section" aria-labelledby="st-tough-title">
+        <h2 id="st-tough-title" className="gv-section-header">
           Words that trip you up
         </h2>
         {tough.length ? (
           <>
-            <ul className="st-tough__list">
+            <ul className="gv-list st-plain">
               {tough.map((t) => (
-                <li key={t.id} className="st-tough__row">
+                <li key={t.id} className="gv-row st-tough">
                   <button className="gv-iconbtn gv-iconbtn--sm" aria-label={`Hear ${t.item.bg}`} onClick={() => void speak(t.item.bg, { itemId: t.id })}>
                     <IconSpeaker />
                   </button>
-                  <div className="st-tough__text">
-                    <span className="st-tough__emoji" aria-hidden="true">
-                      {t.item.emoji}
-                    </span>
-                    <span className="t-body-strong" lang="bg">
+                  <span className="gv-row__body">
+                    <span className="gv-row__title" lang="bg">
                       {t.item.bg}
                     </span>
-                    {props.translit && <span className="t-caption muted">{t.item.tr}</span>}
-                    <span className="t-caption">{t.item.en}</span>
-                  </div>
-                  <div className="st-tough__score">
-                    <span className="t-body-strong">
-                      {t.n - t.wrong}/{t.n}
-                    </span>
-                    <span className="t-caption muted">right</span>
-                  </div>
+                    <span className="gv-row__subtitle">{props.translit ? `${t.item.tr} · ${t.item.en}` : t.item.en}</span>
+                  </span>
+                  <span className="gv-row__accessory st-tough__score">
+                    {t.n - t.wrong}/{t.n}
+                    <span className="st-tough__right">right</span>
+                  </span>
                 </li>
               ))}
             </ul>
-            <button className="gv-btn gv-btn--block" disabled={props.mistakesCount === 0} onClick={props.onPractise}>
-              <IconTarget width={20} height={20} /> {props.mistakesCount ? 'Practise these' : 'All fixed for now'}
+            <button className="gv-btn gv-btn--tinted gv-btn--block st-practise" disabled={props.mistakesCount === 0} onClick={props.onPractise}>
+              <IconTarget /> {props.mistakesCount ? 'Practise these' : 'All fixed for now'}
             </button>
           </>
         ) : (
-          <p className="muted">Nothing keeps tripping you up yet. Words show up here after three tries with at least one miss.</p>
+          <div className="gv-list">
+            <p className="gv-row st-wrap muted">Nothing keeps tripping you up yet. Words show up here after three tries with at least one miss.</p>
+          </div>
         )}
       </motion.section>
 
       <motion.div variants={enter}>
-        <ExportCard />
+        <ExportSection />
       </motion.div>
     </>
   )
 }
 
-function Tile({ icon, value, unit, label }: { icon: ReactNode; value: string; unit: string; label: string }) {
+function insightIcon(s: string) {
+  if (/morning|afternoon|evening|night|day|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday/i.test(s)) return <IconChart />
+  if (/weak|skill|listen|typ|speak|build|recog|letter|conversation/i.test(s)) return <IconTarget />
+  return <IconStar />
+}
+
+function Cell({ label, value, unit, accent }: { label: string; value: string; unit: string; accent?: boolean }) {
   return (
-    <div className="gv-card st-tile">
-      <span className="st-tile__icon" aria-hidden="true">
-        {icon}
+    <div className="gv-statcell">
+      <span className="gv-statcell__label">{label}</span>
+      <span className={`gv-statcell__value${accent ? ' st-accent' : ''}`}>
+        {value}
+        <span className="gv-statcell__unit">{unit}</span>
       </span>
-      <p className="st-tile__value">
-        {value} <span className="st-tile__unit">{unit}</span>
-      </p>
-      <p className="t-caption muted">{label}</p>
     </div>
   )
 }
 
-// ------------------------------------------------------------- chart card with table view and tooltip
+// ------------------------------------------------------------- chart section with table view and tooltip
 
 interface Tip {
   x: number
@@ -272,55 +333,55 @@ function ChartCard({ title, subtitle, table, children, id }: { title: string; su
   const hide = () => setTip(null)
 
   return (
-    <section className="gv-card st-chart" aria-labelledby={`${id}-t`}>
-      <div className="st-chart__head">
-        <div>
-          <h2 id={`${id}-t`} className="t-card-title">
-            {title}
-          </h2>
-          {subtitle && <p className="t-caption muted">{subtitle}</p>}
-        </div>
-        <button className="st-toggle" aria-pressed={asTable} onClick={() => setAsTable((v) => !v)}>
-          {asTable ? 'Chart' : 'Table'}
+    <section className="gv-section" aria-labelledby={`${id}-t`}>
+      <div className="gv-section-header">
+        <h2 id={`${id}-t`} className="st-sechead">
+          {title}
+        </h2>
+        <button className="gv-section-header__action" aria-pressed={asTable} onClick={() => setAsTable((v) => !v)}>
+          {asTable ? 'Show chart' : 'Show table'}
         </button>
       </div>
-      {asTable ? (
-        <div className="st-table-wrap">
-          <table className="st-table">
-            <thead>
-              <tr>
-                {table.head.map((h) => (
-                  <th key={h} scope="col">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {table.rows.map((r, i) => (
-                <tr key={i}>
-                  {r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
+      <div className="gv-card st-chart">
+        {asTable ? (
+          <div className="st-table-wrap">
+            <table className="st-table">
+              <thead>
+                <tr>
+                  {table.head.map((h) => (
+                    <th key={h} scope="col">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="st-chart__plot" ref={box} onPointerLeave={hide}>
-          {children(show, hide)}
-          {tip && (
-            <div className={`st-tip st-tip--${tip.align}`} role="status" style={{ left: tip.x, top: tip.y }}>
-              <strong>{tip.value}</strong>
-              <span>{tip.label}</span>
-            </div>
-          )}
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {table.rows.map((r, i) => (
+                  <tr key={i}>
+                    {r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="st-chart__plot" ref={box} onPointerLeave={hide}>
+            {children(show, hide)}
+            {tip && (
+              <div className={`st-tip st-tip--${tip.align}`} role="status" style={{ left: tip.x, top: tip.y }}>
+                <strong>{tip.value}</strong>
+                <span>{tip.label}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {subtitle && <p className="gv-section-footer">{subtitle}</p>}
     </section>
   )
 }
 
-// ------------------------------------------------------------- 12-week streak calendar
+// ------------------------------------------------------------- 12-week activity calendar
 
 const CELL = 20
 const GAP = 4
@@ -367,13 +428,18 @@ function Heatmap({ activity, goal }: { activity: Map<string, DayActivity>; goal:
     })
 
   return (
-    <ChartCard id="st-cal" title="Last 12 weeks" subtitle={`${daysPractised} ${daysPractised === 1 ? 'day' : 'days'} practised · darkest means you hit your ${goal} XP goal`} table={{ head: ['Day', 'Minutes', 'XP', 'Answers', 'Result'], rows: rows.length ? rows : [['No practice yet', '', '', '', '']] }}>
+    <ChartCard
+      id="st-cal"
+      title="Activity"
+      subtitle={`${daysPractised} ${daysPractised === 1 ? 'day' : 'days'} practised in the last 12 weeks. Full-colour squares are days you reached your ${goal} XP goal.`}
+      table={{ head: ['Day', 'Minutes', 'XP', 'Answers', 'Result'], rows: rows.length ? rows : [['No practice yet', '', '', '', '']] }}
+    >
       {(show, hide) => (
         <>
           <svg className="st-cal" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Practice calendar for the last 12 weeks: ${daysPractised} days practised.`}>
             {['Mon', '', 'Wed', '', 'Fri', '', 'Sun'].map((l, i) =>
               l ? (
-                <text key={i} x={0} y={TOP + i * STEP + CELL * 0.72} className="st-axis">
+                <text key={i} x={0} y={TOP + i * STEP + CELL * 0.7} className="st-axis">
                   {l}
                 </text>
               ) : null,
@@ -415,11 +481,11 @@ function Heatmap({ activity, goal }: { activity: Map<string, DayActivity>; goal:
             })}
           </svg>
           <div className="st-legend" aria-hidden="true">
-            <span className="t-caption muted">None</span>
+            <span>Less</span>
             {[0, 1, 2, 3].map((l) => (
               <i key={l} className={`st-heat-swatch st-heat--${l}`} />
             ))}
-            <span className="t-caption muted">Goal met</span>
+            <span>Goal met</span>
           </div>
         </>
       )}
@@ -427,39 +493,56 @@ function Heatmap({ activity, goal }: { activity: Map<string, DayActivity>; goal:
   )
 }
 
-// ------------------------------------------------------------- accuracy by skill (meter list)
+// ------------------------------------------------------------- accuracy by skill
+
+function Meter({ label, extra, value, rate, show, hide, flag }: { label: string; extra?: string; value: string; rate: Rate; show: (e: { currentTarget: Element }, value: string, label: string) => void; hide: () => void; flag?: ReactNode }) {
+  const tipLabel = `${label} · ${rate.n} answers`
+  return (
+    <li className="st-meter">
+      <div className="st-meter__top">
+        <span className="st-meter__label">{label}</span>
+        {extra && <span className="st-meter__extra">{extra}</span>}
+        {flag}
+        <span className="st-meter__val">{value}</span>
+      </div>
+      <button
+        className="st-meter__track"
+        aria-label={`${label}: ${value} right from ${rate.n} answers`}
+        onPointerEnter={(e) => show(e, value, tipLabel)}
+        onFocus={(e) => show(e, value, tipLabel)}
+        onBlur={hide}
+        onClick={(e) => show(e, value, tipLabel)}
+      >
+        <motion.span className="st-meter__fill" initial={{ scaleX: 0 }} animate={{ scaleX: rate.accuracy }} transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }} />
+      </button>
+    </li>
+  )
+}
 
 function SkillBars({ skills }: { skills: ReturnType<typeof bySkill> }) {
   const enough = skills.filter((s) => s.rate.n >= 8)
   const weakest = enough.length >= 2 ? [...enough].sort((a, b) => a.rate.accuracy - b.rate.accuracy)[0].id : null
   const sorted = [...skills].sort((a, b) => b.rate.accuracy - a.rate.accuracy)
   return (
-    <ChartCard id="st-skill" title="Accuracy by skill" subtitle="Share of answers you got right" table={{ head: ['Skill', 'Right', 'Answers', 'Avg time'], rows: sorted.map((s) => [s.label, pct(s.rate), s.rate.n, Number.isFinite(s.rate.avgMs) ? `${(s.rate.avgMs / 1000).toFixed(1)} s` : 'n/a']) }}>
+    <ChartCard
+      id="st-skill"
+      title="Accuracy by skill"
+      subtitle="Share of answers you got right in each kind of exercise."
+      table={{ head: ['Skill', 'Right', 'Answers', 'Avg time'], rows: sorted.map((s) => [s.label, pct(s.rate), s.rate.n, Number.isFinite(s.rate.avgMs) ? `${(s.rate.avgMs / 1000).toFixed(1)} s` : 'n/a']) }}
+    >
       {(show, hide) => (
         <ul className="st-meters">
           {sorted.map((s) => (
-            <li key={s.id} className="st-meter">
-              <div className="st-meter__top">
-                <span className="t-body-strong">{s.label}</span>
-                {s.id === weakest && (
-                  <span className="st-flag">
-                    <IconTarget width={14} height={14} /> Focus here
-                  </span>
-                )}
-                <span className="st-meter__val">{pct(s.rate)}</span>
-              </div>
-              <button
-                className="st-meter__track"
-                aria-label={`${s.label}: ${pct(s.rate)} right from ${s.rate.n} answers`}
-                onPointerEnter={(e) => show(e, pct(s.rate), `${s.label} · ${s.rate.n} answers`)}
-                onFocus={(e) => show(e, pct(s.rate), `${s.label} · ${s.rate.n} answers`)}
-                onBlur={hide}
-                onClick={(e) => show(e, pct(s.rate), `${s.label} · ${s.rate.n} answers`)}
-              >
-                <motion.span className="st-meter__fill" initial={{ scaleX: 0 }} animate={{ scaleX: s.rate.accuracy }} transition={{ type: 'spring', stiffness: 120, damping: 22 }} />
-              </button>
-              <span className="t-caption muted">{fmt(s.rate.n)} answers</span>
-            </li>
+            <Meter
+              key={s.id}
+              label={s.label}
+              extra={`${fmt(s.rate.n)} answers`}
+              value={pct(s.rate)}
+              rate={s.rate}
+              show={show}
+              hide={hide}
+              flag={s.id === weakest ? <span className="gv-badge st-flag">Focus here</span> : undefined}
+            />
           ))}
         </ul>
       )}
@@ -480,16 +563,16 @@ function WhenBest({ parts, days }: { parts: ReturnType<typeof byTimeOfDay>; days
   const bestDay = okDays.length >= 2 ? [...okDays].sort((a, b) => b.rate.accuracy - a.rate.accuracy)[0].index : null
 
   const W = 300
-  const H = 128
-  const base = 100
+  const H = 112
+  const base = 86
   const colStep = W / 7
-  const barW = 22
+  const barW = 18
 
   return (
     <ChartCard
       id="st-when"
       title="When you learn best"
-      subtitle="Accuracy by time of day and by weekday"
+      subtitle="Accuracy by time of day and by weekday. A time needs at least 15 answers before it can be called the best."
       table={{
         head: ['When', 'Right', 'Answers'],
         rows: [...parts.map((p) => [`${p.label} (${p.hours})`, p.rate.n ? pct(p.rate) : 'n/a', p.rate.n]), ...days.map((d) => [d.long, d.rate.n ? pct(d.rate) : 'n/a', d.rate.n])],
@@ -498,56 +581,42 @@ function WhenBest({ parts, days }: { parts: ReturnType<typeof byTimeOfDay>; days
       {(show, hide) => (
         <div className="st-when">
           <ul className="st-meters">
-            {parts.map((p) => (
-              <li key={p.id} className="st-meter">
-                <div className="st-meter__top">
-                  <span className="t-body-strong">{p.label}</span>
-                  <span className="t-caption muted">{p.hours}</span>
-                  {p.id === bestPart && (
-                    <span className="st-flag st-flag--best">
-                      <IconStar width={14} height={14} /> Best
-                    </span>
-                  )}
-                  <span className="st-meter__val">{p.rate.n >= PART_MIN ? pct(p.rate) : 'n/a'}</span>
-                </div>
-                {p.rate.n >= PART_MIN ? (
-                  <button
-                    className="st-meter__track"
-                    aria-label={`${p.label}: ${pct(p.rate)} right from ${p.rate.n} answers`}
-                    onPointerEnter={(e) => show(e, pct(p.rate), `${p.label} · ${p.rate.n} answers`)}
-                    onFocus={(e) => show(e, pct(p.rate), `${p.label} · ${p.rate.n} answers`)}
-                    onBlur={hide}
-                    onClick={(e) => show(e, pct(p.rate), `${p.label} · ${p.rate.n} answers`)}
-                  >
-                    <motion.span className="st-meter__fill" initial={{ scaleX: 0 }} animate={{ scaleX: p.rate.accuracy }} transition={{ type: 'spring', stiffness: 120, damping: 22 }} />
-                  </button>
-                ) : null}
-                {p.rate.n >= PART_MIN ? (
-                  <span className="t-caption muted">{fmt(p.rate.n)} answers</span>
-                ) : (
-                  <span className="t-caption muted">{p.rate.n ? `Only ${p.rate.n} answers so far` : 'No answers yet'}</span>
-                )}
-              </li>
-            ))}
+            {parts.map((p) =>
+              p.rate.n >= PART_MIN ? (
+                <Meter
+                  key={p.id}
+                  label={p.label}
+                  extra={p.hours}
+                  value={pct(p.rate)}
+                  rate={p.rate}
+                  show={show}
+                  hide={hide}
+                  flag={p.id === bestPart ? <span className="gv-badge gv-badge--accent st-flag">Best</span> : undefined}
+                />
+              ) : (
+                <li key={p.id} className="st-meter">
+                  <div className="st-meter__top">
+                    <span className="st-meter__label">{p.label}</span>
+                    <span className="st-meter__extra">{p.hours}</span>
+                    <span className="st-meter__val st-meter__val--na">{p.rate.n ? `${p.rate.n} answers` : 'No answers'}</span>
+                  </div>
+                </li>
+              ),
+            )}
           </ul>
 
-          <svg className="st-cols" viewBox={`0 0 ${W} ${H + 20}`} role="img" aria-label="Accuracy by weekday">
-            <line x1={0} x2={W} y1={base + 4} y2={base + 4} className="st-grid" />
+          <svg className="st-cols" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Accuracy by weekday">
+            <line x1={0} x2={W} y1={base} y2={base} className="st-grid" />
             {days.map((d, i) => {
               const cx = i * colStep + colStep / 2
               const ok = d.rate.n >= PART_MIN
-              const h = ok ? Math.max(4, d.rate.accuracy * (base - 14)) : 0
-              const y = base + 4 - h
+              const h = ok ? Math.max(3, d.rate.accuracy * (base - 16)) : 0
+              const y = base - h
               return (
                 <g key={d.index}>
-                  {ok && (
-                    <path
-                      d={`M${cx - barW / 2} ${base + 4} V${y + 4} a4 4 0 0 1 4 -4 H${cx + barW / 2 - 4} a4 4 0 0 1 4 4 V${base + 4} Z`}
-                      className="st-col"
-                    />
-                  )}
+                  {ok && <path d={`M${cx - barW / 2} ${base} V${y + 4} a4 4 0 0 1 4 -4 H${cx + barW / 2 - 4} a4 4 0 0 1 4 4 V${base} Z`} className={`st-col${d.index === bestDay ? ' is-best' : ''}`} />}
                   {ok && d.index === bestDay && (
-                    <text x={cx} y={y - 6} textAnchor="middle" className="st-col-val">
+                    <text x={cx} y={y - 5} textAnchor="middle" className="st-col-val">
                       {pct(d.rate)}
                     </text>
                   )}
@@ -555,7 +624,7 @@ function WhenBest({ parts, days }: { parts: ReturnType<typeof byTimeOfDay>; days
                     x={cx - colStep / 2}
                     y={0}
                     width={colStep}
-                    height={base + 22}
+                    height={H}
                     className="st-hit"
                     tabIndex={0}
                     aria-label={`${d.long}: ${ok ? pct(d.rate) : 'not enough answers'}`}
@@ -564,7 +633,7 @@ function WhenBest({ parts, days }: { parts: ReturnType<typeof byTimeOfDay>; days
                     onBlur={hide}
                     onClick={(e) => show(e, ok ? pct(d.rate) : 'n/a', `${d.long} · ${d.rate.n} answers`)}
                   />
-                  <text x={cx} y={base + 22} textAnchor="middle" className={`st-axis${d.index === bestDay ? ' st-axis--strong' : ''}`}>
+                  <text x={cx} y={base + 18} textAnchor="middle" className={`st-axis${d.index === bestDay ? ' st-axis--strong' : ''}`}>
                     {d.short}
                   </text>
                 </g>
@@ -581,23 +650,27 @@ function WhenBest({ parts, days }: { parts: ReturnType<typeof byTimeOfDay>; days
 
 function TrendLine({ trend }: { trend: ReturnType<typeof weeklyTrend> }) {
   const W = 300
-  const H = 140
+  const H = 132
   const L = 34
   const R = 36
-  const T = 12
-  const B = 24
+  const T = 10
+  const B = 22
   const pw = W - L - R
   const ph = H - T - B
   const x = (i: number) => L + (trend.length === 1 ? pw / 2 : (i * pw) / (trend.length - 1))
   const y = (v: number) => T + ph * (1 - v)
   const pts = trend.map((w, i) => [x(i), y(w.rate.accuracy)] as const)
   const line = pts.map(([px, py], i) => `${i ? 'L' : 'M'}${px.toFixed(1)} ${py.toFixed(1)}`).join(' ')
-  const area = `${line} L${pts[pts.length - 1][0].toFixed(1)} ${y(0)} L${pts[0][0].toFixed(1)} ${y(0)} Z`
   const last = trend[trend.length - 1]
   const [cross, setCross] = useState<number | null>(null)
 
   return (
-    <ChartCard id="st-trend" title="First-try accuracy" subtitle="Per week, right on the first attempt" table={{ head: ['Week of', 'First try', 'Answers'], rows: trend.map((w) => [dateLabel(w.week, { day: 'numeric', month: 'short' }), pct(w.rate), w.rate.n]) }}>
+    <ChartCard
+      id="st-trend"
+      title="First-try accuracy"
+      subtitle="Per week, answers you got right on the first attempt."
+      table={{ head: ['Week of', 'First try', 'Answers'], rows: trend.map((w) => [dateLabel(w.week, { day: 'numeric', month: 'short' }), pct(w.rate), w.rate.n]) }}
+    >
       {(show, hide) => (
         <svg className="st-trend" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`First-try accuracy over ${trend.length} weeks, latest ${pct(last.rate)}`} onPointerLeave={() => setCross(null)}>
           {[0, 0.5, 1].map((v) => (
@@ -608,12 +681,11 @@ function TrendLine({ trend }: { trend: ReturnType<typeof weeklyTrend> }) {
               </text>
             </g>
           ))}
-          <path d={area} className="st-area" />
           <path d={line} className="st-line" />
           {cross !== null && <line x1={pts[cross][0]} x2={pts[cross][0]} y1={T} y2={y(0)} className="st-cross" />}
           {pts.map(([px, py], i) => (
             <g key={trend[i].week}>
-              {(i === pts.length - 1 || i === cross) && <circle cx={px} cy={py} r={4} className="st-dot" />}
+              {(i === pts.length - 1 || i === cross) && <circle cx={px} cy={py} r={3.5} className="st-dot" />}
               <rect
                 x={px - Math.max(12, pw / Math.max(1, trend.length - 1) / 2)}
                 y={T}
@@ -640,10 +712,10 @@ function TrendLine({ trend }: { trend: ReturnType<typeof weeklyTrend> }) {
           <text x={pts[pts.length - 1][0] + 8} y={pts[pts.length - 1][1] + 4} className="st-end-val">
             {pct(last.rate)}
           </text>
-          <text x={L} y={H - 6} className="st-axis">
+          <text x={L} y={H - 4} className="st-axis">
             {dateLabel(trend[0].week, { day: 'numeric', month: 'short' })}
           </text>
-          <text x={W - R} y={H - 6} textAnchor="end" className="st-axis">
+          <text x={W - R} y={H - 4} textAnchor="end" className="st-axis">
             {dateLabel(last.week, { day: 'numeric', month: 'short' })}
           </text>
         </svg>
@@ -654,7 +726,7 @@ function TrendLine({ trend }: { trend: ReturnType<typeof weeklyTrend> }) {
 
 // ------------------------------------------------------------- export
 
-function ExportCard() {
+function ExportSection() {
   const [busy, setBusy] = useState(false)
   const [outcome, setOutcome] = useState<ExportOutcome | 'error' | null>(null)
   const run = async () => {
@@ -674,18 +746,23 @@ function ExportCard() {
         ? 'Saved as a JSON file in your downloads.'
         : outcome === 'error'
           ? "Couldn't export just now. Try again in a moment."
-          : ''
+          : 'Every answer you give is logged on this phone, with the time it took. Export it to back it up or analyse it later.'
   return (
-    <section className="gv-card st-export" aria-labelledby="st-export-t">
-      <div className="gv-shevitsa gv-shevitsa--sm gv-tone-rose st-export__band" aria-hidden="true" />
-      <h2 id="st-export-t" className="t-card-title">
+    <section className="gv-section" aria-labelledby="st-export-t">
+      <h2 id="st-export-t" className="gv-section-header">
         Your data
       </h2>
-      <p className="muted">Every answer you give is logged on this phone, with the time it took. Export it any time to back it up or analyse it later.</p>
-      <button className="gv-btn gv-btn--quiet gv-btn--block" onClick={() => void run()} disabled={busy}>
-        <IconShare width={20} height={20} /> {busy ? 'Preparing' : 'Export my data'}
-      </button>
-      <p className="t-caption muted st-export__msg" aria-live="polite">
+      <div className="gv-list">
+        <button className="gv-row" onClick={() => void run()} disabled={busy}>
+          <span className="gv-row__icon" aria-hidden="true">
+            <IconShare />
+          </span>
+          <span className="gv-row__body">
+            <span className="gv-row__title st-action">{busy ? 'Preparing…' : 'Export my data'}</span>
+          </span>
+        </button>
+      </div>
+      <p className="gv-section-footer" aria-live="polite">
         {message}
       </p>
     </section>

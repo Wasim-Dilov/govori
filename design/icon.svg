@@ -1,40 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <!-- Govori app icon (master). Щърко's head on brand rose, wearing a мартеница.
-       Full-bleed square: iOS applies its own rounded mask. -->
-  <rect width="1024" height="1024" fill="#d12c4a"/>
-  <g id="art">
-    <!-- neck (ink outline under white), runs off the bottom edge -->
-    <path d="M405 560 C388 780 360 960 330 1420" fill="none" stroke="#2a1a20" stroke-width="296" stroke-linecap="round"/>
-    <path d="M405 560 C388 780 360 960 330 1420" fill="none" stroke="#ffffff" stroke-width="252" stroke-linecap="round"/>
-    <!-- beak -->
-    <g stroke="#2a1a20" stroke-width="22" stroke-linejoin="round">
-      <path d="M600 300 L990 552 Q1006 572 982 580 L604 520 Z" fill="#ec5b3f"/>
-      <path d="M604 500 L982 580 Q952 608 912 602 L612 562 Z" fill="#c9402f"/>
-      <!-- head -->
-      <circle cx="404" cy="414" r="262" fill="#ffffff"/>
-    </g>
-    <ellipse cx="420" cy="520" rx="60" ry="34" fill="#ffb3c1"/>
-    <circle cx="492" cy="362" r="62" fill="#2a1a20"/>
-    <circle cx="515" cy="338" r="21" fill="#ffffff"/>
-    <!-- мартеница cord around the neck -->
-    <clipPath id="cord"><rect x="206" y="772" width="340" height="88" rx="44" transform="rotate(-6 376 816)"/></clipPath>
-    <g clip-path="url(#cord)">
-      <rect x="180" y="740" width="400" height="150" fill="#ffffff"/>
-      <g fill="#d12c4a">
-        <path d="M176 890 l64 -150 h36 l-64 150z"/><path d="M252 890 l64 -150 h36 l-64 150z"/><path d="M328 890 l64 -150 h36 l-64 150z"/><path d="M404 890 l64 -150 h36 l-64 150z"/><path d="M480 890 l64 -150 h36 l-64 150z"/><path d="M556 890 l64 -150 h36 l-64 150z"/>
-      </g>
-    </g>
-    <rect x="206" y="772" width="340" height="88" rx="44" transform="rotate(-6 376 816)" fill="none" stroke="#2a1a20" stroke-width="16"/>
-    <!-- Пижо (white) and Пенда (red) tassels -->
-    <path d="M470 846 C462 880 448 912 436 940" fill="none" stroke="#d12c4a" stroke-width="14" stroke-linecap="round"/>
-    <path d="M486 844 C512 880 540 912 566 944" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
-    <circle cx="430" cy="962" r="42" fill="#d12c4a" stroke="#2a1a20" stroke-width="12"/>
-    <circle cx="574" cy="964" r="42" fill="#ffffff" stroke="#2a1a20" stroke-width="12"/>
-    <!-- gold eight-pointed embroidery star (осмолъчка) -->
-    <g transform="translate(838 196)">
-      <rect x="-66" y="-66" width="132" height="132" fill="#f5a623"/>
-      <rect x="-66" y="-66" width="132" height="132" fill="#f5a623" transform="rotate(45)"/>
-      <rect x="-21" y="-21" width="42" height="42" fill="#ffffff" transform="rotate(45)"/>
-    </g>
-  </g>
+  <!-- Govori app icon (master): a Г monogram with a rhombus stitch, the шевица motif, on brand rose. Full-bleed square; iOS applies its own mask. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d22a57"/><stop offset="1" stop-color="#b51d44"/></linearGradient>
+    <radialGradient id="fade" cx="0.5" cy="0.5" r="0.75"><stop offset="0.3" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></radialGradient>
+    <mask id="m"><rect width="1024" height="1024" fill="url(#fade)"/></mask>
+    <pattern id="p" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M32 6 L58 32 L32 58 L6 32 Z" fill="none" stroke="#fff" stroke-width="3"/><rect x="29" y="29" width="6" height="6" fill="#fff"/></pattern>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#g)"/><rect width="1024" height="1024" fill="url(#p)" opacity="0.12" mask="url(#m)"/>
+  <path d="M332 236 H688 Q706 236 706 254 V354 Q706 372 688 372 H450 V770 Q450 788 432 788 H332 Q314 788 314 770 V254 Q314 236 332 236 Z" fill="#fff"/><path d="M638 616 L724 702 L638 788 L552 702 Z" fill="#fff"/>
 </svg>

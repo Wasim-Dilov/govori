@@ -8,7 +8,7 @@ import { OnboardingScreen } from './screens/Onboarding.tsx'
 import { SessionScreen } from './screens/Session.tsx'
 import { CompleteScreen } from './screens/Complete.tsx'
 import { TabBar } from './components/TabBar.tsx'
-import { Mascot } from './components/Mascot.tsx'
+import { BrandMark } from './components/BrandMark.tsx'
 import { Toast } from './components/Toast.tsx'
 
 export default function App() {
@@ -32,7 +32,7 @@ function Screens() {
   if (!ready)
     return (
       <div className="app-shell" style={{ display: 'grid', placeItems: 'center' }}>
-        <Mascot mood="idle" size={120} />
+        <BrandMark size={72} />
       </div>
     )
 

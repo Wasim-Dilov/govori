@@ -1,62 +1,119 @@
-/* Shared exercise layout. Components come from components.css. */
-.ex { display: grid; gap: var(--space-6); padding-block: var(--space-4) var(--space-6); }
-.ex-prompt { color: var(--ink); }
-.ex-eyebrow { color: var(--tone, var(--rose)); }
+/* Shared exercise layout, native iOS. Components come from components.css; colours from tokens only. */
+.ex { display: grid; gap: var(--space-5); padding-block: var(--space-3) var(--space-6); }
+.ex-prompt { color: var(--ink); margin: 0; }
+.ex-eyebrow { font: 600 13px/18px var(--font-text); color: var(--tone-text, var(--rose)); margin: 0; }
 .ex-bg { display: inline-flex; flex-direction: column; gap: 2px; min-width: 0; }
-.ex-tr { font: 600 15px/20px var(--font-text); color: var(--ink-muted); letter-spacing: 0.01em; }
-.ex-emoji { font-size: 44px; line-height: 1; }
+.ex-tr { font: 400 15px/20px var(--font-text); color: var(--ink-muted); letter-spacing: 0; }
+.ex-opt-strong { font-weight: 600; }
 
-.ex-hero { display: flex; align-items: center; gap: var(--space-4); min-height: 72px; }
+/* The Bulgarian being taught, with its play button */
+.ex-hero { display: flex; align-items: center; gap: var(--space-4); min-height: 64px; }
 .ex-hero .t-bg-word { overflow-wrap: anywhere; }
-.ex-hero--en { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
-.ex-hero--listen { justify-content: center; gap: var(--space-6); padding-block: var(--space-4); }
-.ex-hero--letter { justify-content: center; }
-.ex-bigletter { color: var(--trk-azbuka); }
-.ex-readword { font-size: 44px; line-height: 52px; letter-spacing: 0.02em; }
-.ex-optletter { font: 800 30px/34px var(--font-text); }
 
-.ex-list { display: grid; gap: var(--space-3); }
+/* English cue for production: a neat emoji tile and the meaning */
+.ex-cue {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg);
+  background: var(--linen-raised); box-shadow: var(--shadow-card);
+}
+.ex-cue__emoji {
+  flex: none; width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--linen-sunk); font-size: 28px; line-height: 1;
+}
+.ex-cue__text { font: 600 20px/25px var(--font-display); color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+
+/* Listening: one large play button and a quiet slow one */
+.ex-listen { display: flex; align-items: center; justify-content: center; gap: var(--space-5); padding-block: var(--space-2); }
+.gv-iconbtn.ex-slow { background: var(--fill-secondary); color: var(--ink); }
+
+/* Letter, sound and reading cards */
+.ex-lettercard, .ex-soundcard {
+  display: grid; place-items: center; gap: var(--space-1);
+  padding: var(--space-6) var(--space-4); border-radius: var(--radius-lg);
+  background: var(--linen-raised); box-shadow: var(--shadow-card); text-align: center;
+}
+.ex-lettercard .t-letter { color: var(--ink); }
+.ex-readword { font: 600 40px/48px var(--font-text); letter-spacing: 0.01em; color: var(--ink); overflow-wrap: anywhere; }
+.ex-soundcard__sound { font: 700 40px/48px var(--font-display); color: var(--ink); }
+.ex-soundcard__hint { font: 400 15px/20px var(--font-text); color: var(--ink-muted); max-width: 30ch; }
+.ex-optletter { font: 600 26px/30px var(--font-text); }
+
+.ex-list { display: grid; gap: var(--space-2); }
 .ex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 
-/* intro */
-.ex-intro { justify-items: center; text-align: center; gap: var(--space-4); }
-.ex-intro__emoji { font-size: 96px; line-height: 1.1; filter: drop-shadow(0 6px 0 color-mix(in srgb, var(--ink) 10%, transparent)); }
-.ex-intro__word { display: grid; gap: var(--space-2); justify-items: center; }
-.ex-intro__en { color: var(--ink-muted); }
-.ex-intro__audio { justify-content: center; gap: var(--space-4); }
-.ex-note { display: flex; gap: var(--space-3); align-items: flex-start; text-align: left; width: 100%; }
-.ex-note .gv-star { flex: none; margin-top: 2px; --tone: var(--gold); }
-.ex-example { display: flex; align-items: center; gap: var(--space-3); width: 100%; text-align: left; }
-.ex-example__text { display: grid; flex: 1; min-width: 0; }
+/* ---------- intro */
+.ex-intro { gap: var(--space-4); }
+.ex-introcard { display: grid; justify-items: center; gap: var(--space-2); padding: var(--space-6) var(--space-4) var(--space-5); text-align: center; }
+.ex-introcard__emoji {
+  width: 64px; height: 64px; border-radius: 16px; display: grid; place-items: center;
+  background: var(--linen-sunk); font-size: 36px; line-height: 1; margin-bottom: var(--space-2);
+}
+.ex-introcard__bg { align-items: center; }
+.ex-introcard__en { font: 400 17px/22px var(--font-text); color: var(--ink-muted); margin: 0; }
+.ex-introcard__audio { display: flex; gap: var(--space-3); justify-content: center; margin-top: var(--space-3); }
+.ex-note { display: flex; gap: var(--space-3); align-items: flex-start; text-align: left; font: 400 15px/20px var(--font-text); color: var(--ink); }
+.ex-note p { margin: 0; }
+.ex-note__mark {
+  flex: none; width: 18px; height: 18px; margin-top: 1px; background: var(--rose);
+  -webkit-mask: var(--mask-star8) center / contain no-repeat; mask: var(--mask-star8) center / contain no-repeat;
+}
+.ex-section { margin-bottom: 0; }
+.ex-section .gv-section-header { margin: 0; }
+.ex-row-text { margin: 0; font: 400 15px/21px var(--font-text); }
+.ex-row-emoji { flex: none; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: var(--linen-sunk); font-size: 18px; }
+.ex-intro .gv-letter { width: 100%; }
 
-/* match */
-.ex-match { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
-.ex-match__col { display: grid; gap: var(--space-3); align-content: start; }
-.ex-match .gv-choice { justify-content: center; text-align: center; min-height: 64px; padding-inline: var(--space-2); }
+/* ---------- match */
+.ex-match {
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(var(--rows, 5), minmax(56px, auto));
+  grid-auto-flow: column; gap: var(--space-2) var(--space-3);
+}
+/* Columns stay in the DOM for structure, but their cells join the shared grid so rows line up. */
+.ex-match__col { display: contents; }
+.ex-match .gv-choice { justify-content: center; text-align: center; min-height: 56px; height: 100%; padding-inline: var(--space-2); }
 .ex-match .gv-choice__text { align-items: center; }
-.ex-match__bg { font-size: 18px; }
-.ex-match__done { opacity: 0.4; transform: scale(0.97); }
+.ex-match__bg { font-size: 17px; }
+.ex-match__done { opacity: 0.35; }
 
-/* build */
-.ex-build__en { flex-direction: row; align-items: center; }
+/* ---------- build: tiles on a ruled answer line */
 .ex-build__answer {
   display: flex; flex-wrap: wrap; gap: var(--space-2); align-content: flex-start;
-  min-height: 112px; padding: var(--space-3) 0;
-  background-image: repeating-linear-gradient(to bottom, transparent 0 54px, var(--line) 54px 56px);
-  background-position: 0 var(--space-3);
+  min-height: 116px; padding: var(--space-2) 0;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 57px, var(--separator) 57px 58px);
+  background-position: 0 var(--space-2);
 }
-.ex-build__answer.is-correct .gv-tile { border-color: var(--pine); color: var(--pine-ink); }
-.ex-build__answer.is-wrong .gv-tile { border-color: var(--rose); color: var(--rose-ink); }
+.ex-build__answer.is-correct .gv-tile { border-color: var(--pine); color: var(--pine-ink); background: var(--pine-soft); }
+.ex-build__answer.is-wrong .gv-tile { border-color: var(--warn); color: var(--warn-ink); background: var(--warn-soft); }
+.ex-build__answer .gv-tile, .ex-build__bank .gv-tile { min-height: 50px; }
 .ex-build__bank { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center; }
 
-/* typing */
+/* ---------- typing */
 .ex-type { gap: var(--space-4); }
-.ex-type .gv-input { min-height: 88px; }
-.ex-type__switch { display: flex; justify-content: flex-end; margin-top: calc(-1 * var(--space-2)); }
-.ex-kbd { display: grid; gap: 8px; padding: var(--space-2); border-radius: var(--radius-md); background: var(--linen-sunk); }
+.ex-type__field { display: grid; gap: var(--space-2); }
+.ex-type .gv-input { min-height: 0; height: 84px; }
+.ex-type__switch {
+  justify-self: end; appearance: none; border: 0; background: none; padding: 4px 2px;
+  font: 400 15px/20px var(--font-text); color: var(--rose); cursor: pointer;
+}
+.ex-type__switch:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 6px; }
+/* The Bulgarian keyboard, drawn like the iOS keyboard */
+.ex-kbd {
+  display: grid; gap: 10px; padding: 8px 4px 10px; margin-inline: calc(-1 * var(--space-2));
+  border-radius: var(--radius-md); background: var(--fill-secondary);
+}
 .ex-kbd__row { display: flex; gap: 5px; }
+.ex-kbd .gv-key {
+  height: 44px; border-radius: 6px; background: var(--segment-thumb); color: var(--ink);
+  box-shadow: 0 1px 0 var(--line-strong); font: 400 22px/1 var(--font-text);
+}
+.ex-kbd .gv-key:active { background: var(--linen-sunk); }
+.ex-kbd .gv-key--wide { background: var(--line-strong); color: var(--ink); font: 400 16px/1 var(--font-text); }
+.ex-kbd__space { flex: 4 1 0; }
+.ex-kbd__del { flex: 1.4 1 0; display: grid; place-items: center; }
+.ex-kbd__del svg { width: 24px; height: 24px; }
 
 @media (max-height: 720px) {
-  .ex-bigletter { font-size: 88px; line-height: 92px; }
   .ex { gap: var(--space-4); }
+  .ex-lettercard, .ex-soundcard { padding-block: var(--space-4); }
+  .ex-lettercard .t-letter { font-size: 80px; line-height: 84px; }
 }

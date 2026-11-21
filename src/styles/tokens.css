@@ -1,169 +1,214 @@
 /* Govori — generated from tokens.json by scripts/build-tokens.mjs. Do not edit by hand. */
 :root, [data-theme="light"] {
-  --linen: #fff8f4;
+  --linen: #f2f2f7;
   --linen-raised: #ffffff;
-  --linen-sunk: #f7eae5;
-  --line: #eed9d2;
-  --line-strong: #ddc1b8;
-  --ink: #2a1a20;
-  --ink-muted: #6e5961;
-  --rose: #d12c4a;
-  --rose-deep: #9c1730;
-  --rose-soft: #ffe3e8;
-  --rose-ink: #a81c38;
+  --linen-sunk: #eeeef2;
+  --fill-secondary: #e5e5ea;
+  --segment-thumb: #ffffff;
+  --material: #f9f9f9cc;
+  --material-thick: #ffffffeb;
+  --separator: #c6c6c8;
+  --line: #e3e3e8;
+  --line-strong: #c7c7cc;
+  --ink: #000000;
+  --ink-muted: #69696e;
+  --label-tertiary: #aeaeb2;
+  --accent: #c8234f;
+  --accent-pressed: #a51b40;
+  --on-accent: #ffffff;
+  --rose: #c8234f;
+  --rose-deep: #a51b40;
+  --rose-soft: #fbe8ee;
+  --rose-ink: #a51b40;
   --on-rose: #ffffff;
-  --pine: #11806a;
-  --pine-deep: #0a5e4e;
-  --pine-soft: #d9f4eb;
-  --pine-ink: #0a6654;
+  --pick: var(--rose);
+  --pick-soft: var(--rose-soft);
+  --pick-deep: var(--rose-deep);
+  --pine: #1f7a37;
+  --pine-deep: #18692e;
+  --pine-soft: #e5f5e9;
+  --pine-ink: #18692e;
   --on-pine: #ffffff;
-  --gold: #f5a623;
-  --gold-deep: #c27c00;
-  --gold-soft: #fff1d2;
-  --gold-ink: #8a5300;
-  --on-gold: #2a1a20;
-  --pick: #1f63bd;
-  --pick-soft: #e3eefc;
-  --pick-deep: #164a8e;
-  --trk-azbuka: #6e52d4;
-  --trk-azbuka-deep: #4c35a3;
-  --trk-azbuka-soft: #ece6fd;
-  --trk-basics: #2770d0;
-  --trk-basics-deep: #1b55a3;
-  --trk-basics-soft: #e3eefc;
-  --trk-kids: #dd5f18;
-  --trk-kids-deep: #a8430a;
-  --trk-kids-soft: #ffe8d9;
+  --warn: #b04a05;
+  --warn-deep: #8f3c04;
+  --warn-soft: #fdf0e1;
+  --warn-ink: #93400a;
+  --on-warn: #ffffff;
+  --gold: #e5a00d;
+  --gold-deep: #b57b00;
+  --gold-soft: #fcf3dc;
+  --gold-ink: #855600;
+  --on-gold: #1c1c1e;
+  --trk-azbuka: #5f52c4;
+  --trk-azbuka-deep: #4a3fa3;
+  --trk-azbuka-soft: #eeecfb;
+  --trk-basics: #2a68b8;
+  --trk-basics-deep: #1f5293;
+  --trk-basics-soft: #e8f0fa;
+  --trk-kids: #b4561c;
+  --trk-kids-deep: #8f4312;
+  --trk-kids-soft: #f9ede5;
   --trk-love: var(--rose);
   --trk-love-deep: var(--rose-deep);
   --trk-love-soft: var(--rose-soft);
-  --trk-home: #44811f;
-  --trk-home-deep: #2f5d13;
-  --trk-home-soft: #e6f3d9;
-  --trk-family: #a23c8a;
-  --trk-family-deep: #73255f;
-  --trk-family-soft: #f8e1f2;
-  --trk-grammar: #0b7a8f;
-  --trk-grammar-deep: #075665;
-  --trk-grammar-soft: #daf2f6;
-  --trk-out: #9a6c00;
-  --trk-out-deep: #6b4a00;
-  --trk-out-soft: #f8edcf;
+  --trk-home: #3a7d33;
+  --trk-home-deep: #2c6326;
+  --trk-home-soft: #e9f4e7;
+  --trk-family: #94407f;
+  --trk-family-deep: #763264;
+  --trk-family-soft: #f6eaf3;
+  --trk-grammar: #1a7183;
+  --trk-grammar-deep: #135a68;
+  --trk-grammar-soft: #e4f2f5;
+  --trk-out: #86650f;
+  --trk-out-deep: #6b500a;
+  --trk-out-soft: #f6f0df;
   --on-track: #ffffff;
-  --shadow-float: 0 12px 32px -8px #2a1a2033;
-  --focus-ring: 0 0 0 3px #fff8f4, 0 0 0 6px #2770d0;
+  --shadow-card: 0 1px 2px #0000000a;
+  --shadow-float: 0 12px 32px -12px #00000040, 0 2px 6px #0000000d;
+  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #c8234f;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --linen: #1a1115;
-    --linen-raised: #251a1f;
-    --linen-sunk: #120b0e;
-    --line: #3b2a31;
-    --line-strong: #54404a;
-    --ink: #f8edf0;
-    --ink-muted: #c3adb5;
-    --rose: #ff6680;
-    --rose-deep: #b8304a;
-    --rose-soft: #40161f;
-    --rose-ink: #ff8ea1;
-    --on-rose: #2a0a12;
-    --pine: #3ccfa4;
-    --pine-deep: #1f8f6f;
-    --pine-soft: #0f3329;
-    --pine-ink: #6be3c0;
-    --on-pine: #062a20;
-    --gold: #ffc247;
-    --gold-deep: #c98a10;
-    --gold-soft: #3a2a0c;
-    --gold-ink: #ffd27a;
-    --on-gold: #2a1a20;
-    --pick: #6aa8ff;
-    --pick-soft: #14243d;
-    --pick-deep: #3d78c9;
-    --trk-azbuka: #a68dff;
-    --trk-azbuka-deep: #6f57c9;
-    --trk-azbuka-soft: #231a40;
-    --trk-basics: #6aa8ff;
-    --trk-basics-deep: #3d78c9;
-    --trk-basics-soft: #14243d;
-    --trk-kids: #ff9a5c;
-    --trk-kids-deep: #c56a2f;
-    --trk-kids-soft: #3d2112;
+    --linen: #000000;
+    --linen-raised: #1c1c1e;
+    --linen-sunk: #2c2c2e;
+    --fill-secondary: #3a3a3c;
+    --segment-thumb: #636366;
+    --material: #1e1e1ebf;
+    --material-thick: #1c1c1ef2;
+    --separator: #38383a;
+    --line: #2c2c2e;
+    --line-strong: #48484a;
+    --ink: #ffffff;
+    --ink-muted: #98989f;
+    --label-tertiary: #636366;
+    --accent: #d12c57;
+    --accent-pressed: #b02148;
+    --on-accent: #ffffff;
+    --rose: #ff6b8e;
+    --rose-deep: #e04f74;
+    --rose-soft: #3a1520;
+    --rose-ink: #ff8fa8;
+    --on-rose: #1f0610;
+    --pick: var(--rose);
+    --pick-soft: var(--rose-soft);
+    --pick-deep: var(--rose-deep);
+    --pine: #30d158;
+    --pine-deep: #22a447;
+    --pine-soft: #10301b;
+    --pine-ink: #5fe07f;
+    --on-pine: #04210e;
+    --warn: #ffa53d;
+    --warn-deep: #e08a20;
+    --warn-soft: #3a2610;
+    --warn-ink: #ffbd70;
+    --on-warn: #2a1600;
+    --gold: #ffcc40;
+    --gold-deep: #d9a320;
+    --gold-soft: #33280b;
+    --gold-ink: #ffd668;
+    --on-gold: #1c1c1e;
+    --trk-azbuka: #a59bff;
+    --trk-azbuka-deep: #7c71e0;
+    --trk-azbuka-soft: #1f1c3a;
+    --trk-basics: #6fa8ff;
+    --trk-basics-deep: #4a86e0;
+    --trk-basics-soft: #142338;
+    --trk-kids: #ff9d63;
+    --trk-kids-deep: #e07c40;
+    --trk-kids-soft: #33200f;
     --trk-love: var(--rose);
     --trk-love-deep: var(--rose-deep);
     --trk-love-soft: var(--rose-soft);
-    --trk-home: #8ccb5a;
-    --trk-home-deep: #5c9433;
-    --trk-home-soft: #1c2c10;
-    --trk-family: #e07bc8;
-    --trk-family-deep: #a84e92;
-    --trk-family-soft: #371430;
-    --trk-grammar: #4fd0e3;
-    --trk-grammar-deep: #2a93a3;
-    --trk-grammar-soft: #0e2c32;
-    --trk-out: #e8b84a;
-    --trk-out-deep: #a8801f;
-    --trk-out-soft: #33280c;
-    --on-track: #1a1115;
-    --shadow-float: 0 12px 32px -8px #000000cc;
-    --focus-ring: 0 0 0 3px #1a1115, 0 0 0 6px #6aa8ff;
+    --trk-home: #7cd377;
+    --trk-home-deep: #56b351;
+    --trk-home-soft: #142a13;
+    --trk-family: #f08fda;
+    --trk-family-deep: #cf6bb9;
+    --trk-family-soft: #301829;
+    --trk-grammar: #5fd0e2;
+    --trk-grammar-deep: #3cabbd;
+    --trk-grammar-soft: #0f2b30;
+    --trk-out: #e8c25a;
+    --trk-out-deep: #c49d34;
+    --trk-out-soft: #2e260f;
+    --on-track: #0b0b0f;
+    --shadow-card: none;
+    --shadow-float: 0 12px 32px -10px #000000cc;
+    --focus-ring: 0 0 0 2px #000000, 0 0 0 4px #ff6b8e;
     color-scheme: dark;
   }
 }
 [data-theme="dark"] {
-  --linen: #1a1115;
-  --linen-raised: #251a1f;
-  --linen-sunk: #120b0e;
-  --line: #3b2a31;
-  --line-strong: #54404a;
-  --ink: #f8edf0;
-  --ink-muted: #c3adb5;
-  --rose: #ff6680;
-  --rose-deep: #b8304a;
-  --rose-soft: #40161f;
-  --rose-ink: #ff8ea1;
-  --on-rose: #2a0a12;
-  --pine: #3ccfa4;
-  --pine-deep: #1f8f6f;
-  --pine-soft: #0f3329;
-  --pine-ink: #6be3c0;
-  --on-pine: #062a20;
-  --gold: #ffc247;
-  --gold-deep: #c98a10;
-  --gold-soft: #3a2a0c;
-  --gold-ink: #ffd27a;
-  --on-gold: #2a1a20;
-  --pick: #6aa8ff;
-  --pick-soft: #14243d;
-  --pick-deep: #3d78c9;
-  --trk-azbuka: #a68dff;
-  --trk-azbuka-deep: #6f57c9;
-  --trk-azbuka-soft: #231a40;
-  --trk-basics: #6aa8ff;
-  --trk-basics-deep: #3d78c9;
-  --trk-basics-soft: #14243d;
-  --trk-kids: #ff9a5c;
-  --trk-kids-deep: #c56a2f;
-  --trk-kids-soft: #3d2112;
+  --linen: #000000;
+  --linen-raised: #1c1c1e;
+  --linen-sunk: #2c2c2e;
+  --fill-secondary: #3a3a3c;
+  --segment-thumb: #636366;
+  --material: #1e1e1ebf;
+  --material-thick: #1c1c1ef2;
+  --separator: #38383a;
+  --line: #2c2c2e;
+  --line-strong: #48484a;
+  --ink: #ffffff;
+  --ink-muted: #98989f;
+  --label-tertiary: #636366;
+  --accent: #d12c57;
+  --accent-pressed: #b02148;
+  --on-accent: #ffffff;
+  --rose: #ff6b8e;
+  --rose-deep: #e04f74;
+  --rose-soft: #3a1520;
+  --rose-ink: #ff8fa8;
+  --on-rose: #1f0610;
+  --pick: var(--rose);
+  --pick-soft: var(--rose-soft);
+  --pick-deep: var(--rose-deep);
+  --pine: #30d158;
+  --pine-deep: #22a447;
+  --pine-soft: #10301b;
+  --pine-ink: #5fe07f;
+  --on-pine: #04210e;
+  --warn: #ffa53d;
+  --warn-deep: #e08a20;
+  --warn-soft: #3a2610;
+  --warn-ink: #ffbd70;
+  --on-warn: #2a1600;
+  --gold: #ffcc40;
+  --gold-deep: #d9a320;
+  --gold-soft: #33280b;
+  --gold-ink: #ffd668;
+  --on-gold: #1c1c1e;
+  --trk-azbuka: #a59bff;
+  --trk-azbuka-deep: #7c71e0;
+  --trk-azbuka-soft: #1f1c3a;
+  --trk-basics: #6fa8ff;
+  --trk-basics-deep: #4a86e0;
+  --trk-basics-soft: #142338;
+  --trk-kids: #ff9d63;
+  --trk-kids-deep: #e07c40;
+  --trk-kids-soft: #33200f;
   --trk-love: var(--rose);
   --trk-love-deep: var(--rose-deep);
   --trk-love-soft: var(--rose-soft);
-  --trk-home: #8ccb5a;
-  --trk-home-deep: #5c9433;
-  --trk-home-soft: #1c2c10;
-  --trk-family: #e07bc8;
-  --trk-family-deep: #a84e92;
-  --trk-family-soft: #371430;
-  --trk-grammar: #4fd0e3;
-  --trk-grammar-deep: #2a93a3;
-  --trk-grammar-soft: #0e2c32;
-  --trk-out: #e8b84a;
-  --trk-out-deep: #a8801f;
-  --trk-out-soft: #33280c;
-  --on-track: #1a1115;
-  --shadow-float: 0 12px 32px -8px #000000cc;
-  --focus-ring: 0 0 0 3px #1a1115, 0 0 0 6px #6aa8ff;
+  --trk-home: #7cd377;
+  --trk-home-deep: #56b351;
+  --trk-home-soft: #142a13;
+  --trk-family: #f08fda;
+  --trk-family-deep: #cf6bb9;
+  --trk-family-soft: #301829;
+  --trk-grammar: #5fd0e2;
+  --trk-grammar-deep: #3cabbd;
+  --trk-grammar-soft: #0f2b30;
+  --trk-out: #e8c25a;
+  --trk-out-deep: #c49d34;
+  --trk-out-soft: #2e260f;
+  --on-track: #0b0b0f;
+  --shadow-card: none;
+  --shadow-float: 0 12px 32px -10px #000000cc;
+  --focus-ring: 0 0 0 2px #000000, 0 0 0 4px #ff6b8e;
   color-scheme: dark;
 }
 :root {
@@ -171,29 +216,39 @@
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
   --space-12: 48px;
   --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
   --radius-full: 9999px;
-  --ledge-sm: 3px;
-  --ledge-md: 5px;
-  --ledge-lg: 8px;
-  --font-display: "Unbounded Variable", "Unbounded", system-ui, sans-serif;
-  --font-text: "Rubik Variable", "Rubik", -apple-system, system-ui, sans-serif;
+  --ledge-sm: 0px;
+  --ledge-md: 0px;
+  --ledge-lg: 0px;
+  --font-display: -apple-system, "SF Pro Display", BlinkMacSystemFont, "Inter Variable", "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-text: -apple-system, "SF Pro Text", BlinkMacSystemFont, "Inter Variable", "Segoe UI", Roboto, system-ui, sans-serif;
   --font-bgstyle: "Sofia Sans Variable", "Sofia Sans", sans-serif;
 }
-.t-hero { font-family: var(--font-display); font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -0.02em; }
-.t-screen-title { font-family: var(--font-display); font-size: 26px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em; }
-.t-card-title { font-family: var(--font-display); font-size: 19px; line-height: 24px; font-weight: 700; }
-.t-stat { font-family: var(--font-display); font-size: 17px; line-height: 20px; font-weight: 700; }
-.t-letter { font-family: var(--font-text); font-size: 120px; line-height: 120px; font-weight: 800; }
-.t-bg-word { font-family: var(--font-text); font-size: 36px; line-height: 42px; font-weight: 800; }
-.t-prompt { font-family: var(--font-text); font-size: 22px; line-height: 28px; font-weight: 800; }
-.t-body { font-family: var(--font-text); font-size: 17px; line-height: 24px; font-weight: 500; }
-.t-body-strong { font-family: var(--font-text); font-size: 17px; line-height: 24px; font-weight: 700; }
-.t-label { font-family: var(--font-text); font-size: 15px; line-height: 18px; font-weight: 800; letter-spacing: 0.06em; }
-.t-caption { font-family: var(--font-text); font-size: 13px; line-height: 18px; font-weight: 600; }
-.t-bg-alt { font-family: var(--font-bgstyle); font-size: 56px; line-height: 60px; font-weight: 700; }
+.t-large-title { font-family: var(--font-display); font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.015em; }
+.t-title1 { font-family: var(--font-display); font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.01em; }
+.t-title2 { font-family: var(--font-display); font-size: 22px; line-height: 28px; font-weight: 700; }
+.t-title3 { font-family: var(--font-display); font-size: 20px; line-height: 25px; font-weight: 600; }
+.t-headline { font-family: var(--font-text); font-size: 17px; line-height: 22px; font-weight: 600; }
+.t-body { font-family: var(--font-text); font-size: 17px; line-height: 22px; font-weight: 400; }
+.t-callout { font-family: var(--font-text); font-size: 16px; line-height: 21px; font-weight: 400; }
+.t-subhead { font-family: var(--font-text); font-size: 15px; line-height: 20px; font-weight: 400; }
+.t-footnote { font-family: var(--font-text); font-size: 13px; line-height: 18px; font-weight: 400; }
+.t-caption { font-family: var(--font-text); font-size: 12px; line-height: 16px; font-weight: 400; }
+.t-bg-word { font-family: var(--font-text); font-size: 30px; line-height: 36px; font-weight: 600; }
+.t-letter { font-family: var(--font-text); font-size: 96px; line-height: 100px; font-weight: 600; }
+.t-bg-alt { font-family: var(--font-bgstyle); font-size: 44px; line-height: 48px; font-weight: 600; }
+/* Aliases for older style names */
+.t-hero { font-family: var(--font-display); font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.015em; }
+.t-screen-title { font-family: var(--font-display); font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.01em; }
+.t-card-title { font-family: var(--font-display); font-size: 20px; line-height: 25px; font-weight: 600; }
+.t-prompt { font-family: var(--font-display); font-size: 22px; line-height: 28px; font-weight: 700; }
+.t-stat { font-family: var(--font-text); font-size: 17px; line-height: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.t-body-strong { font-family: var(--font-text); font-size: 17px; line-height: 22px; font-weight: 600; }
+.t-label { font-family: var(--font-text); font-size: 15px; line-height: 20px; font-weight: 400; font-weight: 600; letter-spacing: 0; text-transform: none; }

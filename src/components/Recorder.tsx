@@ -61,7 +61,7 @@ export function Recorder({ itemId, label, onChange }: { itemId: string; label: s
         if (ms >= CAP_MS) void stop()
       }, 200)
     } catch {
-      setError('The microphone is blocked. Allow it for Govori in the iPhone Settings app.')
+      setError('Microphone blocked. Allow it for Govori in the iPhone Settings app.')
       setState('idle')
     }
   }
@@ -91,7 +91,7 @@ export function Recorder({ itemId, label, onChange }: { itemId: string; label: s
             0:{String(secs).padStart(2, '0')}
             <span className="rec-cap">/ 0:10</span>
           </span>
-          <button type="button" className="gv-iconbtn gv-iconbtn--sm gv-tone-rose rec-btn" onClick={() => void stop()} aria-label={`Stop recording ${label}`}>
+          <button type="button" className="gv-iconbtn gv-iconbtn--sm rec-btn rec-btn--stop" onClick={() => void stop()} aria-label={`Stop recording ${label}`}>
             <IconStop />
           </button>
         </>
@@ -99,14 +99,14 @@ export function Recorder({ itemId, label, onChange }: { itemId: string; label: s
         <>
           <button
             type="button"
-            className={`gv-iconbtn gv-iconbtn--sm gv-tone-pick rec-btn ${state === 'playing' ? 'is-playing' : ''}`}
+            className={`gv-iconbtn gv-iconbtn--sm rec-btn ${state === 'playing' ? 'is-playing' : ''}`}
             onClick={() => void play()}
             aria-label={`Play her recording of ${label}`}
             disabled={state !== 'idle'}
           >
             <IconPlay />
           </button>
-          <button type="button" className="gv-iconbtn gv-iconbtn--sm gv-tone-rose rec-btn" onClick={() => void start()} aria-label={`Record ${label} again`} disabled={state !== 'idle'}>
+          <button type="button" className="gv-iconbtn gv-iconbtn--sm rec-btn rec-btn--quiet" onClick={() => void start()} aria-label={`Record ${label} again`} disabled={state !== 'idle'}>
             <IconMic />
           </button>
           <button type="button" className="rec-del" onClick={() => void remove()} aria-label={`Delete recording of ${label}`} disabled={state !== 'idle'}>
@@ -114,7 +114,7 @@ export function Recorder({ itemId, label, onChange }: { itemId: string; label: s
           </button>
         </>
       ) : (
-        <button type="button" className="gv-iconbtn gv-iconbtn--sm gv-tone-rose rec-btn" onClick={() => void start()} aria-label={`Record ${label}`} disabled={state !== 'idle'}>
+        <button type="button" className="gv-iconbtn gv-iconbtn--sm rec-btn" onClick={() => void start()} aria-label={`Record ${label}`} disabled={state !== 'idle'}>
           <IconMic />
         </button>
       )}

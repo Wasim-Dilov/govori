@@ -1,0 +1,14 @@
+/* Add-to-Home-Screen steps: a grouped list (full) or plain rows (compact, inside another card). */
+.ig { list-style: none; margin: 0; padding: 0; }
+.ig-row { gap: var(--space-3); --row-inset: calc(var(--space-4) + 32px + var(--space-3)); }
+.ig-icon {
+  flex: none; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--fill-secondary); color: var(--rose);
+}
+.ig-icon--app { background: transparent; }
+.ig-num { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+
+.ig--compact { display: grid; }
+.ig--compact .ig-row { padding-left: 0; padding-right: 0; min-height: 40px; }
+.ig--compact .ig-row + .ig-row::before { left: calc(32px + var(--space-3)); }
+.ig--compact .gv-row__title { font-size: 15px; line-height: 20px; }

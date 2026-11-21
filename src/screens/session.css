@@ -1,23 +1,68 @@
+/* Lesson player, native iOS. */
 .session { background: var(--linen); }
-.session__head { display: flex; align-items: center; gap: var(--space-3); min-height: 52px; position: sticky; top: 0; z-index: 5; background: var(--linen); padding-top: 4px; }
-.session__close { appearance: none; border: 0; background: none; color: var(--ink-muted); width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--radius-sm); cursor: pointer; flex: none; }
-.session__close svg { width: 26px; height: 26px; }
+
+/* Top bar: close button, thin progress, quiet counter */
+.session__head {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: var(--space-3);
+  min-height: 48px; padding-top: 4px; padding-bottom: 4px;
+  background: var(--linen);
+}
+.session__close {
+  appearance: none; border: 0; padding: 0; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--fill-secondary); color: var(--ink-muted);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms var(--ease-out), opacity 120ms var(--ease-out);
+}
+.session__close svg { width: 16px; height: 16px; stroke-width: 2.5; }
+.session__close:active { transform: scale(0.94); opacity: 0.7; }
 .session__close:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.session__progress { flex: 1; }
-.session__combo { display: inline-flex; align-items: center; gap: 2px; color: var(--gold-ink); min-width: 48px; }
-.session__combo svg { width: 22px; height: 22px; }
-.session__timer { color: var(--ink); min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
-.session__body { overflow-x: hidden; padding-bottom: var(--space-8); }
-.session__retry { color: var(--rose-ink); background: var(--rose-soft); border-radius: var(--radius-full); padding: 4px 12px; display: inline-block; margin-top: var(--space-2); }
+.session__progress { flex: 1; min-width: 0; }
+.session__storytitle { flex: 1; margin: 0 40px 0 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; font: 600 17px/22px var(--font-text); color: var(--ink); }
+.session__trailing { display: flex; justify-content: flex-end; min-width: 0; }
+.session__trailing:empty { display: none; }
+.session__combo { display: inline-flex; align-items: center; gap: 2px; color: var(--rose); font: 600 15px/20px var(--font-text); font-variant-numeric: tabular-nums; }
+.session__combo svg { width: 16px; height: 16px; }
+.session__timer { color: var(--ink); font: 600 15px/20px var(--font-text); font-variant-numeric: tabular-nums; }
 
+.session__body {
+  /* clip, not hidden: hidden would make this a scroll box and break the sticky conversation dock */
+  overflow-x: clip; padding-bottom: var(--space-6);
+  /* The track colour stays on the progress bar; exercises use the app accent. */
+  --tone: var(--accent); --tone-deep: var(--accent-pressed); --tone-soft: var(--rose-soft); --on-tone: var(--on-accent); --tone-ink: var(--rose-ink); --tone-text: var(--rose);
+}
+.session__retry {
+  display: inline-flex; align-items: center; gap: 6px; margin: var(--space-2) 0 0;
+  font: 400 13px/18px var(--font-text); color: var(--warn-ink);
+}
+.session__retry svg { width: 14px; height: 14px; }
+.session__nolisten {
+  display: block; margin: 0 auto; appearance: none; border: 0; background: none; padding: 6px;
+  font: 400 15px/20px var(--font-text); color: var(--rose); cursor: pointer;
+}
+.session__nolisten:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 8px; }
+
+/* Bottom bar: the primary action on a translucent material */
 .session__foot { position: sticky; bottom: 0; z-index: 6; }
-.session__actions { padding-block: var(--space-3) calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--linen) 75%, transparent); border-top: 2px solid var(--line); }
-.session__fbtext { flex: 1; min-width: 0; display: grid; gap: 2px; }
-.session__fben { font: 600 14px/18px var(--font-text); opacity: 0.85; }
-.session__mascot { flex: none; margin: -24px -4px -8px 0; }
+.session__actions {
+  padding-block: var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  background: var(--material);
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 calc(-1 * var(--hairline)) 0 var(--separator);
+}
 
-.session__scrim { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; background: color-mix(in srgb, var(--ink) 45%, transparent); }
-.session__quit { width: 100%; max-width: 520px; display: grid; gap: var(--space-3); justify-items: center; text-align: center; }
-.session__storytitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-muted); }
-.session__nolisten { appearance: none; border: 0; background: none; display: block; margin: calc(-1 * var(--space-2)) auto var(--space-4); padding: 10px 14px; border-radius: var(--radius-sm); font: 700 14px/18px var(--font-text); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); cursor: pointer; }
-.session__nolisten:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+/* Result sheet (after Check) */
+.session__sheet { box-shadow: var(--shadow-float); padding-top: var(--space-5); gap: var(--space-4); }
+.session__sheet .gv-feedback__head { align-items: flex-start; }
+.session__sheet .gv-feedback__badge { width: 32px; height: 32px; margin-top: -3px; }
+.session__fbtext { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.session__fbtext p { margin: 0; }
+.session__praise { font: 400 15px/20px var(--font-text); opacity: 0.8; margin-left: 4px; }
+.session__fblabel { font: 400 13px/18px var(--font-text); opacity: 0.8; margin-top: var(--space-1) !important; }
+
+/* Leave-lesson sheet */
+.session__scrim { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; background: #00000059; /* iOS dims with black in both themes */ }
+.session__quit { width: 100%; max-width: 520px; display: grid; gap: var(--space-2); text-align: center; padding-top: var(--space-2); }
+.session__quit h2 { margin: var(--space-2) 0 0; }
+.session__quittext { margin: 0 0 var(--space-3); font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+.session__quitbtns { display: grid; gap: var(--space-1); }

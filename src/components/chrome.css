@@ -1,0 +1,85 @@
+/* Shared app chrome: compact navigation bar, large titles, goal ring, streak,
+   track badges and the bottom sheet layer. Native iOS look; tokens only. */
+
+/* Tab screens with a navbar: the navbar itself clears the status bar. */
+.screen.has-navbar { padding-top: 0; }
+
+.gv-navbar.app-nav { justify-content: center; }
+.gv-navbar.app-nav .gv-navbar__trailing { gap: var(--space-3); }
+
+/* Large title row: the title on the left, an optional subtitle under it. */
+.app-largetitle { display: grid; gap: 2px; margin: 0 0 var(--space-5); }
+.app-largetitle .gv-largetitle { margin: 0; }
+.app-largetitle__sub { font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+
+/* ---------- streak */
+.nav-streak {
+  display: inline-flex; align-items: center; gap: 3px;
+  font: 600 16px/1 var(--font-text); font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+.nav-streak svg { width: 20px; height: 20px; }
+.nav-streak.is-on { color: var(--rose); }
+
+/* ---------- goal ring (wraps .gv-ring) */
+.goal-ring { color: var(--ink); }
+.goal-ring .gv-ring__value { stroke: var(--accent); }
+.goal-ring.is-reached .gv-ring__value { stroke: var(--pine); }
+.goal-ring__check { color: var(--pine); }
+.goal-ring__check svg { width: 55%; height: 55%; }
+
+/* ---------- track badge: an iOS Settings-style tile with the track's Cyrillic initial */
+.track-badge {
+  flex: none; display: inline-grid; place-items: center;
+  width: var(--badge-size, 30px); height: var(--badge-size, 30px);
+  border-radius: calc(var(--badge-size, 30px) * 0.24);
+  background: var(--tone); color: var(--on-tone);
+  font: 600 calc(var(--badge-size, 30px) * 0.5)/1 var(--font-text);
+}
+.track-badge--plan { background: var(--accent); color: var(--on-accent); }
+.track-badge--plan svg { width: 60%; height: 60%; }
+.track-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--tone); }
+
+/* ---------- bottom sheet layer */
+.sheet-layer { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.sheet-backdrop { position: absolute; inset: 0; border: 0; padding: 0; margin: 0; background: rgb(0 0 0 / 0.32); cursor: pointer; }
+.sheet-panel {
+  position: relative; width: 100%; max-width: 520px; max-height: 88dvh; overflow-y: auto; overscroll-behavior: contain;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.sheet-panel:focus { outline: none; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin: 0 0 var(--space-4); }
+.sheet-head h2 { font: 700 22px/28px var(--font-display); letter-spacing: -0.01em; }
+.sheet-close {
+  appearance: none; border: 0; flex: none; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--fill-secondary); color: var(--ink-muted); cursor: pointer;
+}
+.sheet-close svg { width: 15px; height: 15px; }
+.sheet-close:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Lists inside sheets sit on a cell colour slightly lifted from the sheet material. */
+.sheet-panel .gv-list { box-shadow: none; }
+.sheet-section-title { font: 400 13px/18px var(--font-text); color: var(--ink-muted); padding: 0 var(--space-4) 6px; margin: 0; }
+
+/* ---------- focus sheet */
+.focus-body { display: grid; gap: var(--space-5); }
+.focus-check { flex: none; width: 20px; height: 20px; color: var(--rose); }
+.focus-row-sub { display: flex; align-items: center; gap: 6px; }
+.focus-mini { display: inline-block; width: 36px; height: 4px; border-radius: var(--radius-full); background: var(--fill-secondary); overflow: hidden; }
+.focus-mini > span { display: block; height: 100%; border-radius: inherit; background: var(--tone); }
+.focus-plan-toggle .gv-row__chevron { transition: transform 200ms var(--ease-out); }
+.focus-plan-toggle[aria-expanded="true"] .gv-row__chevron { transform: rotate(90deg); }
+.focus-week {
+  flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--fill-secondary); color: var(--ink-muted); font: 600 13px/1 var(--font-text); font-variant-numeric: tabular-nums;
+}
+.gv-row.is-now .focus-week { background: var(--accent); color: var(--on-accent); }
+.gv-row.is-past .gv-row__title { color: var(--ink-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-plan-toggle .gv-row__chevron { transition: none; }
+}
+
+/* A row icon slot that holds its own tile (track badge, week number): no tinted backing. */
+.gv-row__icon.badge-slot { background: transparent; color: inherit; border-radius: 0; }
+.focus-plan-track { flex: none; display: inline-flex; }

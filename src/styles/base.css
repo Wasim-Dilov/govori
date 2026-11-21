@@ -5,16 +5,21 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   background: var(--linen);
   color: var(--ink);
-  font: 500 17px/24px var(--font-text);
+  font: 400 17px/22px var(--font-text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overscroll-behavior-y: none;
 }
 #root { min-height: 100%; }
 button { font: inherit; color: inherit; }
 img, svg { max-width: 100%; }
 [hidden] { display: none !important; }
-/* Bulgarian always uses Rubik (standard Cyrillic forms); only the deliberate alternate glyph uses the Bulgarian style. */
+/* Bulgarian uses the system font (standard Cyrillic forms); only the deliberate alternate glyph uses the Bulgarian style. */
 :lang(bg):not(.bgstyle-note__glyph) { font-family: var(--font-text) !important; }
+/* Sentence case everywhere: older styles that uppercased labels are switched off. */
+.t-label { text-transform: none !important; letter-spacing: 0 !important; }
+::selection { background: var(--rose-soft); }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 p { margin: 0; }
 
@@ -42,6 +47,7 @@ p { margin: 0; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .muted { color: var(--ink-muted); }
+.tabular { font-variant-numeric: tabular-nums; }
 .stack { display: grid; gap: var(--space-3); }
 .row { display: flex; align-items: center; gap: var(--space-3); }
 
@@ -50,5 +56,5 @@ p { margin: 0; }
 }
 
 /* Bulgarian-style letterform note on letter cards */
-.bgstyle-note { display: flex; align-items: center; gap: var(--space-3); text-align: left; font: 500 14px/19px var(--font-text); color: var(--ink-muted); background: var(--trk-azbuka-soft); border-radius: var(--radius-md); padding: var(--space-2) var(--space-3); width: 100%; }
-.bgstyle-note__glyph { font: 700 34px/1 var(--font-bgstyle); color: var(--ink); flex: none; min-width: 56px; text-align: center; }
+.bgstyle-note { display: flex; align-items: center; gap: var(--space-3); text-align: left; font: 400 15px/20px var(--font-text); color: var(--ink-muted); background: var(--linen-sunk); border-radius: var(--radius-md); padding: var(--space-3); width: 100%; }
+.bgstyle-note__glyph { font: 600 34px/1 var(--font-bgstyle); color: var(--ink); flex: none; min-width: 56px; text-align: center; }

@@ -6,22 +6,23 @@ import type { DialogueLine, Who } from '../content/types.ts'
 import { shuffle, translit } from '../lib/engine.ts'
 import { sfx, speak, stopSpeaking, voiceForWho } from '../lib/audio.ts'
 import { useApp } from '../lib/store.ts'
-import { IconCheck, IconSpeaker } from '../components/Icons.tsx'
+import { IconChat, IconCheck, IconSpeaker, IconX } from '../components/Icons.tsx'
 import type { ExerciseProps } from './types.ts'
 import './exercises-d.css'
 
-const CAST: Record<Who, { emoji: string; name: string; bg?: boolean }> = {
-  me: { emoji: '🙂', name: 'You' },
-  wife: { emoji: '👩', name: 'Your wife' },
-  son: { emoji: '👦', name: 'Your son' },
-  daughter: { emoji: '👧', name: 'Your daughter' },
-  mil: { emoji: '👵', name: 'Тъща', bg: true },
-  fil: { emoji: '👴', name: 'Тъст', bg: true },
-  grandma: { emoji: '👵', name: 'Баба', bg: true },
-  friend: { emoji: '🧑', name: 'A friend' },
-  waiter: { emoji: '🧑‍🍳', name: 'Waiter' },
-  seller: { emoji: '🧑‍🌾', name: 'Seller' },
-  neighbour: { emoji: '🙋', name: 'Neighbour' },
+/** Who speaks: a name, an initial for the avatar circle, and a tone for its tint. */
+const CAST: Record<Who, { initial: string; name: string; tone: string; bg?: boolean }> = {
+  me: { initial: 'Я', name: 'You', tone: 'rose' },
+  wife: { initial: 'W', name: 'Your wife', tone: 'love' },
+  son: { initial: 'S', name: 'Your son', tone: 'kids' },
+  daughter: { initial: 'D', name: 'Your daughter', tone: 'kids' },
+  mil: { initial: 'Т', name: 'Тъща', tone: 'family', bg: true },
+  fil: { initial: 'Т', name: 'Тъст', tone: 'family', bg: true },
+  grandma: { initial: 'Б', name: 'Баба', tone: 'family', bg: true },
+  friend: { initial: 'F', name: 'A friend', tone: 'basics' },
+  waiter: { initial: 'W', name: 'Waiter', tone: 'out' },
+  seller: { initial: 'S', name: 'Seller', tone: 'out' },
+  neighbour: { initial: 'N', name: 'Neighbour', tone: 'home' },
 }
 
 type Step = { kind: 'line'; index: number } | { kind: 'question'; index: number }
@@ -191,9 +192,9 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
     <div className="dlg">
       <div className="dlg__scroll">
         <header className="dlg-scene">
-          <div className="dlg-scene__emoji" aria-hidden="true">
-            {d.emoji}
-          </div>
+          <span className="dlg-scene__icon" aria-hidden="true">
+            <IconChat />
+          </span>
           <div className="dlg-scene__text">
             <span className="dlg-scene__eyebrow">Conversation</span>
             <h2 className="dlg-scene__title">{d.title}</h2>
@@ -215,13 +216,13 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
               <motion.li
                 key={i}
                 className={`dlg-line ${me ? 'dlg-line--me' : ''}`}
-                initial={{ opacity: 0, y: 14, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
               >
                 {!me && (
-                  <span className="dlg-avatar" aria-hidden="true">
-                    {cast.emoji}
+                  <span className={`dlg-avatar gv-tone-${cast.tone}`} aria-hidden="true" lang={cast.bg ? 'bg' : undefined}>
+                    {cast.initial}
                   </span>
                 )}
                 <div className="dlg-line__body">
@@ -248,6 +249,7 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
                         >
                           {l.en}
                         </motion.span>
@@ -266,12 +268,12 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
               <motion.li
                 key="typing"
                 className="dlg-line"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0, transition: { duration: 0.1 } }}
               >
-                <span className="dlg-avatar" aria-hidden="true">
-                  {CAST[typing].emoji}
+                <span className={`dlg-avatar gv-tone-${CAST[typing].tone}`} aria-hidden="true" lang={CAST[typing].bg ? 'bg' : undefined}>
+                  {CAST[typing].initial}
                 </span>
                 <div className="dlg-bubble dlg-bubble--typing" aria-label={`${CAST[typing].name} is typing`}>
                   <i />
@@ -282,7 +284,7 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
             )}
           </AnimatePresence>
         </ol>
-        {revealed.length > 0 && !question && <p className="dlg-tip">Tap a bubble to see the English.</p>}
+        {revealed.length > 0 && !question && <p className="dlg-tip">Tap a message to see the English.</p>}
         <div ref={bottom} />
       </div>
 
@@ -293,9 +295,9 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
 
         <AnimatePresence mode="wait">
           {isMe && rightPick === null && line && (
-            <motion.div key={`me-${pos}`} className="dlg-ask" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}>
+            <motion.div key={`me-${pos}`} className="dlg-ask" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
               <div className="dlg-ask__head">
-                <span className="t-prompt">What do you say?</span>
+                <span className="dlg-ask__title">What do you say?</span>
                 {!hint ? (
                   <button type="button" className="dlg-hint" onClick={() => setHint(true)}>
                     Show a hint
@@ -304,17 +306,19 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
                   <span className="dlg-hint__text">“{line.en}”</span>
                 )}
               </div>
-              <div className="dlg-options">
+              <div className="gv-list dlg-options">
                 {options[step.index].map((o, i) => {
                   const wrong = wrongPicks.includes(i)
                   return (
-                    <button key={o.text} type="button" className={`gv-choice ${wrong ? 'is-wrong is-dim' : ''}`} disabled={wrong} onClick={() => pickLine(i)}>
-                      <span className="gv-choice__key" aria-hidden="true">
-                        {i + 1}
+                    <button key={o.text} type="button" className={`gv-row dlg-opt ${wrong ? 'is-wrong' : ''}`} disabled={wrong} onClick={() => pickLine(i)}>
+                      <span className="dlg-opt__key" aria-hidden="true">
+                        {wrong ? <IconX width={12} height={12} /> : i + 1}
                       </span>
-                      <span className="gv-choice__text">
-                        <span lang="bg">{o.text}</span>
-                        {showTr && <span className="gv-choice__sub">{translit(o.text, 'ă')}</span>}
+                      <span className="gv-row__body">
+                        <span className="gv-row__title" lang="bg">
+                          {o.text}
+                        </span>
+                        {showTr && <span className="gv-row__subtitle">{translit(o.text, 'ă')}</span>}
                       </span>
                     </button>
                   )
@@ -324,12 +328,12 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
           )}
 
           {question && (
-            <motion.div key={`q-${pos}`} className="dlg-ask" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }}>
+            <motion.div key={`q-${pos}`} className="dlg-ask" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
               <div className="dlg-ask__head">
                 <span className="dlg-ask__eyebrow">Quick check</span>
-                <span className="t-prompt">{question.q}</span>
+                <span className="dlg-ask__title">{question.q}</span>
               </div>
-              <div className="dlg-options">
+              <div className="gv-list dlg-options">
                 {question.options.map((o, i) => {
                   const wrong = wrongPicks.includes(i)
                   const right = rightPick === i
@@ -337,14 +341,16 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
                     <button
                       key={o}
                       type="button"
-                      className={`gv-choice ${wrong ? 'is-wrong is-dim' : ''} ${right ? 'is-correct' : ''} ${rightPick !== null && !right ? 'is-dim' : ''}`}
+                      className={`gv-row dlg-opt ${wrong ? 'is-wrong' : ''} ${right ? 'is-right' : ''} ${rightPick !== null && !right ? 'is-dim' : ''}`}
                       disabled={wrong || rightPick !== null}
                       onClick={() => pickAnswer(i)}
                     >
-                      <span className="gv-choice__key" aria-hidden="true">
-                        {right ? <IconCheck width={14} height={14} /> : i + 1}
+                      <span className="dlg-opt__key" aria-hidden="true">
+                        {right ? <IconCheck width={12} height={12} /> : wrong ? <IconX width={12} height={12} /> : i + 1}
                       </span>
-                      <span className="gv-choice__text">{o}</span>
+                      <span className="gv-row__body">
+                        <span className="gv-row__title">{o}</span>
+                      </span>
                     </button>
                   )
                 })}
@@ -354,13 +360,8 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
         </AnimatePresence>
 
         {(ready || (isMe && rightPick !== null)) && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="dlg-continue">
-            <button
-              type="button"
-              className={`gv-btn gv-btn--block ${(isMe || question) && rightPick !== null ? 'gv-tone-pine' : ''}`}
-              onClick={next}
-              disabled={!ready}
-            >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }} className="dlg-continue">
+            <button type="button" className="gv-btn gv-btn--block" onClick={next} disabled={!ready}>
               {pos < steps.length - 1 ? 'Continue' : 'Finish'}
             </button>
           </motion.div>

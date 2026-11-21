@@ -63,7 +63,7 @@ export type Tab = 'home' | 'letters' | 'stats' | 'me'
 const DEFAULT_PROFILE: Profile = {
   name: '',
   speaker: 'm',
-  dailyGoal: 30,
+  dailyGoal: 40,
   onboarded: false,
   theme: 'system',
   sfx: true,

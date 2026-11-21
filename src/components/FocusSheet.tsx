@@ -1,11 +1,33 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useApp } from '../lib/store.ts'
 import { tracks, type TrackView } from '../content/index.ts'
+import type { TrackId } from '../content/types.ts'
 import type { LessonProgress } from '../lib/db.ts'
 import { PLAN, planWeek } from '../content/plan.ts'
-import { IconChevron, IconClose, IconPath } from './Icons.tsx'
-import '../screens/home.css'
+import { IconCheck, IconClose, IconPath } from './Icons.tsx'
+import './chrome.css'
+
+// ------------------------------------------------------------- track badge
+
+/** Each track's Bulgarian initial, shown on its badge: Азбука, Основи, Децата... */
+const INITIAL: Record<TrackId, string> = { azbuka: 'А', basics: 'О', kids: 'Д', love: 'Л', home: 'В', family: 'С', grammar: 'Г', out: 'Н' }
+
+/** An iOS Settings-style tile in the track's colour with its Cyrillic initial. */
+export function TrackBadge({ track, size = 30 }: { track: TrackId | 'plan'; size?: number }) {
+  const style = { '--badge-size': `${size}px` } as CSSProperties
+  if (track === 'plan')
+    return (
+      <span className="track-badge track-badge--plan" style={style} aria-hidden="true">
+        <IconPath />
+      </span>
+    )
+  return (
+    <span className={`track-badge gv-tone-${track}`} style={style} aria-hidden="true" lang="bg">
+      {INITIAL[track]}
+    </span>
+  )
+}
 
 // ------------------------------------------------------------- generic bottom sheet
 
@@ -50,14 +72,12 @@ export function BottomSheet({ open, onClose, title, children, labelledBy }: { op
             initial={{ y: reduce ? 0 : '100%' }}
             animate={{ y: 0 }}
             exit={{ y: reduce ? 0 : '100%' }}
-            transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 38 }}
+            transition={reduce ? { duration: 0 } : { type: 'tween', duration: 0.32, ease: [0.2, 0.8, 0.2, 1] }}
           >
             <div className="gv-sheet__grip" />
             {title && (
               <div className="sheet-head">
-                <h2 id={headingId} className="t-card-title">
-                  {title}
-                </h2>
+                <h2 id={headingId}>{title}</h2>
                 <button type="button" className="sheet-close" onClick={onClose} aria-label="Close">
                   <IconClose />
                 </button>
@@ -98,82 +118,99 @@ export function FocusSheet({ open, onClose }: { open: boolean; onClose: () => vo
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} title="What do you want to learn?">
+    <BottomSheet open={open} onClose={onClose} title="What to learn">
       <div className="focus-body">
-        <div className="focus-scope">
-          <span className="t-caption muted">Keep this focus for</span>
-          <div className="gv-chips" role="group" aria-label="Focus length">
-            <button type="button" className="gv-chip" aria-pressed={scope === 'day'} onClick={() => setScope('day')}>
-              Today
+        <div className="gv-segmented gv-segmented--block" role="group" aria-label="Keep this focus for">
+          <button type="button" aria-pressed={scope === 'day'} onClick={() => setScope('day')}>
+            Today
+          </button>
+          <button type="button" aria-pressed={scope === 'week'} onClick={() => setScope('week')}>
+            This week
+          </button>
+        </div>
+
+        <div>
+          <div className="gv-list">
+            <button type="button" className={`gv-row${focus.track === 'plan' ? ' is-current' : ''}`} onClick={() => choose('plan')} aria-pressed={focus.track === 'plan'}>
+              <span className="gv-row__icon badge-slot">
+                <TrackBadge track="plan" size={32} />
+              </span>
+              <span className="gv-row__body">
+                <span className="gv-row__title">Follow my 12-week plan</span>
+                <span className="gv-row__subtitle">
+                  Week {week.week} · {week.title}
+                </span>
+              </span>
+              {focus.track === 'plan' && <IconCheck className="focus-check" />}
             </button>
-            <button type="button" className="gv-chip" aria-pressed={scope === 'week'} onClick={() => setScope('week')}>
-              This week
-            </button>
+          </div>
+          <p className="gv-section-footer">The plan changes focus each week and always lasts a full week.</p>
+        </div>
+
+        <div>
+          <p className="sheet-section-title">Or focus on one track</p>
+          <div className="gv-list">
+            {tracks.map((t) => {
+              const c = lessonsDone(t, progress)
+              const active = focus.track === t.id
+              return (
+                <button key={t.id} type="button" className={`gv-row gv-tone-${t.id}${active ? ' is-current' : ''}`} onClick={() => choose(t.id)} aria-pressed={active}>
+                  <span className="gv-row__icon badge-slot">
+                    <TrackBadge track={t.id} size={32} />
+                  </span>
+                  <span className="gv-row__body">
+                    <span className="gv-row__title">{t.title}</span>
+                    <span className="gv-row__subtitle focus-row-sub">
+                      <span lang="bg">{t.titleBg}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>
+                        {c.done} of {c.total}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="focus-mini" aria-hidden="true">
+                    <span style={{ width: `${c.total ? (c.done / c.total) * 100 : 0}%` }} />
+                  </span>
+                  {active ? <IconCheck className="focus-check" /> : <span className="focus-check" aria-hidden="true" />}
+                </button>
+              )
+            })}
           </div>
         </div>
 
-        <button type="button" className={`gv-trackcard gv-tone-rose${focus.track === 'plan' ? ' is-active' : ''}`} onClick={() => choose('plan')}>
-          <span className="gv-trackcard__icon focus-plan-icon" aria-hidden="true">
-            <IconPath />
-          </span>
-          <span>
-            <span className="gv-trackcard__title">Follow my 12-week plan</span>
-            <span className="gv-trackcard__meta" style={{ display: 'block' }}>
-              Week {week.week}: {week.title}
-            </span>
-          </span>
-          <IconChevron className="focus-chev" />
-        </button>
-
-        <div className="focus-tracks">
-          {tracks.map((t) => {
-            const c = lessonsDone(t, progress)
-            const active = focus.track === t.id
-            return (
-              <button key={t.id} type="button" className={`gv-trackcard gv-tone-${t.id}${active ? ' is-active' : ''}`} onClick={() => choose(t.id)} aria-pressed={active}>
-                <span className="gv-trackcard__icon" aria-hidden="true">
-                  {t.emoji}
-                </span>
-                <span className="focus-track-text">
-                  <span className="gv-trackcard__title">{t.title}</span>
-                  <span className="gv-trackcard__bg" lang="bg">
-                    {t.titleBg}
-                  </span>
-                  <span className="gv-trackcard__meta">
-                    {c.done} of {c.total} lessons
-                  </span>
-                </span>
-                <span className="focus-mini" aria-hidden="true">
-                  <span style={{ width: `${c.total && c.done ? Math.max(8, (c.done / c.total) * 100) : 0}%` }} />
-                </span>
-              </button>
-            )
-          })}
+        <div>
+          <div className="gv-list">
+            <button type="button" className="gv-row focus-plan-toggle" aria-expanded={showPlan} onClick={() => setShowPlan((v) => !v)}>
+              <span className="gv-row__body">
+                <span className="gv-row__title">The 12-week plan</span>
+              </span>
+              <span className="gv-row__accessory">Week {week.week}</span>
+              <span className="gv-row__chevron" aria-hidden="true" />
+            </button>
+            {showPlan &&
+              PLAN.map((w) => {
+                const t = tracks.find((x) => x.id === w.focus)
+                const now = w.week === week.week
+                return (
+                  <div key={w.week} className={`gv-row${now ? ' is-now is-current' : w.week < week.week ? ' is-past' : ''}`} aria-current={now ? 'step' : undefined}>
+                    <span className="gv-row__icon badge-slot">
+                      <span className="focus-week">{w.week}</span>
+                    </span>
+                    <span className="gv-row__body">
+                      <span className="gv-row__title">{w.title}</span>
+                      <span className="gv-row__subtitle" lang="bg">
+                        {w.titleBg}
+                      </span>
+                    </span>
+                    <span className="focus-plan-track" title={t?.title}>
+                      <TrackBadge track={w.focus} size={22} />
+                      <span className="sr-only">{t?.title}</span>
+                    </span>
+                  </div>
+                )
+              })}
+          </div>
         </div>
-
-        <button type="button" className="focus-plan-toggle" aria-expanded={showPlan} onClick={() => setShowPlan((v) => !v)}>
-          <span>{showPlan ? 'Hide' : 'Peek at'} the 12-week plan</span>
-          <IconChevron className={showPlan ? 'is-open' : ''} />
-        </button>
-        {showPlan && (
-          <ol className="focus-plan">
-            {PLAN.map((w) => {
-              const t = tracks.find((x) => x.id === w.focus)
-              return (
-                <li key={w.week} className={w.week === week.week ? 'is-now' : w.week < week.week ? 'is-past' : ''}>
-                  <span className="focus-plan__wk">{w.week}</span>
-                  <span className="focus-plan__text">
-                    <strong>{w.title}</strong>
-                    <span lang="bg">{w.titleBg}</span>
-                  </span>
-                  <span className="focus-plan__emoji" aria-label={t?.title}>
-                    {t?.emoji}
-                  </span>
-                </li>
-              )
-            })}
-          </ol>
-        )}
       </div>
     </BottomSheet>
   )

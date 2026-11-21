@@ -1,13 +1,12 @@
-// The reward after every session: confetti, XP count-up, stats and what you unlocked.
-import { useEffect, useRef, useState } from 'react'
-import { animate, motion } from 'motion/react'
-import confetti from 'canvas-confetti'
+// The calm summary after every session: what you did, what it earned, what you met.
+import { useEffect, useRef } from 'react'
+import { motion } from 'motion/react'
 import { useApp } from '../lib/store.ts'
 import { LEVEL_NAMES } from '../lib/progress.ts'
 import { sfx, speak } from '../lib/audio.ts'
 import type { StudyItem } from '../content/index.ts'
-import { Mascot } from '../components/Mascot.tsx'
-import { IconFlame, IconSpeaker, IconStar, IconTarget } from '../components/Icons.tsx'
+import { IconChat, IconCheck, IconFlame, IconSpeaker, IconStar, IconTarget } from '../components/Icons.tsx'
+import { ShareProgress } from '../components/ShareProgress.tsx'
 import './complete.css'
 
 const TITLES: Record<string, { en: string; bg: string }> = {
@@ -16,16 +15,7 @@ const TITLES: Record<string, { en: string; bg: string }> = {
   story: { en: 'Conversation complete', bg: 'Чудесно!' },
   practice: { en: 'Review done', bg: 'Добре!' },
   mistakes: { en: 'Mistakes fixed', bg: 'Готово!' },
-  speed: { en: 'Speed round', bg: 'Бързо!' },
-}
-
-const reduceMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-
-function tokenColors(): string[] {
-  const css = getComputedStyle(document.documentElement)
-  return ['--rose', '--gold', '--pine', '--pick', '--trk-azbuka', '--linen-raised']
-    .map((v) => css.getPropertyValue(v).trim())
-    .filter((c) => /^#[0-9a-f]{3,8}$/i.test(c))
+  speed: { en: 'Speed round done', bg: 'Бързо!' },
 }
 
 const fmtTime = (ms: number) => {
@@ -35,35 +25,23 @@ const fmtTime = (ms: number) => {
 
 const sayItem = (it: StudyItem) => speak(it.kind === 'letter' && it.letter ? it.letter.example.bg : it.bg, { itemId: it.id })
 
+const fade = (i: number) => ({
+  initial: { opacity: 0, y: 6 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.25, ease: [0.2, 0.8, 0.2, 1] as [number, number, number, number], delay: 0.06 * i },
+})
+
 export function CompleteScreen() {
   const screen = useApp((s) => s.screen)
   const go = useApp((s) => s.go)
   const result = screen.name === 'complete' ? screen.result : null
-  const [xp, setXp] = useState(0)
-  const fired = useRef(false)
+  const played = useRef(false)
 
-  // Count the XP up (re-runs safely under StrictMode).
+  // A short chime once per result.
   useEffect(() => {
-    if (!result) return
-    const controls = animate(0, result.xp, { duration: reduceMotion() ? 0 : 1.1, delay: 0.25, ease: [0.2, 0.8, 0.2, 1], onUpdate: (v) => setXp(Math.round(v)) })
-    return () => {
-      controls.stop()
-      setXp(result.xp)
-    }
-  }, [result])
-
-  // Sound and confetti once per result.
-  useEffect(() => {
-    if (!result || fired.current) return
-    fired.current = true
+    if (!result || played.current) return
+    played.current = true
     sfx.complete()
-    if (reduceMotion()) return
-    const colors = tokenColors()
-    const shoot = (x: number, angle: number) =>
-      confetti({ particleCount: 70, spread: 70, angle, startVelocity: 52, origin: { x, y: 0.62 }, colors, shapes: ['square'], scalar: 1.1, ticks: 220, disableForReducedMotion: true })
-    shoot(0.1, 60)
-    shoot(0.9, 120)
-    if (result.perfect) setTimeout(() => confetti({ particleCount: 120, spread: 110, origin: { y: 0.35 }, colors, shapes: ['square', 'circle'], disableForReducedMotion: true }), 450)
   }, [result])
 
   if (!result) return null
@@ -73,137 +51,142 @@ export function CompleteScreen() {
   const isLessonKind = result.kind === 'lesson' || result.kind === 'letters'
   const levelName = result.levelUp ? LEVEL_NAMES[Math.min(result.levelUp.to - 1, LEVEL_NAMES.length - 1)] : null
   const words = result.newItems.slice(0, 8)
-
-  const tile = (i: number) => ({
-    initial: { opacity: 0, y: 18, scale: 0.85 },
-    animate: { opacity: 1, y: 0, scale: 1 },
-    transition: { type: 'spring' as const, stiffness: 380, damping: 22, delay: 0.55 + i * 0.12 },
-  })
+  const showStory = result.lessonLevelUp && result.kind === 'story'
+  const showLesson = result.lessonLevelUp && isLessonKind
+  const hasNews = result.goalReached || !!levelName || showStory || showLesson
 
   return (
     <div className={`done gv-tone-${result.trackId}`}>
       <div className="done__body flow__pad">
-        <motion.div className="done__mascot" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 16 }}>
-          <Mascot mood={result.perfect ? 'cheer' : 'happy'} size={132} />
-        </motion.div>
+        <div className="gv-shevitsa done__band" aria-hidden="true" />
 
-        <div className="done__head">
+        <motion.header className="done__hero" {...fade(0)}>
+          <span className="gv-ring-wrap done__mark">
+            <svg className="gv-ring gv-ring--lg gv-tone-pine" viewBox="0 0 36 36" style={{ ['--value' as string]: 100 }} aria-hidden="true">
+              <circle className="gv-ring__track" cx="18" cy="18" r="16" />
+              <circle className="gv-ring__value" cx="18" cy="18" r="16" pathLength={100} />
+            </svg>
+            <span className="gv-ring__label done__check">
+              <IconCheck />
+            </span>
+          </span>
+          <h1 className="t-title1 done__title">{title.en}</h1>
           <p className="done__bg" lang="bg">
             {result.perfect ? 'Перфектно!' : title.bg}
           </p>
-          <h1 className="t-screen-title">{title.en}</h1>
-        </div>
+        </motion.header>
 
-        <motion.div className="done__xp" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 14, delay: 0.2 }} aria-label={`${result.xp} XP earned`}>
-          <IconStar className="done__xp-star" />
-          <span className="t-hero">+{xp}</span>
-          <span className="done__xp-unit">XP</span>
-          {result.perfect && <span className="done__perfect">+5 perfect bonus</span>}
+        <motion.div className="gv-statgrid done__stats" {...fade(1)}>
+          <div className="gv-statcell">
+            <span className="gv-statcell__label">Accuracy</span>
+            <span className="gv-statcell__value">
+              {accuracy}
+              <span className="gv-statcell__unit">%</span>
+            </span>
+          </div>
+          <div className="gv-statcell">
+            <span className="gv-statcell__label">Time</span>
+            <span className="gv-statcell__value">{fmtTime(result.ms)}</span>
+          </div>
+          <div className="gv-statcell">
+            <span className="gv-statcell__label">XP</span>
+            <span className="gv-statcell__value">+{result.xp}</span>
+          </div>
         </motion.div>
 
-        <div className="done__tiles">
-          <motion.div className="done-tile gv-tone-pine" {...tile(0)}>
-            <span className="done-tile__label">Accuracy</span>
-            <span className="done-tile__value">{accuracy}%</span>
-          </motion.div>
-          <motion.div className="done-tile gv-tone-pick" {...tile(1)}>
-            <span className="done-tile__label">Time</span>
-            <span className="done-tile__value">{fmtTime(result.ms)}</span>
-          </motion.div>
-          <motion.div className="done-tile gv-tone-gold" {...tile(2)}>
-            <span className="done-tile__label">Streak</span>
-            <span className="done-tile__value">
-              <IconFlame className={`done-tile__flame ${result.streakIncreased ? 'is-new' : ''}`} />
-              {result.streak}
-            </span>
-            {result.streakIncreased && (
-              <motion.span className="done-tile__plus" initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 1.1 }}>
-                +1
-              </motion.span>
+        <motion.p className="done__streak" {...fade(2)}>
+          <IconFlame className="done__flame" />
+          <span>
+            <strong>{result.streak}-day streak</strong>
+            {result.streakIncreased && <span className="done__streak-new"> · +1 today</span>}
+          </span>
+          {result.perfect && <span className="done__perfect">Perfect · +5 XP</span>}
+        </motion.p>
+
+        {hasNews && (
+          <motion.div className="gv-list done__news" {...fade(3)}>
+            {result.goalReached && (
+              <div className="gv-row gv-tone-gold">
+                <span className="gv-row__icon">
+                  <IconTarget />
+                </span>
+                <span className="gv-row__body">
+                  <span className="gv-row__title">Daily goal reached</span>
+                  <span className="gv-row__subtitle">
+                    <span lang="bg">Цел постигната.</span> Same time tomorrow?
+                  </span>
+                </span>
+              </div>
+            )}
+            {result.levelUp && levelName && (
+              <div className="gv-row gv-tone-azbuka">
+                <span className="gv-row__icon">
+                  <IconStar />
+                </span>
+                <span className="gv-row__body">
+                  <span className="gv-row__title">
+                    Level {result.levelUp.to}: {levelName.en}
+                  </span>
+                  <span className="gv-row__subtitle" lang="bg">
+                    {levelName.bg}
+                  </span>
+                </span>
+              </div>
+            )}
+            {showLesson && (
+              <div className="gv-row">
+                <span className="gv-row__icon done__dots" aria-hidden="true">
+                  {[1, 2, 3].map((n) => (
+                    <i key={n} className={n <= result.level ? 'on' : ''} />
+                  ))}
+                </span>
+                <span className="gv-row__body">
+                  <span className="gv-row__title">Level {result.level} of 3 complete</span>
+                  <span className="gv-row__subtitle">{result.level < 3 ? `Level ${result.level + 1} unlocked: harder exercises, same words.` : 'You have mastered this lesson.'}</span>
+                </span>
+              </div>
+            )}
+            {showStory && (
+              <div className="gv-row">
+                <span className="gv-row__icon">
+                  <IconChat />
+                </span>
+                <span className="gv-row__body">
+                  <span className="gv-row__title">Next unit unlocked</span>
+                  <span className="gv-row__subtitle">Replay this conversation any time from the path.</span>
+                </span>
+              </div>
             )}
           </motion.div>
-        </div>
-
-        <div className="done__banners">
-          {result.goalReached && (
-            <motion.div className="done-banner gv-tone-gold" {...tile(3)}>
-              <IconTarget className="done-banner__icon" />
-              <div>
-                <p className="done-banner__title">Daily goal reached</p>
-                <p className="done-banner__sub">
-                  <span lang="bg">Цел постигната.</span> Same time tomorrow?
-                </p>
-              </div>
-            </motion.div>
-          )}
-          {result.levelUp && levelName && (
-            <motion.div className="done-banner gv-tone-azbuka" {...tile(4)}>
-              <span className="done-banner__badge">{result.levelUp.to}</span>
-              <div>
-                <p className="done-banner__title">Level up: {levelName.en}</p>
-                <p className="done-banner__sub" lang="bg">
-                  {levelName.bg}
-                </p>
-              </div>
-            </motion.div>
-          )}
-          {result.lessonLevelUp && isLessonKind && (
-            <motion.div className="done-banner gv-tone-rose" {...tile(5)}>
-              <span className="done-banner__stars" aria-hidden="true">
-                {[1, 2, 3].map((n) => (
-                  <motion.i key={n} className={n <= result.level ? 'on' : ''} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 12, delay: 1.2 + n * 0.15 }} />
-                ))}
-              </span>
-              <div>
-                <p className="done-banner__title">Level {result.level} of 3 complete</p>
-                <p className="done-banner__sub">{result.level < 3 ? `Level ${result.level + 1} is unlocked: harder exercises, same words.` : 'You mastered this lesson.'}</p>
-              </div>
-            </motion.div>
-          )}
-          {result.lessonLevelUp && result.kind === 'story' && (
-            <motion.div className="done-banner gv-tone-rose" {...tile(5)}>
-              <span className="done-banner__badge" aria-hidden="true">
-                💬
-              </span>
-              <div>
-                <p className="done-banner__title">Conversation unlocked the next unit</p>
-                <p className="done-banner__sub">Replay it any time from the path.</p>
-              </div>
-            </motion.div>
-          )}
-        </div>
+        )}
 
         {words.length > 0 && (
-          <motion.section className="done__words" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}>
-            <h2 className="done__words-title">{result.kind === 'letters' ? 'New letters' : 'New words'}</h2>
-            <ul className="done__chips">
+          <motion.section className="gv-section done__words" {...fade(4)}>
+            <h2 className="gv-section-header">{result.kind === 'letters' ? 'New letters' : 'New words'}</h2>
+            <div className="gv-list">
               {words.map((w) => (
-                <li key={w.id}>
-                  <button type="button" className="done-chip" onClick={() => void sayItem(w)}>
-                    <span className="done-chip__emoji" aria-hidden="true">
-                      {w.emoji}
+                <button key={w.id} type="button" className="gv-row done__word" onClick={() => void sayItem(w)} aria-label={`Play ${w.bg}`}>
+                  <span className="gv-row__body">
+                    <span className="gv-row__title" lang="bg">
+                      {w.kind === 'letter' && w.letter ? `${w.letter.upper} ${w.letter.lower}` : w.bg}
                     </span>
-                    <span className="done-chip__text">
-                      <span className="done-chip__bg" lang="bg">
-                        {w.kind === 'letter' && w.letter ? `${w.letter.upper} ${w.letter.lower}` : w.bg}
-                      </span>
-                      <span className="done-chip__en">{w.kind === 'letter' ? w.tr : w.en}</span>
-                    </span>
-                    <IconSpeaker className="done-chip__icon" />
-                  </button>
-                </li>
+                    <span className="gv-row__subtitle">{w.kind === 'letter' ? w.tr : `${w.tr} · ${w.en}`}</span>
+                  </span>
+                  <span className="done__play" aria-hidden="true">
+                    <IconSpeaker />
+                  </span>
+                </button>
               ))}
-            </ul>
+            </div>
           </motion.section>
         )}
       </div>
 
       <div className="done__foot flow__pad">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
-          <button type="button" className="gv-btn gv-btn--block" onClick={() => go({ name: 'home' })}>
-            Continue
-          </button>
-        </motion.div>
+        <ShareProgress result={result} />
+        <button type="button" className="gv-btn gv-btn--block" onClick={() => go({ name: 'home' })}>
+          Continue
+        </button>
       </div>
     </div>
   )

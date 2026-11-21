@@ -2,22 +2,27 @@ import { AnimatePresence, motion } from 'motion/react'
 import type { CSSProperties } from 'react'
 import { useApp } from '../lib/store.ts'
 
+// An iOS-style capsule under the status bar, on a translucent material.
 const style: CSSProperties = {
   position: 'fixed',
   left: '50%',
-  bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
+  top: 'calc(env(safe-area-inset-top, 0px) + 10px)',
   zIndex: 40,
-  width: 'min(440px, calc(100vw - 32px))',
-  padding: '12px 16px',
-  borderRadius: 'var(--radius-md)',
-  background: 'var(--ink)',
-  color: 'var(--linen)',
-  boxShadow: 'var(--shadow-float)',
-  font: '600 15px/20px var(--font-text)',
+  width: 'max-content',
+  maxWidth: 'min(420px, calc(100vw - 32px))',
+  padding: '10px 18px',
+  borderRadius: 'var(--radius-full)',
+  background: 'var(--material-thick)',
+  WebkitBackdropFilter: 'saturate(180%) blur(30px)',
+  backdropFilter: 'saturate(180%) blur(30px)',
+  color: 'var(--ink)',
+  boxShadow: 'var(--shadow-float), 0 0 0 var(--hairline) var(--separator)',
+  font: '500 15px/20px var(--font-text)',
   textAlign: 'center',
+  textWrap: 'balance',
 }
 
-/** A short, friendly message that slides up and fades away. */
+/** A short, friendly message that drops in from the top and fades away. */
 export function Toast() {
   const toast = useApp((s) => s.toast)
   return (
@@ -28,10 +33,10 @@ export function Toast() {
           role="status"
           aria-live="polite"
           style={style}
-          initial={{ opacity: 0, y: 24, x: '-50%' }}
-          animate={{ opacity: 1, y: 0, x: '-50%' }}
-          exit={{ opacity: 0, y: 12, x: '-50%' }}
-          transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+          initial={{ opacity: 0, y: -16, x: '-50%', scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, x: '-50%', scale: 1 }}
+          exit={{ opacity: 0, y: -10, x: '-50%', scale: 0.98 }}
+          transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
         >
           {toast.text}
         </motion.div>

@@ -83,6 +83,7 @@ export const voiceForWho = (who: string, speaker: 'm' | 'f'): VoiceProfile => (w
 
 const VOICES_BASE = `${import.meta.env.BASE_URL}voices/`
 let clips = new Map<string, string>()
+let clipSource: { provider: string | null; voices: Partial<Record<VoiceProfile, string>> } = { provider: null, voices: {} }
 let manifestPromise: Promise<void> | null = null
 
 /** Loads public/voices/manifest.json once. Missing or broken manifests simply mean "no clips". */
@@ -90,11 +91,24 @@ export function manifestReady(): Promise<void> {
   if (!manifestPromise)
     manifestPromise = fetch(`${VOICES_BASE}manifest.json`, { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : null))
-      .then((m: { clips?: Record<string, string> } | null) => {
+      .then((m: { clips?: Record<string, string>; provider?: string; voices?: Partial<Record<VoiceProfile, string>> } | null) => {
         if (m?.clips) clips = new Map(Object.entries(m.clips))
+        // Older manifests (Azure only) have no provider field.
+        if (m) clipSource = { provider: m.provider ?? (m.clips ? 'azure' : null), voices: m.voices ?? {} }
       })
       .catch(() => undefined)
   return manifestPromise
+}
+
+/** Who voiced the clips: provider ("elevenlabs" | "azure") and the voice name per profile. */
+export const clipVoices = () => clipSource
+
+/** A label for the main voice, e.g. "Milena (ElevenLabs)" or "Kalina (Microsoft)"; null without clips. */
+export function clipVoiceLabel(): string | null {
+  if (!clips.size || !clipSource.provider) return null
+  const provider = clipSource.provider === 'elevenlabs' ? 'ElevenLabs' : clipSource.provider === 'azure' ? 'Microsoft' : clipSource.provider
+  const name = clipSource.voices.f ?? (clipSource.provider === 'azure' ? 'Kalina' : null)
+  return name ? `${name} (${provider})` : provider
 }
 if (typeof window !== 'undefined') void manifestReady()
 

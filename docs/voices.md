@@ -35,11 +35,11 @@ To try other voices later:
 3. Set the repository variables `ELEVENLABS_VOICE_F`, `ELEVENLABS_VOICE_M` or `ELEVENLABS_VOICE_KID` (https://github.com/Wasim-Dilov/govori/settings/variables/actions/new). Changing a voice makes fresh clips for it.
 
 ### 4. Voice the app
-Run the workflow with mode **full** (or just wait: it also runs when lessons change and on the 2nd of every month). It makes the clips in learning order, commits them and redeploys the site.
+Run the workflow with mode **full** (or just wait: it also runs when lessons change and on the 23rd of every month, just after the free credits refill). It makes the clips in learning order, commits them and redeploys the site.
 
 ### Characters and cost
 - Govori needs about 23,000 characters to voice everything once.
-- The **free plan** gives 10,000 characters a month. The run stops cleanly when the month's characters run out, and a monthly schedule (on the 2nd) carries on automatically, so everything is voiced over about three months. The free plan asks for attribution and is for non-commercial use, which fits a personal app.
+- The **free plan** gives 10,000 characters a month. The run stops cleanly when the month's characters run out, and a monthly schedule (on the 23rd, after the credits refill) carries on automatically, so everything is voiced over about three months. The free plan asks for attribution and is for non-commercial use, which fits a personal app.
 - Clips are made in learning order, so each month's characters voice what you meet first: the alphabet words, then lessons in 12-week-plan order (Basics units 1 and 2, Love unit 1, Kids unit 1, then every track unit by unit), then conversations, then single words for the word tiles, and last the woman's forms (only needed if Govori addresses the learner as a woman). Anything not yet voiced uses the phone's voice.
 - The **Starter plan** (about $5 for one month, cancel after) covers everything in one run.
 - After that, only new or changed lessons use characters.

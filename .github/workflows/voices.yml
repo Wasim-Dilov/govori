@@ -31,7 +31,7 @@ on:
       - 'scripts/voices-elevenlabs.mjs'
   # Free ElevenLabs plans get new characters each month: carry on where the last run stopped.
   schedule:
-    - cron: '17 6 2 * *'
+    - cron: '17 6 23 * *'
 
 permissions:
   contents: write

@@ -1,14 +1,13 @@
-// The "Me" tab: profile, settings, reminders, her voice, data.
+// The "Me" tab: profile, settings, reminders, her voice, data. Native iOS Settings layout.
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { Mascot } from '../components/Mascot.tsx'
 import { InstallGuide } from '../components/InstallGuide.tsx'
 import { Recorder } from '../components/Recorder.tsx'
-import { IconBell, IconFlame, IconHeart, IconMic, IconSpeaker, IconStar, IconTarget, IconUser } from '../components/Icons.tsx'
+import { IconCheck, IconSpeaker, IconUser } from '../components/Icons.tsx'
 import { allItemIds, study, trackById, tracks } from '../content/index.ts'
 import { planWeek } from '../content/plan.ts'
 import type { TrackId } from '../content/types.ts'
-import { clipCount, clipUrls, hasBulgarianVoice, manifestReady, sfx, speak } from '../lib/audio.ts'
+import { clipCount, clipUrls, clipVoiceLabel, hasBulgarianVoice, manifestReady, sfx, speak } from '../lib/audio.ts'
 import { db, getKV } from '../lib/db.ts'
 import { exportAll } from '../lib/exportData.ts'
 import { readBackup, restoreBackup, type Backup, type BackupSummary } from '../lib/importData.ts'
@@ -16,7 +15,6 @@ import { learnerLevel, liveStreak } from '../lib/progress.ts'
 import { GITHUB_ACTION_URL, GITHUB_SECRET_URL, disableReminders, enableReminders, getReminderCode, reminderStatus, type ReminderStatus } from '../lib/push.ts'
 import { useApp, type Profile } from '../lib/store.ts'
 import './me.css'
-
 
 const GOALS = [
   { xp: 20, label: '5 min' },
@@ -26,61 +24,109 @@ const GOALS = [
 
 // ------------------------------------------------------------- small building blocks
 
-function Section({ icon, tone, title, children }: { icon: ReactNode; tone: string; title: string; children: ReactNode }) {
+const IconExternal = () => (
+  <svg className="me-ext" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M14 5h5v5M19 5l-8 8M17 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h4" />
+  </svg>
+)
+const IconSearch = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+    <circle cx="10.5" cy="10.5" r="6" />
+    <path d="M15 15l5 5" />
+  </svg>
+)
+
+/** True once the page has scrolled past the large title, so the compact bar can take over. */
+function useScrolled(threshold = 44) {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > threshold)
+    on()
+    window.addEventListener('scroll', on, { passive: true })
+    return () => window.removeEventListener('scroll', on)
+  }, [threshold])
+  return scrolled
+}
+
+function Section({ title, footer, children, before }: { title?: string; footer?: ReactNode; children: ReactNode; before?: ReactNode }) {
   return (
-    <section className="gv-card me-card" aria-label={title}>
-      <h2 className="me-card-head">
-        <span className={`me-card-icon gv-tone-${tone}`} aria-hidden="true">
-          {icon}
-        </span>
-        <span className="t-card-title">{title}</span>
-      </h2>
-      <div className="me-rows">{children}</div>
+    <section className="gv-section" aria-label={title}>
+      {title && <h2 className="gv-section-header">{title}</h2>}
+      {before}
+      <div className="gv-list">{children}</div>
+      {footer && <div className="gv-section-footer">{footer}</div>}
     </section>
   )
 }
 
-function Row({ label, hint, children }: { label: ReactNode; hint?: ReactNode; children?: ReactNode }) {
+function Row({ title, subtitle, accessory, children, className = '' }: { title: ReactNode; subtitle?: ReactNode; accessory?: ReactNode; children?: ReactNode; className?: string }) {
   return (
-    <div className="me-row">
-      <div className="me-row-text">
-        <span className="me-row-label">{label}</span>
-        {hint && <span className="me-row-hint">{hint}</span>}
-      </div>
-      {children && <div className="me-row-ctrl">{children}</div>}
+    <div className={`gv-row ${className}`}>
+      <span className="gv-row__body">
+        <span className="gv-row__title">{title}</span>
+        {subtitle && <span className="gv-row__subtitle">{subtitle}</span>}
+        {children}
+      </span>
+      {accessory && <span className="gv-row__accessory">{accessory}</span>}
     </div>
   )
 }
 
-function Toggle({ label, hint, on, onChange }: { label: string; hint?: string; on: boolean; onChange: (v: boolean) => void }) {
+/** A tappable row whose title is an action in the accent colour, like iOS Settings. */
+function ActionRow({ label, subtitle, onClick, disabled }: { label: ReactNode; subtitle?: ReactNode; onClick: () => void; disabled?: boolean }) {
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={on}
-      className="me-row me-toggle"
-      onClick={() => {
-        sfx.tap()
-        onChange(!on)
-      }}
-    >
-      <span className="me-row-text">
-        <span className="me-row-label">{label}</span>
-        {hint && <span className="me-row-hint">{hint}</span>}
+    <button type="button" className="gv-row me-action" onClick={onClick} disabled={disabled}>
+      <span className="gv-row__body">
+        <span className="gv-row__title">{label}</span>
+        {subtitle && <span className="gv-row__subtitle">{subtitle}</span>}
       </span>
-      <span className="me-switch" aria-hidden="true" />
     </button>
   )
 }
 
-function Chips<T extends string | number>({ label, value, options, onPick }: { label: string; value: T; options: { v: T; label: string }[]; onPick: (v: T) => void }) {
+function LinkRow({ href, title, subtitle }: { href: string; title: string; subtitle?: ReactNode }) {
   return (
-    <div className="gv-chips" role="group" aria-label={label}>
+    <a className="gv-row" href={href} target="_blank" rel="noreferrer">
+      <span className="gv-row__body">
+        <span className="gv-row__title me-link-title">{title}</span>
+        {subtitle && <span className="gv-row__subtitle">{subtitle}</span>}
+      </span>
+      <span className="gv-row__accessory">
+        <IconExternal />
+      </span>
+    </a>
+  )
+}
+
+function ToggleRow({ id, label, hint, on, onChange }: { id: string; label: string; hint?: string; on: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="gv-row me-toggle-row" htmlFor={id}>
+      <span className="gv-row__body">
+        <span className="gv-row__title">{label}</span>
+        {hint && <span className="gv-row__subtitle">{hint}</span>}
+      </span>
+      <input
+        id={id}
+        type="checkbox"
+        role="switch"
+        className="gv-toggle"
+        checked={on}
+        onChange={(e) => {
+          sfx.tap()
+          onChange(e.target.checked)
+        }}
+      />
+    </label>
+  )
+}
+
+function Segmented<T extends string | number>({ label, value, options, onPick, block }: { label: string; value: T; options: { v: T; label: string }[]; onPick: (v: T) => void; block?: boolean }) {
+  return (
+    <div className={`gv-segmented ${block ? 'gv-segmented--block' : ''}`} role="group" aria-label={label}>
       {options.map((o) => (
         <button
           key={String(o.v)}
           type="button"
-          className="gv-chip"
           aria-pressed={value === o.v}
           onClick={() => {
             sfx.tap()
@@ -94,59 +140,63 @@ function Chips<T extends string | number>({ label, value, options, onPick }: { l
   )
 }
 
+const initials = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join('')
+
 // ------------------------------------------------------------- sections
 
 function ProfileHeader() {
   const profile = useApp((s) => s.profile)
   const summary = useApp((s) => s.summary)
   const learned = useApp((s) => s.learned)
-  const reduce = useReducedMotion()
   const lvl = learnerLevel(summary.totalXp)
   const streak = liveStreak(summary)
+  const ini = initials(profile.name)
   return (
-    <header className="me-hero">
-      <div className="me-hero-top">
-        <Mascot mood={streak > 0 ? 'happy' : 'idle'} size={96} />
-        <div className="me-hero-id">
-          <h1 className="t-screen-title">{profile.name || 'You'}</h1>
-          <p className="me-level">
-            Level {lvl.level} · <span lang="bg">{lvl.name.bg}</span>
-          </p>
-          <p className="me-level-en">{lvl.name.en}</p>
+    <section className="gv-section me-profile" aria-label="Profile">
+      <div className="gv-list">
+        <div className="gv-row me-profile-row">
+          <span className="me-avatar" aria-hidden="true">
+            {ini || <IconUser />}
+          </span>
+          <span className="gv-row__body">
+            <span className="gv-row__title me-name">{profile.name || 'You'}</span>
+            <span className="gv-row__subtitle">
+              Level {lvl.level} · <span lang="bg">{lvl.name.bg}</span> · {lvl.name.en}
+            </span>
+            <span className="gv-progress me-xp" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(lvl.progress * 100)} aria-label={`${summary.totalXp - lvl.floor} of ${lvl.next - lvl.floor} XP to level ${lvl.level + 1}`}>
+              <span className="gv-progress__fill" style={{ width: `${Math.max(3, Math.round(lvl.progress * 100))}%`, display: 'block' }} />
+            </span>
+          </span>
         </div>
       </div>
-      <div className="me-xpbar">
-        <div className="gv-progress gv-tone-gold" aria-label={`${summary.totalXp - lvl.floor} of ${lvl.next - lvl.floor} XP to level ${lvl.level + 1}`}>
-          <motion.div
-            className="gv-progress__fill"
-            initial={reduce ? false : { width: '0%' }}
-            animate={{ width: `${Math.max(4, Math.round(lvl.progress * 100))}%` }}
-            transition={{ type: 'spring', stiffness: 120, damping: 18 }}
-          />
+      <div className="gv-statgrid me-stats">
+        <div className="gv-statcell">
+          <span className="gv-statcell__label">Streak</span>
+          <span className={`gv-statcell__value ${streak > 0 ? 'me-accent' : ''}`}>
+            {streak}
+            <span className="gv-statcell__unit">{streak === 1 ? 'day' : 'days'}</span>
+          </span>
         </div>
-        <span className="me-xpbar-note">
-          {lvl.next - summary.totalXp} XP to level {lvl.level + 1}
-        </span>
-      </div>
-      <div className="me-stats">
-        <div className="me-stat">
-          <IconFlame />
-          <span className="t-stat">{streak}</span>
-          <span className="me-stat-label">day streak</span>
+        <div className="gv-statcell">
+          <span className="gv-statcell__label">Total XP</span>
+          <span className="gv-statcell__value">{summary.totalXp.toLocaleString('en-GB')}</span>
         </div>
-        <div className="me-stat">
-          <IconStar className="me-stat-star" />
-          <span className="t-stat">{summary.totalXp}</span>
-          <span className="me-stat-label">total XP</span>
-        </div>
-        <div className="me-stat">
-          <IconHeart className="me-stat-heart" />
-          <span className="t-stat">{learned}</span>
-          <span className="me-stat-label">words met</span>
+        <div className="gv-statcell">
+          <span className="gv-statcell__label">Words met</span>
+          <span className="gv-statcell__value">{learned.toLocaleString('en-GB')}</span>
         </div>
       </div>
-      <div className="gv-shevitsa gv-shevitsa--sm gv-tone-rose me-band" aria-hidden="true" />
-    </header>
+      <p className="gv-section-footer">
+        {(lvl.next - summary.totalXp).toLocaleString('en-GB')} XP to level {lvl.level + 1}.
+      </p>
+    </section>
   )
 }
 
@@ -158,79 +208,115 @@ function LearningSection() {
   const [picking, setPicking] = useState(false)
   const [scope, setScope] = useState<'day' | 'week'>(focus.scope === 'day' ? 'day' : 'week')
   const week = planWeek(profile.startedAt)
-  const focusLabel =
-    focus.track === 'plan' ? `Week ${week.week} of the plan: ${week.title}` : `${trackById.get(focus.track)?.title ?? focus.track}, ${focus.scope === 'day' ? 'today' : 'this week'}`
+  const focusShort = focus.track === 'plan' ? '12-week plan' : (trackById.get(focus.track)?.title ?? focus.track)
+  const focusLong =
+    focus.track === 'plan' ? `Week ${week.week}: ${week.title}` : `${trackById.get(focus.track)?.title ?? focus.track}, ${focus.scope === 'day' ? 'today' : 'this week'}`
 
   return (
-    <Section icon={<IconTarget />} tone="pick" title="Learning">
-      <Row label="Focus" hint={focusLabel}>
-        <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => setPicking((p) => !p)} aria-expanded={picking}>
-          {picking ? 'Done' : 'Change'}
-        </button>
-      </Row>
+    <Section title="Learning" footer="Focus decides what the Today card suggests. Bulgarian changes some words by who is speaking, so Govori uses the right form for you.">
+      <button type="button" className="gv-row" onClick={() => setPicking((p) => !p)} aria-expanded={picking}>
+        <span className="gv-row__body">
+          <span className="gv-row__title">Focus</span>
+          <span className="gv-row__subtitle">{focusLong}</span>
+        </span>
+        <span className="gv-row__accessory">{focusShort}</span>
+        <span className={`gv-row__chevron me-chevron ${picking ? 'is-open' : ''}`} aria-hidden="true" />
+      </button>
       {picking && (
-        <div className="me-focus">
-          <Chips
-            label="Focus for"
-            value={scope}
-            options={[
-              { v: 'day', label: 'Today' },
-              { v: 'week', label: 'This week' },
-            ]}
-            onPick={setScope}
-          />
-          <div className="me-focus-grid">
-            <button type="button" className={`me-focus-opt gv-tone-rose ${focus.track === 'plan' ? 'is-active' : ''}`} aria-pressed={focus.track === 'plan'} onClick={() => void setFocus('plan', 'week')}>
-              <span aria-hidden="true">🗓️</span> 12-week plan
-            </button>
-            {tracks.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                className={`me-focus-opt gv-tone-${t.id} ${focus.track === t.id ? 'is-active' : ''}`}
-                aria-pressed={focus.track === t.id}
-                onClick={() => {
-                  sfx.tap()
-                  void setFocus(t.id as TrackId, scope)
-                }}
-              >
-                <span aria-hidden="true">{t.emoji}</span> {t.title}
-              </button>
-            ))}
+        <>
+          <div className="gv-row me-sub-row">
+            <Segmented
+              label="Focus for"
+              value={scope}
+              block
+              options={[
+                { v: 'day', label: 'Today' },
+                { v: 'week', label: 'This week' },
+              ]}
+              onPick={setScope}
+            />
           </div>
-        </div>
+          <button
+            type="button"
+            className="gv-row me-sub-row"
+            aria-pressed={focus.track === 'plan'}
+            onClick={() => {
+              sfx.tap()
+              void setFocus('plan', 'week')
+            }}
+          >
+            <span className="gv-row__icon" aria-hidden="true">
+              🗓️
+            </span>
+            <span className="gv-row__body">
+              <span className="gv-row__title">12-week plan</span>
+              <span className="gv-row__subtitle">This week: {week.title}</span>
+            </span>
+            {focus.track === 'plan' && (
+              <span className="gv-row__accessory me-check">
+                <IconCheck />
+              </span>
+            )}
+          </button>
+          {tracks.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`gv-row me-sub-row gv-tone-${t.id}`}
+              aria-pressed={focus.track === t.id}
+              onClick={() => {
+                sfx.tap()
+                void setFocus(t.id as TrackId, scope)
+              }}
+            >
+              <span className="gv-row__icon" aria-hidden="true">
+                {t.emoji}
+              </span>
+              <span className="gv-row__body">
+                <span className="gv-row__title">{t.title}</span>
+                <span className="gv-row__subtitle" lang="bg">
+                  {t.titleBg}
+                </span>
+              </span>
+              {focus.track === t.id && (
+                <span className="gv-row__accessory me-check">
+                  <IconCheck />
+                </span>
+              )}
+            </button>
+          ))}
+        </>
       )}
-      <Row label="Daily goal" hint={`${profile.dailyGoal} XP a day`}>
-        <Chips label="Daily goal" value={profile.dailyGoal} options={GOALS.map((g) => ({ v: g.xp, label: g.label }))} onPick={(v) => void setProfile({ dailyGoal: v })} />
-      </Row>
+      <Row title="Daily goal" subtitle={`${profile.dailyGoal} XP a day`} accessory={<Segmented label="Daily goal" value={profile.dailyGoal} options={GOALS.map((g) => ({ v: g.xp, label: g.label }))} onPick={(v) => void setProfile({ dailyGoal: v })} />} />
       <Row
-        label="Address me as"
-        hint={
+        title="Address me as"
+        subtitle={
           <>
-            Changes forms like <span lang="bg">{profile.speaker === 'f' ? 'уморена' : 'уморен'}</span>
+            Forms like <span lang="bg">{profile.speaker === 'f' ? 'уморена' : 'уморен'}</span>
           </>
         }
-      >
-        <Chips
-          label="Address me as"
-          value={profile.speaker}
-          options={[
-            { v: 'm', label: 'A man' },
-            { v: 'f', label: 'A woman' },
-          ]}
-          onPick={(v) => void setProfile({ speaker: v })}
-        />
-      </Row>
-      <Toggle label="Show transliteration" hint="Latin letters under the Bulgarian, like obícham te" on={profile.translit} onChange={(v) => void setProfile({ translit: v })} />
-      <Toggle label="Speaking exercises" hint="Say words out loud and hear yourself back" on={profile.speaking} onChange={(v) => void setProfile({ speaking: v })} />
+        accessory={
+          <Segmented
+            label="Address me as"
+            value={profile.speaker}
+            options={[
+              { v: 'm', label: 'A man' },
+              { v: 'f', label: 'A woman' },
+            ]}
+            onPick={(v) => void setProfile({ speaker: v })}
+          />
+        }
+      />
+      <ToggleRow id="me-translit" label="Show transliteration" hint="Latin letters under the Bulgarian" on={profile.translit} onChange={(v) => void setProfile({ translit: v })} />
+      <ToggleRow id="me-speaking" label="Speaking exercises" hint="Say words out loud and hear yourself" on={profile.speaking} onChange={(v) => void setProfile({ speaking: v })} />
     </Section>
   )
 }
 
 const VOICE_CACHE = 'govori-voices'
 
-/** The Microsoft voice: how many clips exist, how many are saved on the phone, and saving the rest. */
-function VoiceClips({ count }: { count: number }) {
+/** The neural voice clips: who voiced them, how many exist, how many are saved, and saving the rest. */
+function VoiceClips({ count, label }: { count: number; label: string }) {
   const [saved, setSaved] = useState<number | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -285,26 +371,26 @@ function VoiceClips({ count }: { count: number }) {
   }
 
   const all = saved !== null && saved >= count
+  const pct = Math.min(100, ((saved ?? 0) / count) * 100)
   return (
     <>
-      <Row label="Voice: Kalina (Microsoft)" hint={`${count.toLocaleString()} Bulgarian clips, natural neural voices`}>
-        <span className="me-voice-badge" aria-hidden="true">
-          <IconSpeaker />
-        </span>
-      </Row>
+      <Row title="Voice" accessory={label} />
+      <Row title="Bulgarian clips" accessory={count.toLocaleString('en-GB')} />
       {canCache && (
-        <div className="me-offline">
-          <div className="me-offline__head">
-            <span className="t-body-strong">Audio for offline</span>
-            <span className="muted t-caption">{saved === null ? 'Checking…' : `${Math.min(saved, count)} of ${count} saved`}</span>
-          </div>
-          <div className="gv-progress gv-tone-basics" role="progressbar" aria-valuemin={0} aria-valuemax={count} aria-valuenow={saved ?? 0} aria-label="Audio saved for offline">
-            <div className="gv-progress__fill" style={{ width: `${Math.max(4, Math.min(100, ((saved ?? 0) / count) * 100))}%` }} />
-          </div>
-          <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm gv-btn--block" onClick={() => void saveAll()} disabled={busy || all}>
-            {all ? 'All audio saved' : busy ? 'Saving…' : 'Save all audio for offline'}
-          </button>
-          {error && <p className="me-error t-caption">{error}</p>}
+        <div className="gv-row me-offline">
+          <span className="gv-row__body">
+            <span className="gv-row__title">Audio for offline</span>
+            <span className="gv-row__subtitle">{saved === null ? 'Checking…' : `${Math.min(saved, count).toLocaleString('en-GB')} of ${count.toLocaleString('en-GB')} saved`}</span>
+            <span className="gv-progress me-offline__bar" role="progressbar" aria-valuemin={0} aria-valuemax={count} aria-valuenow={saved ?? 0} aria-label="Audio saved for offline">
+              <span className="gv-progress__fill" style={{ width: `${Math.max(pct > 0 ? 3 : 0, pct)}%`, display: 'block' }} />
+            </span>
+            {error && <span className="me-error">{error}</span>}
+          </span>
+          <span className="gv-row__accessory">
+            <button type="button" className="gv-btn gv-btn--tinted gv-btn--sm" onClick={() => void saveAll()} disabled={busy || all}>
+              {all ? 'Saved' : busy ? 'Saving…' : 'Save all'}
+            </button>
+          </span>
         </div>
       )}
     </>
@@ -337,9 +423,14 @@ function SoundSection() {
   }, [voice])
 
   const [clips, setClips] = useState<number | null>(null)
+  const [label, setLabel] = useState<string | null>(null)
   useEffect(() => {
     let live = true
-    void manifestReady().then(() => live && setClips(clipCount()))
+    void manifestReady().then(() => {
+      if (!live) return
+      setClips(clipCount())
+      setLabel(clipVoiceLabel())
+    })
     return () => {
       live = false
     }
@@ -352,35 +443,35 @@ function SoundSection() {
   }
 
   return (
-    <Section icon={<IconSpeaker />} tone="basics" title="Sound">
-      <Toggle label="Sound effects" hint="Chimes for right and wrong answers" on={profile.sfx} onChange={(v) => void setProfile({ sfx: v })} />
-      {clips ? <VoiceClips count={clips} /> : null}
-      {clips ? null : (
-      <>
-      <Row
-        label="Bulgarian voice"
-        hint={voice === null ? 'Checking this phone…' : voice ? 'Ready on this phone' : 'Not found on this phone yet'}
-      >
-        <button type="button" className={`gv-iconbtn gv-iconbtn--sm me-iconbtn ${testing ? 'is-playing' : ''}`} onClick={() => void test()} aria-label="Play a test sentence: Здравей! Как си?">
-          <IconSpeaker />
-        </button>
-      </Row>
-      {voice === false && (
-        <div className="me-note">
-          <p className="me-note-title">Get the Bulgarian voice (free)</p>
+    <Section
+      title="Sound"
+      footer={
+        clips && label ? (
+          'Natural neural voices read every word and conversation. Her own recordings always play first.'
+        ) : voice === false ? (
           <ol className="me-steps">
-            <li>Open the iPhone <strong>Settings</strong> app.</li>
-            <li>
-              Go to <strong>Accessibility</strong>, <strong>Spoken Content</strong>, <strong>Voices</strong>.
-            </li>
-            <li>
-              Tap <strong>Bulgarian</strong> and download the voice.
-            </li>
-            <li>Come back and tap the speaker to test it.</li>
+            <li>Open the iPhone Settings app.</li>
+            <li>Go to Accessibility, Spoken Content, Voices.</li>
+            <li>Tap Bulgarian and download the voice, then come back and test it.</li>
           </ol>
-        </div>
-      )}
-      </>
+        ) : (
+          'Govori uses the Bulgarian voice built into your iPhone until neural clips are available.'
+        )
+      }
+    >
+      <ToggleRow id="me-sfx" label="Sound effects" hint="Chimes for right and wrong answers" on={profile.sfx} onChange={(v) => void setProfile({ sfx: v })} />
+      {clips && label ? (
+        <VoiceClips count={clips} label={label} />
+      ) : (
+        <Row
+          title="iPhone voice"
+          subtitle={voice === null ? 'Checking this phone…' : voice ? 'Bulgarian voice ready' : 'Bulgarian voice not found yet'}
+          accessory={
+            <button type="button" className={`gv-iconbtn gv-iconbtn--sm ${testing ? 'is-playing' : ''}`} onClick={() => void test()} aria-label="Play a test sentence: Здравей! Как си?">
+              <IconSpeaker />
+            </button>
+          }
+        />
       )}
     </Section>
   )
@@ -444,81 +535,68 @@ function RemindersSection() {
   }
 
   const onState = status?.enabled
+  const footer = error ? (
+    <span className="me-error" role="alert">
+      {error}
+    </span>
+  ) : status && !status.standalone ? (
+    'Once Govori is on your Home Screen, open it from there and come back to this page.'
+  ) : status && !status.supported ? (
+    status.reason
+  ) : status?.reason && !onState ? (
+    status.reason
+  ) : (
+    'A nudge around 19:30 Sofia time, or a word of the day if you already practised.'
+  )
+
   return (
-    <Section icon={<IconBell />} tone="gold" title="Reminders">
-      <Row
-        label="Evening reminder"
-        hint={!status ? 'Checking…' : onState ? 'On. A nudge around 19:30 Sofia time, or a word of the day if you already practised.' : 'Off'}
-      >
-        {status && (
-          <span className={`me-pill ${onState ? 'is-on' : ''}`}>{onState ? 'On' : 'Off'}</span>
-        )}
-      </Row>
+    <Section title="Reminders" footer={footer}>
+      <Row title="Evening reminder" subtitle={!status ? 'Checking…' : undefined} accessory={status ? (onState ? 'On' : 'Off') : undefined} />
 
       {status && !status.standalone ? (
-        <div className="me-sub">
-          <p className="me-row-hint">Reminders work when Govori runs from your Home Screen (iOS 16.4 or newer). Add it in three taps:</p>
-          <InstallGuide compact />
-          <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => void check()}>
-            I've added it, check again
-          </button>
-        </div>
-      ) : status && !status.supported ? (
-        <p className="me-row-hint me-sub">{status.reason}</p>
-      ) : status ? (
-        <div className="me-sub">
-          {status.reason && !onState && <p className="me-row-hint">{status.reason}</p>}
-          {!onState && !code && status.permission !== 'denied' && (
-            <button type="button" className="gv-btn gv-btn--block gv-tone-gold" onClick={() => void turnOn()} disabled={busy}>
-              {busy ? 'Turning on…' : 'Turn on reminders'}
-            </button>
-          )}
-          {!onState && status.permission === 'denied' && (
-            <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => void check()}>
-              I've allowed them, check again
-            </button>
-          )}
+        <>
+          <div className="gv-row me-block">
+            <span className="gv-row__body">
+              <span className="gv-row__subtitle">Reminders work when Govori runs from your Home Screen (iOS 16.4 or newer). Add it in three taps:</span>
+              <InstallGuide compact />
+            </span>
+          </div>
+          <ActionRow label="I've added it, check again" onClick={() => void check()} />
+        </>
+      ) : status && status.supported ? (
+        <>
+          {!onState && !code && status.permission !== 'denied' && <ActionRow label={busy ? 'Turning on…' : 'Turn on reminders'} onClick={() => void turnOn()} disabled={busy} />}
+          {!onState && status.permission === 'denied' && <ActionRow label="I've allowed them, check again" onClick={() => void check()} />}
           {code && (
-            <ol className="me-setup">
-              <li>
-                <p className="me-setup-title">Copy your setup code</p>
-                <p className="me-row-hint">It belongs to this phone only. Don't share it.</p>
-                <code id="me-code" className="me-code">
-                  {code}
-                </code>
-                <button type="button" className="gv-btn gv-btn--sm gv-tone-pine" onClick={() => void copy()}>
-                  {copied ? 'Copied' : 'Copy setup code'}
-                </button>
-              </li>
-              <li>
-                <p className="me-setup-title">Give it to GitHub</p>
-                <p className="me-row-hint">
-                  Name the secret <strong className="me-mono">GOVORI_PUSH</strong>, paste the code, tap Add secret.
-                </p>
-                <a className="gv-btn gv-btn--quiet gv-btn--sm me-link" href={GITHUB_SECRET_URL} target="_blank" rel="noreferrer">
-                  Open GitHub secrets
-                </a>
-              </li>
-              <li>
-                <p className="me-setup-title">Send a test</p>
-                <p className="me-row-hint">Tap Run workflow. A notification should arrive within a minute.</p>
-                <a className="gv-btn gv-btn--quiet gv-btn--sm me-link" href={GITHUB_ACTION_URL} target="_blank" rel="noreferrer">
-                  Open the reminder workflow
-                </a>
-              </li>
-            </ol>
+            <>
+              <div className="gv-row me-block">
+                <span className="gv-row__body">
+                  <span className="gv-row__title">1. Copy your setup code</span>
+                  <span className="gv-row__subtitle">It belongs to this phone only. Don't share it.</span>
+                  <code id="me-code" className="me-code">
+                    {code}
+                  </code>
+                </span>
+                <span className="gv-row__accessory">
+                  <button type="button" className="gv-btn gv-btn--tinted gv-btn--sm" onClick={() => void copy()}>
+                    {copied ? 'Copied' : 'Copy'}
+                  </button>
+                </span>
+              </div>
+              <LinkRow
+                href={GITHUB_SECRET_URL}
+                title="2. Add it to GitHub"
+                subtitle={
+                  <>
+                    Name the secret <span className="me-mono">GOVORI_PUSH</span> and paste the code.
+                  </>
+                }
+              />
+              <LinkRow href={GITHUB_ACTION_URL} title="3. Send a test" subtitle="Tap Run workflow. A notification arrives within a minute." />
+            </>
           )}
-          {onState && (
-            <button type="button" className="gv-btn gv-btn--ghost gv-btn--sm me-off" onClick={() => void turnOff()} disabled={busy}>
-              Turn off reminders
-            </button>
-          )}
-          {error && (
-            <p className="me-error" role="alert">
-              {error}
-            </p>
-          )}
-        </div>
+          {onState && <ActionRow label="Turn off reminders" onClick={() => void turnOff()} disabled={busy} />}
+        </>
       ) : null}
     </Section>
   )
@@ -553,17 +631,32 @@ function HerVoiceSection() {
   const shown = items.slice(0, limit)
 
   return (
-    <Section icon={<IconMic />} tone="love" title="Her voice">
-      <p className="me-row-hint me-sub">
-        Ask your wife to record words in her voice. Govori will play her recordings instead of the robot voice.
-      </p>
-      <div className="me-voice-bar">
-        <span className="me-count">
-          <strong>{recorded.size}</strong> recorded
-        </span>
-        <Chips
+    <Section
+      title="Her voice"
+      footer="Ask your wife to record words in her voice. Govori plays her recordings instead of the synthetic voice."
+      before={
+        <div className="me-search">
+          <IconSearch />
+          <label className="sr-only" htmlFor="me-voice-search">
+            Search words
+          </label>
+          <input id="me-voice-search" type="search" placeholder="Search Bulgarian or English" value={query} onChange={(e) => setQuery(e.target.value)} />
+        </div>
+      }
+    >
+      <Row
+        title="Recorded"
+        accessory={
+          <span className="me-count">
+            {recorded.size.toLocaleString('en-GB')} {recorded.size === 1 ? 'word' : 'words'}
+          </span>
+        }
+      />
+      <div className="gv-row me-sub-row">
+        <Segmented
           label="Which words"
           value={scope}
+          block
           options={[
             { v: 'learned', label: 'Learned' },
             { v: 'all', label: 'All words' },
@@ -574,48 +667,39 @@ function HerVoiceSection() {
           }}
         />
       </div>
-      <label className="sr-only" htmlFor="me-voice-search">
-        Search words
-      </label>
-      <input id="me-voice-search" className="me-search" type="search" placeholder="Search Bulgarian or English" value={query} onChange={(e) => setQuery(e.target.value)} />
       {shown.length === 0 ? (
-        <p className="me-empty">{scope === 'learned' && !query ? 'Finish a lesson and its words show up here, ready for her to record.' : 'No words match that search.'}</p>
+        <div className="gv-row">
+          <span className="gv-row__body">
+            <span className="gv-row__subtitle">{scope === 'learned' && !query ? 'Finish a lesson and its words show up here, ready for her to record.' : 'No words match that search.'}</span>
+          </span>
+        </div>
       ) : (
-        <ul className="me-voice-list">
-          {shown.map((it) => (
-            <li key={it.id} className="me-voice-item">
-              <span className="me-voice-emoji" aria-hidden="true">
-                {it.emoji}
+        shown.map((it) => (
+          <div key={it.id} className="gv-row me-voice-row">
+            <span className="gv-row__body">
+              <span className="gv-row__title" lang="bg">
+                {it.bg}
               </span>
-              <span className="me-voice-text">
-                <span lang="bg" className="me-voice-bg">
-                  {it.bg}
-                </span>
-                <span className="me-voice-en">
-                  {it.tr} · {it.en}
-                </span>
+              <span className="gv-row__subtitle">
+                {it.tr} · {it.en}
               </span>
-              <Recorder
-                itemId={it.id}
-                label={it.bg}
-                onChange={(has) =>
-                  setRecorded((prev) => {
-                    const n = new Set(prev)
-                    if (has) n.add(it.id)
-                    else n.delete(it.id)
-                    return n
-                  })
-                }
-              />
-            </li>
-          ))}
-        </ul>
+            </span>
+            <Recorder
+              itemId={it.id}
+              label={it.bg}
+              onChange={(has) =>
+                setRecorded((prev) => {
+                  const n = new Set(prev)
+                  if (has) n.add(it.id)
+                  else n.delete(it.id)
+                  return n
+                })
+              }
+            />
+          </div>
+        ))
       )}
-      {items.length > shown.length && (
-        <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm me-more" onClick={() => setLimit((l) => l + 30)}>
-          Show more ({items.length - shown.length} left)
-        </button>
-      )}
+      {items.length > shown.length && <ActionRow label={`Show more (${items.length - shown.length} left)`} onClick={() => setLimit((l) => l + 30)} />}
     </Section>
   )
 }
@@ -624,11 +708,12 @@ function AppearanceSection() {
   const theme = useApp((s) => s.profile.theme)
   const setProfile = useApp((s) => s.setProfile)
   return (
-    <Section icon={<IconStar />} tone="azbuka" title="Appearance">
-      <Row label="Theme">
-        <Chips<Profile['theme']>
+    <Section title="Appearance">
+      <div className="gv-row me-sub-row">
+        <Segmented<Profile['theme']>
           label="Theme"
           value={theme}
+          block
           options={[
             { v: 'system', label: 'System' },
             { v: 'light', label: 'Light' },
@@ -636,7 +721,7 @@ function AppearanceSection() {
           ]}
           onPick={(v) => void setProfile({ theme: v })}
         />
-      </Row>
+      </div>
     </Section>
   )
 }
@@ -710,76 +795,73 @@ function DataSection() {
 
   const fmt = (d: Date) => d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 
+  const footer = msg ? (
+    <span className="me-error" role="alert">
+      {msg}
+    </span>
+  ) : nudge ? (
+    <span className="me-nudge" role="note">
+      <strong>Back up your progress.</strong> {lastExport ? `Your last backup was on ${fmt(new Date(lastExport))}.` : "You haven't made a backup yet."} Your progress lives only on this phone, and iOS can clear app
+      data when storage runs low. Export a copy to Files or iCloud once a month.
+    </span>
+  ) : (
+    'Your progress lives only on this phone. Her recordings are never exported or deleted here.'
+  )
+
   return (
-    <Section icon={<IconUser />} tone="home" title="Your data">
-      {nudge && (
-        <div className="me-backup-nudge" role="note">
-          <p className="me-setup-title">Back up your progress</p>
-          <p className="me-row-hint">
-            {lastExport ? `Your last backup was on ${fmt(new Date(lastExport))}.` : "You haven't made a backup yet."} Your progress lives only on this phone, and iOS
-            can clear app data when storage runs low. Save a copy to Files or iCloud once a month.
-          </p>
-          <button type="button" className="gv-btn gv-btn--sm gv-tone-gold" onClick={() => void doExport()}>
-            Back up now
-          </button>
-        </div>
-      )}
-      <Row label="Export everything" hint={lastExport ? `Last backup ${fmt(new Date(lastExport))}. Every answer, session and setting as a JSON file.` : 'Every answer, session and setting as a JSON file, for backups or analysis'}>
-        <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => void doExport()}>
-          Export
-        </button>
-      </Row>
-      <Row label="Import a backup" hint="Restore progress from a Govori export. Her recordings stay as they are.">
-        <label className="gv-btn gv-btn--quiet gv-btn--sm me-file">
-          Import
-          <input
-            id="me-import-file"
-            type="file"
-            accept="application/json,.json"
-            className="sr-only"
-            onChange={(e) => {
-              void pickBackup(e.target.files?.[0])
-              e.target.value = ''
-            }}
-          />
-        </label>
-      </Row>
+    <Section title="Your data" footer={footer}>
+      <ActionRow label="Export everything" subtitle={lastExport ? `Last backup ${fmt(new Date(lastExport))}` : 'Every answer, session and setting as a JSON file'} onClick={() => void doExport()} />
+      <label className="gv-row me-action me-file">
+        <span className="gv-row__body">
+          <span className="gv-row__title">Import a backup</span>
+          <span className="gv-row__subtitle">Restore progress from a Govori export</span>
+        </span>
+        <input
+          id="me-import-file"
+          type="file"
+          accept="application/json,.json"
+          className="sr-only"
+          onChange={(e) => {
+            void pickBackup(e.target.files?.[0])
+            e.target.value = ''
+          }}
+        />
+      </label>
       {pending && (
-        <div className="me-danger" role="alert">
-          <p className="me-setup-title">Replace your progress with this backup?</p>
-          <p className="me-row-hint">
-            Backup from {fmt(pending.summary.exportedAt)}: {pending.summary.lessons} lessons, {pending.summary.memory} words and letters, {pending.summary.events} answers.
-            Everything on this phone now will be replaced.
-          </p>
-          <div className="me-danger-actions">
-            <button type="button" className="gv-btn gv-btn--sm gv-tone-pine" onClick={() => void doRestore()} disabled={restoring}>
-              {restoring ? 'Restoring…' : 'Restore backup'}
-            </button>
-            <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => setPending(null)} disabled={restoring}>
-              Cancel
-            </button>
-          </div>
+        <div className="gv-row me-block" role="alert">
+          <span className="gv-row__body">
+            <span className="gv-row__title">Replace your progress with this backup?</span>
+            <span className="gv-row__subtitle">
+              Backup from {fmt(pending.summary.exportedAt)}: {pending.summary.lessons} lessons, {pending.summary.memory} words and letters, {pending.summary.events} answers. Everything on this phone now will be
+              replaced.
+            </span>
+            <span className="me-buttons">
+              <button type="button" className="gv-btn gv-btn--sm" onClick={() => void doRestore()} disabled={restoring}>
+                {restoring ? 'Restoring…' : 'Restore backup'}
+              </button>
+              <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => setPending(null)} disabled={restoring}>
+                Cancel
+              </button>
+            </span>
+          </span>
         </div>
       )}
-      {msg && <p className="me-error">{msg}</p>}
       {!confirm ? (
-        <Row label="Reset progress" hint="Start again from zero. Her recordings stay.">
-          <button type="button" className="gv-btn gv-btn--ghost gv-btn--sm" onClick={() => setConfirm(true)}>
-            Reset
-          </button>
-        </Row>
+        <ActionRow label="Reset progress" onClick={() => setConfirm(true)} />
       ) : (
-        <div className="me-danger" role="alert">
-          <p className="me-setup-title">Delete your streak, XP and all progress?</p>
-          <p className="me-row-hint">This can't be undone. Export first if you want a copy. Recordings are kept.</p>
-          <div className="me-danger-actions">
-            <button type="button" className="gv-btn gv-btn--sm" onClick={() => void reset()} disabled={busy}>
-              {busy ? 'Deleting…' : 'Yes, delete everything'}
-            </button>
-            <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => setConfirm(false)} disabled={busy}>
-              Keep my progress
-            </button>
-          </div>
+        <div className="gv-row me-block" role="alert">
+          <span className="gv-row__body">
+            <span className="gv-row__title">Delete your streak, XP and all progress?</span>
+            <span className="gv-row__subtitle">This can't be undone. Export first if you want a copy. Recordings are kept.</span>
+            <span className="me-buttons">
+              <button type="button" className="gv-btn gv-btn--sm" onClick={() => void reset()} disabled={busy}>
+                {busy ? 'Deleting…' : 'Delete everything'}
+              </button>
+              <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm" onClick={() => setConfirm(false)} disabled={busy}>
+                Keep my progress
+              </button>
+            </span>
+          </span>
         </div>
       )}
     </Section>
@@ -788,26 +870,27 @@ function DataSection() {
 
 function About() {
   return (
-    <footer className="me-about">
-      <div className="gv-star me-about-star gv-tone-rose" aria-hidden="true" />
-      <p className="me-about-name">
-        Govori <span lang="bg">· Говори</span>
-      </p>
-      <p className="muted">Version 1.0. Made for learning my wife's language.</p>
-      <a href="https://github.com/Wasim-Dilov/govori" target="_blank" rel="noreferrer" className="me-about-link">
-        github.com/Wasim-Dilov/govori
-      </a>
-    </footer>
+    <Section title="About" footer="Made for learning my wife's language.">
+      <Row title="Govori" subtitle={<span lang="bg">Говори</span>} accessory="Version 1.0" />
+      <LinkRow href="https://github.com/Wasim-Dilov/govori" title="Source code" subtitle="github.com/Wasim-Dilov/govori" />
+    </Section>
   )
 }
 
 export function MeScreen() {
   const reduce = useReducedMotion()
+  const scrolled = useScrolled()
   const sections = [ProfileHeader, LearningSection, SoundSection, RemindersSection, HerVoiceSection, AppearanceSection, DataSection, About]
   return (
     <main className="screen me">
+      <header className={`gv-navbar ${scrolled ? 'is-scrolled' : ''}`}>
+        <span className="gv-navbar__title" aria-hidden="true">
+          Me
+        </span>
+      </header>
+      <h1 className="gv-largetitle">Me</h1>
       {sections.map((S, n) => (
-        <motion.div key={n} initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(n, 4) * 0.05, type: 'spring', stiffness: 300, damping: 30 }}>
+        <motion.div key={n} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(n, 4) * 0.03, duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}>
           <S />
         </motion.div>
       ))}

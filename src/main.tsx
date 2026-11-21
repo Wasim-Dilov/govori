@@ -1,8 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@fontsource-variable/rubik'
+// The system font (SF Pro) is used on Apple devices; Inter is the fallback elsewhere.
+import '@fontsource-variable/inter'
+// Only for the 'Bulgarian style' alternate letter on letter cards.
 import '@fontsource-variable/sofia-sans'
-import '@fontsource-variable/unbounded'
 import './styles/tokens.css'
 import './styles/components.css'
 import './styles/base.css'

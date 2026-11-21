@@ -22,13 +22,27 @@ const plain = ['spacing', 'radius', 'ledge']
   .concat(Object.entries(tokens.type.families).map(([k, v]) => `  --font-${k}: ${v};`))
   .join('\n')
 
-const typeClasses = tokens.type.groups
-  .flatMap((g) =>
-    g.styles.map((s) => {
-      const fam = s.family ?? g.family
-      return `.t-${s.name} { font-family: var(--font-${fam}); font-size: ${s.fontSize}; line-height: ${s.lineHeight}; font-weight: ${s.fontWeight};${s.letterSpacing ? ` letter-spacing: ${s.letterSpacing};` : ''} }`
-    }),
-  )
+const styleCss = (s, fam) =>
+  `font-family: var(--font-${fam}); font-size: ${s.fontSize}; line-height: ${s.lineHeight}; font-weight: ${s.fontWeight};${s.letterSpacing ? ` letter-spacing: ${s.letterSpacing};` : ''}`
+const styles = new Map(tokens.type.groups.flatMap((g) => g.styles.map((s) => [s.name, { s, fam: s.family ?? g.family }])))
+const typeClasses = [...styles.entries()].map(([name, { s, fam }]) => `.t-${name} { ${styleCss(s, fam)} }`).join('\n')
+
+// Older style names still used by some screens, mapped onto the iOS scale.
+const ALIASES = {
+  hero: ['large-title'],
+  'screen-title': ['title1'],
+  'card-title': ['title3'],
+  prompt: ['title2'],
+  stat: ['headline', 'font-variant-numeric: tabular-nums;'],
+  'body-strong': ['headline'],
+  label: ['subhead', 'font-weight: 600; letter-spacing: 0; text-transform: none;'],
+}
+const aliasClasses = Object.entries(ALIASES)
+  .map(([alias, [target, extra = '']]) => {
+    const t = styles.get(target)
+    if (!t) throw new Error(`alias ${alias} -> missing style ${target}`)
+    return `.t-${alias} { ${styleCss(t.s, t.fam)}${extra ? ' ' + extra : ''} }`
+  })
   .join('\n')
 
 const dark = themes[1]
@@ -51,6 +65,8 @@ ${block(dark)}
 ${plain}
 }
 ${typeClasses}
+/* Aliases for older style names */
+${aliasClasses}
 `
 writeFileSync(new URL('../src/styles/tokens.css', import.meta.url), css)
 
@@ -71,14 +87,20 @@ const ratio = (a, b) => {
   return (x + 0.05) / (y + 0.05)
 }
 // [fg, bg, minimum]
+const grounds = ['linen', 'linen-raised']
 const pairs = [
-  ['ink', 'linen', 4.5], ['ink', 'linen-raised', 4.5], ['ink', 'linen-sunk', 4.5],
-  ['ink-muted', 'linen', 4.5], ['ink-muted', 'linen-raised', 4.5],
-  ['rose', 'linen', 4.5], ['rose', 'linen-raised', 4.5], ['rose-ink', 'rose-soft', 4.5], ['on-rose', 'rose', 4.5],
-  ['pine', 'linen-raised', 4.5], ['pine-ink', 'pine-soft', 4.5], ['on-pine', 'pine', 4.5],
+  ...['linen', 'linen-raised', 'linen-sunk'].flatMap((g) => [['ink', g, 4.5], ['ink-muted', g, 4.5]]),
+  ['ink', 'fill-secondary', 4.5],
+  ['on-accent', 'accent', 4.5], ['on-accent', 'accent-pressed', 4.5],
+  ...grounds.map((g) => ['rose', g, 4.5]), ['rose', 'rose-soft', 4.5], ['rose-ink', 'rose-soft', 4.5], ['on-rose', 'rose', 4.5],
+  ...grounds.map((g) => ['pine', g, 4.5]), ['pine-ink', 'pine-soft', 4.5], ['on-pine', 'pine', 4.5], ['on-pine', 'pine-deep', 4.5],
+  ...grounds.map((g) => ['warn', g, 4.5]), ['warn-ink', 'warn-soft', 4.5], ['on-warn', 'warn', 4.5], ['on-warn', 'warn-deep', 4.5],
   ['gold-ink', 'linen-raised', 4.5], ['gold-ink', 'gold-soft', 4.5], ['on-gold', 'gold', 4.5],
   ['pick', 'pick-soft', 4.5], ['ink', 'pick-soft', 4.5],
-  ...['azbuka', 'basics', 'kids', 'love', 'home', 'family', 'grammar', 'out'].flatMap((t) => [['on-track', `trk-${t}`, 3], [`trk-${t}`, 'linen-raised', 3], ['ink', `trk-${t}-soft`, 4.5]]),
+  ['line-strong', 'linen-raised', 1.3],
+  ...['azbuka', 'basics', 'kids', 'love', 'home', 'family', 'grammar', 'out'].flatMap((t) => [
+    ['on-track', `trk-${t}`, 3], [`trk-${t}`, 'linen-raised', 3], [`trk-${t}`, `trk-${t}-soft`, 3], ['ink', `trk-${t}-soft`, 4.5],
+  ]),
 ]
 let fails = 0
 for (const theme of themes)

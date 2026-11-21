@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { IconCheck, IconClose, IconFlame, IconX } from '../components/Icons.tsx'
-import { Mascot } from '../components/Mascot.tsx'
+import { IconCheck, IconClose, IconFlame, IconRefresh, IconX } from '../components/Icons.tsx'
 import { sfx, speak, stopSpeaking } from '../lib/audio.ts'
 import { exItemId, type Exercise } from '../lib/engine.ts'
 import { logAnswer, updateMemory } from '../lib/progress.ts'
@@ -190,32 +189,39 @@ export function SessionScreen() {
           <IconClose />
         </button>
         {session.plan.kind === 'story' ? (
-          <p className="session__storytitle t-body-strong">{session.plan.lesson?.title}</p>
+          <p className="session__storytitle">{session.plan.lesson?.title}</p>
         ) : (
           <div className="gv-progress session__progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
-            <div className="gv-progress__fill" style={{ width: `${Math.max(4, progress * 100)}%` }} />
+            <div className="gv-progress__fill" style={{ width: `${Math.max(3, progress * 100)}%` }} />
           </div>
         )}
-        {isSpeed ? (
-          <span className="session__timer t-stat" aria-label="Time">
-            {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}
-          </span>
-        ) : (
-          <AnimatePresence>
-            {combo >= 3 && (
-              <motion.span key="combo" className="session__combo t-stat" initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }} aria-label={`${combo} in a row`}>
-                <IconFlame />
-                {combo}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        )}
+        <span className="session__trailing">
+          {isSpeed ? (
+            <span className="session__timer" aria-label="Time">
+              {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}
+            </span>
+          ) : (
+            <AnimatePresence>
+              {combo >= 3 && (
+                <motion.span key="combo" className="session__combo" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} aria-label={`${combo} in a row`}>
+                  <IconFlame />
+                  {combo}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          )}
+        </span>
       </header>
 
       <main className="session__body flow__pad">
         <AnimatePresence mode="wait">
-          <motion.div key={step.key + idx} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: 'spring', stiffness: 380, damping: 34 }}>
-            {step.attempt > 1 && <p className="session__retry t-caption">Let's try this one again</p>}
+          <motion.div key={step.key + idx} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}>
+            {step.attempt > 1 && (
+              <p className="session__retry">
+                <IconRefresh />
+                Let's try this one again
+              </p>
+            )}
             <ExerciseView ex={step.ex} common={common} skip={noListen && isListen} />
             {isListen && !checked && !noListen && (
               <button
@@ -235,18 +241,30 @@ export function SessionScreen() {
 
       {!(selfCompleting && step.ex.type !== 'intro') && (
         <footer className="session__foot">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {checked ? (
-              <motion.div key="fb" className={`gv-feedback ${checked.correct ? '' : 'gv-feedback--wrong'}`} initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }} transition={{ type: 'spring', stiffness: 420, damping: 32 }} role="status">
+              <motion.div
+                key="fb"
+                className={`gv-feedback session__sheet ${checked.correct ? '' : 'gv-feedback--wrong'}`}
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+                role="status"
+              >
                 <div className="gv-feedback__head">
                   <span className="gv-feedback__badge">{checked.correct ? <IconCheck /> : <IconX />}</span>
                   <div className="session__fbtext">
                     {checked.correct ? (
                       <>
                         <p className="gv-feedback__title">
-                          <span lang="bg">{checked.praise.bg}</span> <span className="session__fben">{checked.praise.en}</span>
+                          Correct <span className="session__praise" lang="bg">{checked.praise.bg}</span>
                         </p>
-                        {checked.note === 'typo' && <p className="gv-feedback__tr">Watch the spelling: {checked.solution}</p>}
+                        {checked.note === 'typo' && (
+                          <p className="gv-feedback__tr">
+                            Watch the spelling: <span lang="bg">{checked.solution}</span>
+                          </p>
+                        )}
                         {checked.note === 'latin' && (
                           <p className="gv-feedback__tr">
                             In Cyrillic: <span lang="bg">{checked.solution}</span>
@@ -256,6 +274,7 @@ export function SessionScreen() {
                     ) : (
                       <>
                         <p className="gv-feedback__title">Not quite</p>
+                        <p className="session__fblabel">Correct answer</p>
                         <p className="gv-feedback__answer">
                           <span lang="bg">{checked.solution}</span>
                         </p>
@@ -263,14 +282,13 @@ export function SessionScreen() {
                       </>
                     )}
                   </div>
-                  <Mascot mood={checked.correct ? 'happy' : 'sad'} size={64} className="session__mascot" />
                 </div>
-                <button type="button" className={`gv-btn gv-btn--block ${checked.correct ? 'gv-tone-pine' : 'gv-tone-rose'}`} onClick={() => void advance()}>
-                  {checked.correct ? 'Continue' : 'Got it'}
+                <button type="button" className="gv-btn gv-btn--block" onClick={() => void advance()}>
+                  Continue
                 </button>
               </motion.div>
             ) : (
-              <motion.div key="act" className="session__actions flow__pad" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.div key="act" className="session__actions flow__pad" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
                 {step.ex.type === 'intro' ? (
                   <button type="button" className="gv-btn gv-btn--block" onClick={() => void onComplete(true)}>
                     Continue
@@ -288,20 +306,31 @@ export function SessionScreen() {
 
       <AnimatePresence>
         {confirmQuit && (
-          <motion.div className="session__scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setConfirmQuit(false)}>
-            <motion.div className="gv-sheet session__quit" initial={{ y: 200 }} animate={{ y: 0 }} exit={{ y: 200 }} transition={{ type: 'spring', stiffness: 400, damping: 36 }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="quit-title">
+          <motion.div className="session__scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} onClick={() => setConfirmQuit(false)}>
+            <motion.div
+              className="gv-sheet session__quit"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="quit-title"
+            >
               <div className="gv-sheet__grip" />
-              <Mascot mood="sad" size={96} />
-              <h2 id="quit-title" className="t-card-title">
+              <h2 id="quit-title" className="t-title3">
                 Leave this lesson?
               </h2>
-              <p className="muted">You'll lose the progress from this lesson. Two more minutes keeps the streak alive.</p>
-              <button type="button" className="gv-btn gv-btn--block" onClick={() => setConfirmQuit(false)} autoFocus>
-                Keep learning
-              </button>
-              <button type="button" className="gv-btn gv-btn--ghost gv-btn--block" onClick={quit}>
-                Leave
-              </button>
+              <p className="session__quittext">You'll lose the progress from this lesson. Two more minutes keeps your streak going.</p>
+              <div className="session__quitbtns">
+                <button type="button" className="gv-btn gv-btn--block" onClick={() => setConfirmQuit(false)} autoFocus>
+                  Keep learning
+                </button>
+                <button type="button" className="gv-btn gv-btn--plain gv-btn--block" onClick={quit}>
+                  Leave lesson
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

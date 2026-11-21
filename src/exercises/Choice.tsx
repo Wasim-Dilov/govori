@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import type { StudyItem } from '../content/index.ts'
 import { speak } from '../lib/audio.ts'
-import { Bg, Prompt, SpeakButton } from './common.tsx'
+import { Bg, Cue, Prompt, SpeakButton, fadeIn } from './common.tsx'
 import type { ExerciseProps } from './types.ts'
 
 type ChoiceType = 'mc_bg_en' | 'mc_en_bg' | 'listen_mc' | 'letter_sound' | 'sound_letter' | 'read_word'
@@ -78,12 +78,15 @@ export function ChoiceExercise({ ex, setAnswer, checked, translit }: ExercisePro
             className={`gv-choice ${cards ? 'gv-choice--card' : ''} ${stateOf(o)}`}
             onClick={() => choose(o)}
             disabled={!!checked}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 * i, type: 'spring', stiffness: 400, damping: 30 }}
+            aria-pressed={picked === o.id}
+            {...fadeIn(i)}
           >
             {!cards && <span className="gv-choice__key">{i + 1}</span>}
-            {cards && <span className="gv-choice__emoji">{o.emoji}</span>}
+            {cards && (
+              <span className="gv-choice__emoji" aria-hidden="true">
+                {o.emoji}
+              </span>
+            )}
             <OptionLabel ex={ex} o={o} translit={translit} />
           </motion.button>
         ))}
@@ -99,7 +102,7 @@ function OptionLabel({ ex, o, translit }: { ex: ExerciseProps<ChoiceType>['ex'];
     case 'letter_sound':
       return (
         <span className="gv-choice__text">
-          <span>"{o.tr}"</span>
+          <span className="ex-opt-strong">{o.tr}</span>
           <span className="gv-choice__sub">{o.letter?.sound}</span>
         </span>
       )
@@ -112,7 +115,7 @@ function OptionLabel({ ex, o, translit }: { ex: ExerciseProps<ChoiceType>['ex'];
     case 'read_word':
       return (
         <span className="gv-choice__text">
-          <span>{o.tr}</span>
+          <span className="ex-opt-strong">{o.tr}</span>
           <span className="gv-choice__sub">{o.en}</span>
         </span>
       )
@@ -149,17 +152,14 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>How do you say this in Bulgarian?</Prompt>
-          <div className="ex-hero ex-hero--en">
-            <span className="ex-emoji">{item.emoji}</span>
-            <span className="t-card-title">{item.en}</span>
-          </div>
+          <Cue emoji={item.emoji} text={item.en} />
         </>
       )
     case 'listen_mc':
       return (
         <>
           <Prompt>What do you hear?</Prompt>
-          <div className="ex-hero ex-hero--listen">
+          <div className="ex-listen">
             <SpeakButton text={item.bg} itemId={item.id} size="lg" auto />
             <SpeakButton text={item.bg} itemId={item.id} slow />
           </div>
@@ -169,8 +169,8 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>Which sound does this letter make?</Prompt>
-          <div className="ex-hero ex-hero--letter">
-            <span className="t-letter ex-bigletter" lang="bg">
+          <div className="ex-lettercard">
+            <span className="t-letter" lang="bg">
               {item.letter!.upper}
               {item.letter!.lower}
             </span>
@@ -181,9 +181,9 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>Which letter makes this sound?</Prompt>
-          <div className="ex-hero ex-hero--en">
-            <span className="t-hero">"{item.tr}"</span>
-            <span className="muted">{item.letter!.sound}</span>
+          <div className="ex-soundcard">
+            <span className="ex-soundcard__sound">{item.tr}</span>
+            <span className="ex-soundcard__hint">{item.letter!.sound}</span>
           </div>
         </>
       )
@@ -191,8 +191,8 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>Read this word</Prompt>
-          <div className="ex-hero">
-            <span className="t-bg-word ex-readword" lang="bg">
+          <div className="ex-lettercard">
+            <span className="ex-readword" lang="bg">
               {item.bg}
             </span>
           </div>

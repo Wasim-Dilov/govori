@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { speak, sfx } from '../lib/audio.ts'
 import { shuffle } from '../lib/engine.ts'
-import { Prompt } from './common.tsx'
+import { Prompt, fadeIn } from './common.tsx'
 import type { ExerciseProps } from './types.ts'
 
 /** Tap matching pairs: Bulgarian on the left, meaning on the right. */
@@ -54,10 +54,10 @@ export function MatchExercise({ ex, complete }: ExerciseProps<'match'>) {
   return (
     <div className="ex">
       <Prompt>Tap the matching pairs</Prompt>
-      <div className="ex-match">
+      <div className="ex-match" style={{ ['--rows' as string]: ex.items.length }}>
         <div className="ex-match__col">
           {left.map((it, i) => (
-            <motion.button key={it.id} type="button" className={cls('l', it.id)} onClick={() => tap('l', it.id)} disabled={done.has(it.id)} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}>
+            <motion.button key={it.id} type="button" className={cls('l', it.id)} onClick={() => tap('l', it.id)} disabled={done.has(it.id)} aria-pressed={sel?.side === 'l' && sel.id === it.id} {...fadeIn(i)}>
               <span className="gv-choice__text ex-match__bg" lang="bg">
                 {ex.letters ? `${it.letter!.upper} ${it.letter!.lower}` : it.bg}
               </span>
@@ -66,7 +66,7 @@ export function MatchExercise({ ex, complete }: ExerciseProps<'match'>) {
         </div>
         <div className="ex-match__col">
           {right.map((it, i) => (
-            <motion.button key={it.id} type="button" className={cls('r', it.id)} onClick={() => tap('r', it.id)} disabled={done.has(it.id)} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}>
+            <motion.button key={it.id} type="button" className={cls('r', it.id)} onClick={() => tap('r', it.id)} disabled={done.has(it.id)} aria-pressed={sel?.side === 'r' && sel.id === it.id} {...fadeIn(i)}>
               <span className="gv-choice__text">{ex.letters ? `"${it.tr}"` : it.en}</span>
             </motion.button>
           ))}

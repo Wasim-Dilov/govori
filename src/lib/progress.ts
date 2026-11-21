@@ -7,7 +7,7 @@ export const DEFAULT_SUMMARY: Summary = {
   streak: 0,
   longestStreak: 0,
   lastPracticeDay: null,
-  dailyGoal: 30,
+  dailyGoal: 40,
   xpToday: 0,
   xpDay: null,
   totalXp: 0,

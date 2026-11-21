@@ -90,13 +90,13 @@ export function SpeakExercise({ ex, complete, translit: showTr }: ExerciseProps<
 
   return (
     <div className="spk">
-      <h2 className="t-prompt">Say this out loud</h2>
+      <h2 className="t-title3 spk-prompt">Say this out loud</h2>
 
       <div className="spk-card gv-card">
+        <span className="spk-card__emoji" aria-hidden="true">
+          {item.emoji}
+        </span>
         <div className="spk-card__words">
-          <span className="spk-card__emoji" aria-hidden="true">
-            {item.emoji}
-          </span>
           <p className="t-bg-word spk-card__bg" lang="bg">
             {item.bg}
           </p>
@@ -107,7 +107,7 @@ export function SpeakExercise({ ex, complete, translit: showTr }: ExerciseProps<
           <button type="button" className={`gv-iconbtn ${modelPlaying ? 'is-playing' : ''}`} onClick={() => void playModel()} aria-label="Listen">
             <IconSpeaker />
           </button>
-          <button type="button" className="gv-iconbtn gv-iconbtn--sm" onClick={() => void playModel(true)} aria-label="Listen slowly">
+          <button type="button" className="gv-iconbtn gv-iconbtn--sm ex-slow" onClick={() => void playModel(true)} aria-label="Listen slowly">
             <IconTurtle />
           </button>
         </div>
@@ -116,7 +116,7 @@ export function SpeakExercise({ ex, complete, translit: showTr }: ExerciseProps<
       <div className="spk-stage">
         <AnimatePresence mode="wait">
           {phase !== 'nomic' && phase !== 'recorded' && (
-            <motion.div key="rec" className="spk-rec" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
+            <motion.div key="rec" className="spk-rec" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
               <div className={`spk-rec__wrap ${phase === 'recording' ? 'is-live' : ''}`}>
                 <svg className="spk-rec__ring" viewBox="0 0 120 120" aria-hidden="true">
                   <circle cx="60" cy="60" r="54" className="spk-rec__track" />
@@ -131,21 +131,33 @@ export function SpeakExercise({ ex, complete, translit: showTr }: ExerciseProps<
                   {phase === 'recording' ? <IconStop /> : <IconMic />}
                 </button>
               </div>
-              <p className="spk-rec__label">{phase === 'recording' ? `Listening… ${Math.ceil((CAP_MS - elapsed) / 1000)}s` : 'Tap and say it'}</p>
+              <p className="spk-rec__label">{phase === 'recording' ? `Recording · ${Math.ceil((CAP_MS - elapsed) / 1000)}s` : 'Tap to record yourself'}</p>
             </motion.div>
           )}
 
           {phase === 'recorded' && (
-            <motion.div key="compare" className="spk-compare" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-              <button type="button" className={`spk-compare__btn gv-tone-pick ${modelPlaying ? 'is-playing' : ''}`} onClick={() => void playModel()}>
-                <IconSpeaker />
-                <span>Model</span>
-              </button>
-              <button type="button" className={`spk-compare__btn gv-tone-rose ${mePlaying ? 'is-playing' : ''}`} onClick={() => void playMine()}>
-                <IconPlay />
-                <span>You</span>
-              </button>
-              <button type="button" className="gv-btn gv-btn--ghost gv-btn--sm spk-compare__again" onClick={() => void startRec()}>
+            <motion.div key="compare" className="spk-compare" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+              <div className="gv-list">
+                <button type="button" className={`gv-row spk-play ${modelPlaying ? 'is-playing' : ''}`} onClick={() => void playModel()}>
+                  <span className="gv-row__icon">
+                    <IconSpeaker />
+                  </span>
+                  <span className="gv-row__body">
+                    <span className="gv-row__title">Model</span>
+                    <span className="gv-row__subtitle">How it should sound</span>
+                  </span>
+                </button>
+                <button type="button" className={`gv-row spk-play ${mePlaying ? 'is-playing' : ''}`} onClick={() => void playMine()}>
+                  <span className="gv-row__icon">
+                    <IconPlay />
+                  </span>
+                  <span className="gv-row__body">
+                    <span className="gv-row__title">Your recording</span>
+                    <span className="gv-row__subtitle">Compare the two</span>
+                  </span>
+                </button>
+              </div>
+              <button type="button" className="spk-again" onClick={() => void startRec()}>
                 Record again
               </button>
             </motion.div>
@@ -153,7 +165,7 @@ export function SpeakExercise({ ex, complete, translit: showTr }: ExerciseProps<
 
           {phase === 'nomic' && (
             <motion.div key="nomic" className="spk-nomic gv-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p className="t-body-strong">The microphone isn't available.</p>
+              <p className="t-headline">The microphone isn't available</p>
               <p className="muted">
                 You can allow it in the iPhone Settings app under Safari, Microphone. For now, say it out loud and rate yourself honestly.
               </p>
@@ -164,8 +176,8 @@ export function SpeakExercise({ ex, complete, translit: showTr }: ExerciseProps<
 
       <div className="spk-actions">
         {(phase === 'recorded' || phase === 'nomic') && (
-          <motion.div className="spk-rate" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-            <button type="button" className="gv-btn gv-btn--block gv-tone-pine" onClick={() => rate(true)}>
+          <motion.div className="spk-rate" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+            <button type="button" className="gv-btn gv-btn--block" onClick={() => rate(true)}>
               I said it right
             </button>
             <button type="button" className="gv-btn gv-btn--block gv-btn--quiet" onClick={() => rate(false)}>
