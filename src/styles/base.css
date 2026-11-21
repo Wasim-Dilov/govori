@@ -19,12 +19,49 @@ img, svg { max-width: 100%; }
 :lang(bg):not(.bgstyle-note__glyph) { font-family: var(--font-text) !important; }
 /* Sentence case everywhere: older styles that uppercased labels are switched off. */
 .t-label { text-transform: none !important; letter-spacing: 0 !important; }
+/* Small heading above a card title: quiet, never rose. */
+.t-eyebrow { color: var(--ink-muted); text-transform: none; }
 ::selection { background: var(--rose-soft); }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 p { margin: 0; }
 
 /* The phone-width column everything lives in. */
 .app-shell { max-width: 520px; margin: 0 auto; min-height: 100dvh; position: relative; }
+
+/* Launch: the Г tile centred exactly where the iOS launch image draws it (see scripts/make-splash.mjs). */
+.app-loader { display: grid; place-items: center; min-height: 100dvh; background: var(--linen); }
+
+/* ---------- Screen transitions (App.tsx sets data-vt on <html> for the View Transitions API) */
+::view-transition-old(root), ::view-transition-new(root) { animation-timing-function: var(--ease-out); mix-blend-mode: normal; }
+:root[data-vt="tab"]::view-transition-old(root) { animation: vt-fade-out 180ms var(--ease-out) both; }
+:root[data-vt="tab"]::view-transition-new(root) { animation: vt-fade-in 180ms var(--ease-out) both; }
+:root[data-vt="fade"]::view-transition-old(root) { animation: vt-fade-out 220ms var(--ease-out) both; }
+:root[data-vt="fade"]::view-transition-new(root) { animation: vt-fade-in 220ms var(--ease-out) both; }
+:root[data-vt="push"]::view-transition-old(root) { animation: vt-fade-out 260ms var(--ease-out) both; }
+:root[data-vt="push"]::view-transition-new(root) { animation: vt-slide-in 260ms var(--ease-out) both; }
+:root[data-vt="pop"]::view-transition-old(root) { animation: vt-slide-out 260ms var(--ease-out) both; z-index: 1; }
+:root[data-vt="pop"]::view-transition-new(root) { animation: vt-fade-in 260ms var(--ease-out) both; }
+:root[data-vt="complete"]::view-transition-old(root) { animation: vt-fade-out 240ms var(--ease-out) both; }
+:root[data-vt="complete"]::view-transition-new(root) { animation: vt-scale-in 240ms var(--ease-out) both; }
+:root[data-vt="reduce"]::view-transition-old(root) { animation: vt-fade-out 120ms linear both; }
+:root[data-vt="reduce"]::view-transition-new(root) { animation: vt-fade-in 120ms linear both; }
+@keyframes vt-fade-in { from { opacity: 0; } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-slide-in { from { opacity: 0; transform: translateX(24px); } }
+@keyframes vt-slide-out { to { opacity: 0; transform: translateX(24px); } }
+@keyframes vt-scale-in { from { opacity: 0; transform: scale(0.98); } }
+/* Fallback where View Transitions are missing: animate the incoming screen only. */
+.app-shell[data-enter="tab"] { animation: vt-fade-in 180ms var(--ease-out) both; }
+.app-shell[data-enter="fade"] { animation: vt-fade-in 220ms var(--ease-out) both; }
+.app-shell[data-enter="push"] { animation: vt-slide-in 260ms var(--ease-out) both; }
+.app-shell[data-enter="pop"] { animation: vt-fade-in 260ms var(--ease-out) both; }
+.app-shell[data-enter="complete"] { animation: vt-scale-in 240ms var(--ease-out) both; }
+.app-shell[data-enter="reduce"] { animation: vt-fade-in 120ms linear both; }
+/* The tab bar stays perfectly still between tabs, and fades with the screen otherwise. */
+.tabbar-dock { view-transition-name: tabbar; }
+::view-transition-old(tabbar) { animation: vt-fade-out 200ms var(--ease-out) both; }
+::view-transition-new(tabbar) { animation: vt-fade-in 200ms var(--ease-out) both; }
+:root[data-vt="tab"]::view-transition-old(tabbar), :root[data-vt="tab"]::view-transition-new(tabbar) { animation: none; }
 
 /* A tab screen: clears the status bar at the top and the tab bar at the bottom. */
 .screen {

@@ -11,7 +11,7 @@ import './share.css'
 type Step = 'setup' | 'preview'
 type Build = (opts: { partner: string; from: string; message: string; speaker: Speaker }) => Promise<CardData>
 
-/** "Share with her": a tinted button that opens a sheet with a progress card to send to his wife. */
+/** "Share with her": a plain rose text button (Continue stays the only filled button) that opens a sheet with a progress card to send to his wife. */
 export function ShareProgress({ result, milestone, className }: { result: SessionResult; milestone?: Milestone; className?: string }) {
   const build = useCallback<Build>((o) => buildSessionCard(result, { ...o, milestone }), [result, milestone])
   return <ShareFlow build={build} sheetTitle="Share today’s progress" className={className} />
@@ -111,7 +111,7 @@ function ShareFlow({ build, sheetTitle, className, triggerLabel }: { build: Buil
 
   return (
     <>
-      <button type="button" className={className ?? 'gv-btn gv-btn--tinted gv-btn--block gv-tone-rose share-trigger'} onClick={openSheet} disabled={partner === undefined}>
+      <button type="button" className={className ?? 'share-trigger share-trigger--text'} onClick={openSheet} disabled={partner === undefined}>
         <IconShare width={20} height={20} />
         {label}
       </button>

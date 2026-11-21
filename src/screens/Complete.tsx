@@ -1,6 +1,6 @@
 // The calm summary after every session: what you did, what it earned, what you met.
-import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { AnimatePresence, animate, motion, useReducedMotion } from 'motion/react'
 import { useApp } from '../lib/store.ts'
 import { LEVEL_NAMES } from '../lib/progress.ts'
 import { sfx, speak } from '../lib/audio.ts'
@@ -31,6 +31,63 @@ const fmtTime = (ms: number) => {
 }
 
 const sayItem = (it: StudyItem) => speak(it.kind === 'letter' && it.letter ? it.letter.example.bg : it.bg, { itemId: it.id })
+
+/** Counts a number up from zero (tabular figures do the rest); instant under reduced motion. */
+function useCountUp(target: number, ms: number, delay = 0) {
+  const reduce = useReducedMotion()
+  const [n, setN] = useState(reduce ? target : 0)
+  useEffect(() => {
+    if (reduce) return setN(target)
+    const c = animate(0, target, { duration: ms / 1000, delay: delay / 1000, ease: [0.2, 0.8, 0.2, 1], onUpdate: (v) => setN(Math.round(v)) })
+    return () => c.stop()
+  }, [target, ms, delay, reduce])
+  return n
+}
+
+/** A ring that draws itself closed (CSS transition on stroke-dashoffset), with a check inside. */
+function DrawnCheck({ className = '', ms = 500 }: { className?: string; ms?: number }) {
+  const [value, setValue] = useState(0)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setValue(100))
+    return () => cancelAnimationFrame(id)
+  }, [])
+  return (
+    <span className={`gv-ring-wrap ${className}`}>
+      <svg className="gv-ring gv-ring--lg gv-tone-pine done__ring" viewBox="0 0 36 36" style={{ ['--value' as string]: value, ['--draw-ms' as string]: `${ms}ms` }} aria-hidden="true">
+        <circle className="gv-ring__track" cx="18" cy="18" r="16" />
+        <circle className="gv-ring__value" cx="18" cy="18" r="16" pathLength={100} />
+      </svg>
+      <span className={`gv-ring__label done__check${value ? ' is-on' : ''}`}>
+        <IconCheck />
+      </span>
+    </span>
+  )
+}
+
+/** Points of an eight-pointed star (the шевица осмолъчка) around (c, c). */
+function starPath(c: number, outer: number, rot = 0) {
+  const inner = outer * (Math.cos(Math.PI / 4) / Math.cos(Math.PI / 8))
+  const pts: string[] = []
+  for (let i = 0; i < 16; i++) {
+    const r = i % 2 === 0 ? outer : inner
+    const a = rot + (i * Math.PI) / 8 - Math.PI / 2
+    pts.push(`${(c + r * Math.cos(a)).toFixed(2)},${(c + r * Math.sin(a)).toFixed(2)}`)
+  }
+  return `M${pts.join('L')}Z`
+}
+
+/** The milestone mark: a fine-line star stitched on around a rose numeral or a check. */
+function StarMark({ children }: { children: ReactNode }) {
+  return (
+    <span className="milestone__star">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <path className="milestone__star-back" d={starPath(100, 78, Math.PI / 8)} pathLength={1} />
+        <path className="milestone__star-line" d={starPath(100, 94)} pathLength={1} />
+      </svg>
+      <span className="milestone__star-in">{children}</span>
+    </span>
+  )
+}
 
 const fade = (i: number) => ({
   initial: { opacity: 0, y: 6 },
@@ -69,19 +126,11 @@ export function CompleteScreen() {
 
   return (
     <div className={`done gv-tone-${result.trackId}`}>
-      <div className="done__body flow__pad">
+      <div className="done__body flow__pad" inert={!!milestone}>
         <div className="gv-shevitsa done__band" aria-hidden="true" />
 
         <motion.header className="done__hero" {...fade(0)}>
-          <span className="gv-ring-wrap done__mark">
-            <svg className="gv-ring gv-ring--lg gv-tone-pine" viewBox="0 0 36 36" style={{ ['--value' as string]: 100 }} aria-hidden="true">
-              <circle className="gv-ring__track" cx="18" cy="18" r="16" />
-              <circle className="gv-ring__value" cx="18" cy="18" r="16" pathLength={100} />
-            </svg>
-            <span className="gv-ring__label done__check">
-              <IconCheck />
-            </span>
-          </span>
+          <DrawnCheck className="done__mark" />
           <h1 className="t-title1 done__title">{title.en}</h1>
           <p className="done__bg" lang="bg">
             {result.perfect ? 'Перфектно!' : title.bg}
@@ -89,21 +138,7 @@ export function CompleteScreen() {
         </motion.header>
 
         <motion.div className="gv-statgrid done__stats" {...fade(1)}>
-          <div className="gv-statcell">
-            <span className="gv-statcell__label">Accuracy</span>
-            <span className="gv-statcell__value">
-              {accuracy}
-              <span className="gv-statcell__unit">%</span>
-            </span>
-          </div>
-          <div className="gv-statcell">
-            <span className="gv-statcell__label">Time</span>
-            <span className="gv-statcell__value">{fmtTime(result.ms)}</span>
-          </div>
-          <div className="gv-statcell">
-            <span className="gv-statcell__label">XP</span>
-            <span className="gv-statcell__value">+{result.xp}</span>
-          </div>
+          <Stats accuracy={accuracy} ms={result.ms} xp={result.xp} />
         </motion.div>
 
         <motion.p className="done__streak" {...fade(2)}>
@@ -206,7 +241,7 @@ export function CompleteScreen() {
         )}
       </div>
 
-      <div className="done__foot flow__pad">
+      <div className="done__foot flow__pad" inert={!!milestone}>
         <ShareProgress result={result} />
         <button type="button" className="gv-btn gv-btn--block" onClick={() => go({ name: 'home' })}>
           Continue
@@ -215,6 +250,31 @@ export function CompleteScreen() {
 
       <AnimatePresence>{milestone && <MilestoneSheet key={milestone.id} milestone={milestone} result={result} onContinue={() => setShown((n) => n + 1)} />}</AnimatePresence>
     </div>
+  )
+}
+
+/** Accuracy and XP count up from zero; time is shown as it was. */
+function Stats({ accuracy, ms, xp }: { accuracy: number; ms: number; xp: number }) {
+  const acc = useCountUp(accuracy, 400, 150)
+  const gained = useCountUp(xp, 400, 250)
+  return (
+    <>
+      <div className="gv-statcell">
+        <span className="gv-statcell__label">Accuracy</span>
+        <span className="gv-statcell__value">
+          {acc}
+          <span className="gv-statcell__unit">%</span>
+        </span>
+      </div>
+      <div className="gv-statcell">
+        <span className="gv-statcell__label">Time</span>
+        <span className="gv-statcell__value">{fmtTime(ms)}</span>
+      </div>
+      <div className="gv-statcell">
+        <span className="gv-statcell__label">XP</span>
+        <span className="gv-statcell__value">+{gained}</span>
+      </div>
+    </>
   )
 }
 
@@ -247,8 +307,9 @@ function MilestoneSheet({ milestone: m, result, onContinue }: { milestone: Miles
   useEffect(() => {
     ref.current?.focus()
   }, [])
-  const big = m.kind === 'unit' ? null : `${m.value}`
+  const big = m.kind === 'unit' ? null : m.value
   const unit = m.kind === 'streak' ? (m.value === 1 ? 'day' : 'days') : m.kind === 'words' ? 'words' : ''
+  const count = useCountUp(big ?? 0, 600, 250)
   return (
     <motion.div className="milestone" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.25 }}>
       <motion.div
@@ -263,24 +324,19 @@ function MilestoneSheet({ milestone: m, result, onContinue }: { milestone: Miles
         transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
       >
         <div className="milestone__body flow__pad">
-          <div className="gv-shevitsa milestone__band" aria-hidden="true" />
           <p className="milestone__eyebrow">{m.kind === 'unit' ? 'Unit complete' : m.kind === 'streak' ? 'Streak milestone' : 'Words milestone'}</p>
-          {big ? (
-            <p className="milestone__big" aria-hidden="true">
-              {big}
-              <span>{unit}</span>
-            </p>
-          ) : (
-            <span className="gv-ring-wrap milestone__mark" aria-hidden="true">
-              <svg className="gv-ring gv-ring--lg gv-tone-pine" viewBox="0 0 36 36" style={{ ['--value' as string]: 100 }}>
-                <circle className="gv-ring__track" cx="18" cy="18" r="16" />
-                <circle className="gv-ring__value" cx="18" cy="18" r="16" pathLength={100} />
-              </svg>
-              <span className="gv-ring__label done__check">
+          <StarMark>
+            {big !== null ? (
+              <span className="milestone__num" aria-label={`${big} ${unit}`}>
+                {count}
+                <span>{unit}</span>
+              </span>
+            ) : (
+              <span className="milestone__tick" aria-hidden="true">
                 <IconCheck />
               </span>
-            </span>
-          )}
+            )}
+          </StarMark>
           <h2 id="milestone-title" className="t-title1 milestone__title">
             {m.title}
           </h2>
@@ -292,7 +348,7 @@ function MilestoneSheet({ milestone: m, result, onContinue }: { milestone: Miles
             </p>
           )}
           <figure className="milestone__proverb">
-            <blockquote lang="bg">{m.proverb.bg}</blockquote>
+            <blockquote lang="bg">„{m.proverb.bg}“</blockquote>
             <figcaption>
               <span>{m.proverb.tr}</span>
               <span>{m.proverb.en}</span>

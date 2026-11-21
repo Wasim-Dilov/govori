@@ -27,12 +27,18 @@ export function useScrolled(threshold = 44) {
 }
 
 /** A thin Apple-Fitness-style ring that fills with today's XP toward the daily goal. */
-export function GoalRing({ value, goal, size = 28, width = 3.5, children, label }: { value: number; goal: number; size?: number; width?: number; children?: ReactNode; label?: string }) {
+export function GoalRing({ value, goal, size = 28, width = 3, children, label }: { value: number; goal: number; size?: number; width?: number; children?: ReactNode; label?: string }) {
   const pct = goal > 0 ? Math.min(100, (value / goal) * 100) : 0
   const reached = pct >= 100
-  const style = { '--value': pct, '--ring-size': `${size}px`, '--ring-width': width } as CSSProperties
+  // Start empty and sweep to the value, so the ring closes visibly (600ms ease-out in CSS).
+  const [shown, setShown] = useState(0)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setShown(pct))
+    return () => cancelAnimationFrame(id)
+  }, [pct])
+  const style = { '--value': shown, '--ring-size': `${size}px`, '--ring-width': width } as CSSProperties
   return (
-    <span className={`gv-ring-wrap goal-ring${reached ? ' is-reached' : ''}`} role="img" aria-label={label ?? `${value} of ${goal} XP today`}>
+    <span className={`gv-ring-wrap goal-ring${reached ? ' is-reached' : ''}${shown <= 0 ? ' is-zero' : ''}`} role="img" aria-label={label ?? `${value} of ${goal} XP today`}>
       <svg className="gv-ring" viewBox="0 0 36 36" style={style} aria-hidden="true">
         <circle className="gv-ring__track" cx="18" cy="18" r="16" />
         <circle className="gv-ring__value" cx="18" cy="18" r="16" pathLength={100} />
@@ -51,32 +57,37 @@ export function GoalRing({ value, goal, size = 28, width = 3.5, children, label 
 }
 
 /**
- * Flame and day count, rose once today's practice is done, with a snowflake per freeze in hand.
+ * Flame and day count, rose once today's practice is done, with the freezes in hand as one quiet capsule.
  * A broken streak never shows a bare 0: a repairable one shows the old number muted, otherwise just the flame.
  */
 export function Streak() {
   const st = useApp((s) => s.streak)
   const done = st.state === 'done'
   const shown = st.streak > 0 ? st.streak : st.repairable ? st.repairFrom : null
-  const label =
-    st.streak > 0
-      ? `${st.streak} day streak${done ? '' : ', not practised yet today'}${st.freezes ? `, ${st.freezes} ${st.freezes === 1 ? 'freeze' : 'freezes'}` : ''}`
-      : st.repairable
-        ? `Your ${st.repairFrom} day streak can still be repaired`
-        : 'Start a streak today'
   return (
-    <span className={`nav-streak${done ? ' is-on' : ''}${st.streak === 0 ? ' is-off' : ''}`} aria-label={label}>
+    <span className={`nav-streak${done ? ' is-on' : ''}${st.streak === 0 ? ' is-off' : ''}`}>
       <IconFlame filled={done} />
-      {shown !== null && <span aria-hidden="true">{shown}</span>}
+      {shown !== null && <span>{shown}</span>}
       {st.freezes > 0 && (
-        <span className="nav-streak__freezes" aria-hidden="true">
-          {Array.from({ length: st.freezes }, (_, i) => (
-            <IconSnowflake key={i} />
-          ))}
+        <span className="nav-streak__freezes">
+          <IconSnowflake />
+          {st.freezes > 1 && <span>{st.freezes}</span>}
         </span>
       )}
     </span>
   )
+}
+
+/** The streak in one sentence, for the navbar tip and screen readers. */
+export function streakText(st: StreakStatus): string {
+  const freezes = st.freezes > 0 ? ` · ${st.freezes} ${st.freezes === 1 ? 'freeze' : 'freezes'} saved` : st.goalDays > 0 && st.streak > 0 ? ` · ${st.goalDays} of ${GOAL_DAYS_PER_FREEZE} days to a freeze` : ''
+  if (st.repairable) return `Your ${st.repairFrom}-day streak can still be repaired`
+  if (st.frozenToday) return `A freeze saved your ${st.streak}-day streak`
+  if (st.state === 'frozen') return `A freeze covers yesterday · practise today${freezes}`
+  if (st.state === 'done') return `${st.streak}-day streak · done today${freezes}`
+  if (st.state === 'alive') return `${st.streak}-day streak · practise today${freezes}`
+  if (st.best > 0) return `Best run: ${st.best} days · a new one starts today`
+  return 'Practise today to start a streak'
 }
 
 /** "Tue 18:00", or "the end of Sunday" for a midnight deadline. */
@@ -87,32 +98,13 @@ const deadlineText = (ms: number) => {
 }
 
 /**
- * The streak in one calm line under the large title: freezes, a freeze that saved the streak,
- * a repair in progress, or the best run after a lapse. Never a bare broken "0".
+ * Under the large title Home shows only what needs action: a streak that can still be repaired.
+ * The everyday streak status lives in the navbar (tap it for the sentence).
  */
 export function StreakStatusBlock() {
   const st = useApp((s) => s.streak)
   if (st.repairable) return <RepairNotice st={st} />
-  const freezeNote = st.freezes > 0 ? `${st.freezes} ${st.freezes === 1 ? 'freeze' : 'freezes'}` : st.goalDays > 0 && st.streak > 0 ? `${st.goalDays}/${GOAL_DAYS_PER_FREEZE} to a freeze` : ''
-  let text: ReactNode = null
-  if (st.frozenToday) text = <>Streak saved with a freeze · {st.streak} days</>
-  else if (st.state === 'frozen') text = <>A freeze covers yesterday · practise today</>
-  else if (st.state === 'done') text = <>{st.streak}-day streak · done today</>
-  else if (st.state === 'alive') text = <>{st.streak}-day streak · practise today</>
-  else if (st.best > 0) text = <>Best: {st.best} days · a new run starts today</>
-  if (!text) return null
-  return (
-    <p className={`streak-line${st.state === 'done' ? ' is-done' : ''}`}>
-      {st.frozenToday || st.state === 'frozen' ? <IconSnowflake className="streak-line__icon is-frost" /> : <IconFlame className="streak-line__icon" filled={st.state === 'done'} />}
-      <span className="streak-line__text">{text}</span>
-      {freezeNote && st.state !== 'none' && (
-        <span className={`streak-line__freeze${st.freezes > 0 ? ' has-freeze' : ''}`}>
-          {st.freezes > 0 && <IconSnowflake className="streak-line__chip" />}
-          {freezeNote}
-        </span>
-      )}
-    </p>
-  )
+  return null
 }
 
 function RepairNotice({ st }: { st: StreakStatus }) {
@@ -170,20 +162,42 @@ export function LargeTitle({ children, sub, subLang }: { children: ReactNode; su
   )
 }
 
-/** Home's navigation bar: "Learn", with the streak and today's goal ring on the right. */
+/** Home's navigation bar: "Learn", with the streak and today's goal ring on the right. Tap either for a one-line tip. */
 export function TopBar() {
   const summary = useApp((s) => s.summary)
   const goal = useApp((s) => s.profile.dailyGoal)
+  const st = useApp((s) => s.streak)
   const xp = xpToday(summary)
+  const [tip, setTip] = useState<string | null>(null)
+  useEffect(() => {
+    if (!tip) return
+    const t = setTimeout(() => setTip(null), 2600)
+    return () => clearTimeout(t)
+  }, [tip])
+  const ringLabel = xp >= goal ? `Goal reached · ${xp} XP today` : `${xp} of ${goal} XP today`
   return (
-    <NavBar
-      title="Learn"
-      trailing={
-        <>
-          <Streak />
-          <GoalRing value={xp} goal={goal} size={26} label={`${xp} of ${goal} XP today`} />
-        </>
-      }
-    />
+    <>
+      <NavBar
+        title="Learn"
+        trailing={
+          <>
+            <button type="button" className="nav-tap" onClick={() => setTip((t) => (t === 'streak' ? null : 'streak'))} aria-label={streakText(st)}>
+              <Streak />
+            </button>
+            <button type="button" className="nav-tap" onClick={() => setTip((t) => (t === 'ring' ? null : 'ring'))} aria-label={ringLabel}>
+              <GoalRing value={xp} goal={goal} label={ringLabel} />
+            </button>
+          </>
+        }
+      />
+      {/* A zero-height sticky layer: the tip floats over the page instead of pushing it down. */}
+      <div className="nav-tip-layer">
+        {tip && (
+          <p className="nav-tip" role="status" onClick={() => setTip(null)}>
+            {tip === 'ring' ? ringLabel : streakText(st)}
+          </p>
+        )}
+      </div>
+    </>
   )
 }

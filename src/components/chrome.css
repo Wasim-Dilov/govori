@@ -5,12 +5,40 @@
 .screen.has-navbar { padding-top: 0; }
 
 .gv-navbar.app-nav { justify-content: center; }
-.gv-navbar.app-nav .gv-navbar__trailing { gap: var(--space-3); }
+.gv-navbar.app-nav .gv-navbar__trailing { gap: var(--space-2); }
+/* Scrolled: thick material so content never ghosts through, with a hairline separator. */
+.gv-navbar.app-nav.is-scrolled {
+  background: var(--material-thick, var(--material));
+  -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px);
+  box-shadow: 0 var(--hairline, 0.5px) 0 var(--separator);
+}
+
+/* Navbar items you can tap for a one-line tip (streak, goal ring). */
+.nav-tap {
+  appearance: none; border: 0; background: none; color: inherit; padding: 0 2px; margin: 0;
+  min-width: 36px; min-height: 36px; display: inline-grid; place-items: center; border-radius: var(--radius-sm);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 120ms var(--ease-out);
+}
+.nav-tap:active { opacity: 0.6; }
+.nav-tap:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.nav-tip-layer {
+  position: sticky; top: calc(44px + env(safe-area-inset-top, 0px) + var(--space-1)); z-index: 11;
+  height: 0; display: flex; justify-content: flex-end; pointer-events: none;
+}
+.nav-tip {
+  pointer-events: auto; width: max-content; max-width: min(100%, 320px); margin: 0;
+  padding: 8px 12px; border-radius: var(--radius-md);
+  background: var(--material-thick, var(--linen-raised));
+  -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px);
+  box-shadow: var(--shadow-float); font: 400 15px/20px var(--font-text); color: var(--ink);
+  font-variant-numeric: tabular-nums; animation: nav-tip-in 180ms var(--ease-out);
+}
+@keyframes nav-tip-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
 /* Large title row: the title on the left, an optional subtitle under it. */
 .app-largetitle { display: grid; gap: 2px; margin: 0 0 var(--space-5); }
 .app-largetitle .gv-largetitle { margin: 0; }
-.app-largetitle__sub { font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+.app-largetitle__sub { font: 400 17px/22px var(--font-text); color: var(--ink-muted); }
 
 /* ---------- streak */
 .nav-streak {
@@ -27,6 +55,8 @@
 .goal-ring.is-reached .gv-ring__value { stroke: var(--pine); }
 .goal-ring__check { color: var(--pine); }
 .goal-ring__check svg { width: 55%; height: 55%; }
+.goal-ring.is-zero .gv-ring__value { opacity: 0; }
+.goal-ring .gv-ring__value { transition: stroke-dashoffset 600ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 120ms; }
 
 /* ---------- track badge: an iOS Settings-style tile with the track's Cyrillic initial */
 .track-badge {
@@ -78,6 +108,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .focus-plan-toggle .gv-row__chevron { transition: none; }
+  .goal-ring .gv-ring__value { transition: none; }
+  .nav-tip { animation: none; }
 }
 
 /* A row icon slot that holds its own tile (track badge, week number): no tinted backing. */
@@ -86,8 +118,12 @@
 
 /* ---------- streak: freezes in the navbar, the status line and the repair notice */
 .nav-streak.is-off { color: var(--label-tertiary); }
-.nav-streak__freezes { display: inline-flex; gap: 1px; margin-left: 2px; color: var(--trk-basics); }
-.nav-streak__freezes svg { width: 14px; height: 14px; }
+.nav-streak__freezes {
+  display: inline-flex; align-items: center; gap: 2px; margin-left: 4px; padding: 2px 6px 2px 4px;
+  border-radius: var(--radius-full); background: var(--fill-secondary); color: var(--ink-muted);
+  font: 600 12px/1 var(--font-text);
+}
+.nav-streak__freezes svg { width: 13px; height: 13px; }
 
 .streak-line {
   display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--space-2);
@@ -96,17 +132,17 @@
 }
 .streak-line__icon { flex: none; width: 18px; height: 18px; color: var(--ink-muted); }
 .streak-line.is-done .streak-line__icon { color: var(--rose); }
-.streak-line__icon.is-frost { color: var(--trk-basics); }
+.streak-line__icon.is-frost { color: var(--ink-muted); }
 .streak-line__text { min-width: 0; }
 .streak-line__freeze {
   display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: var(--radius-full);
   background: var(--fill-secondary); font: 500 13px/18px var(--font-text); color: var(--ink-muted); white-space: nowrap;
 }
-.streak-line__freeze.has-freeze { background: var(--trk-basics-soft); color: var(--trk-basics-ink, var(--ink)); }
-.streak-line__chip { width: 14px; height: 14px; color: var(--trk-basics); }
+.streak-line__freeze.has-freeze { background: var(--fill-secondary); color: var(--ink-muted); }
+.streak-line__chip { width: 14px; height: 14px; color: var(--ink-muted); }
 
 .streak-repair {
-  display: grid; gap: var(--space-3); padding: var(--space-4); margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+  display: grid; gap: var(--space-3); padding: var(--space-4); margin: 0 0 var(--space-5);
   background: var(--linen-raised); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
 }
 .streak-repair__head { display: flex; align-items: flex-start; gap: var(--space-3); }

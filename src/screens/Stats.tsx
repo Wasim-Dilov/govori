@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { MotionConfig, motion } from 'motion/react'
 import { useApp } from '../lib/store.ts'
 import { db, localDay, type AnswerEvent, type Memory, type SessionRecord } from '../lib/db.ts'
-import { learnerLevel, liveStreak } from '../lib/progress.ts'
+import { isLetter, isWord, learnerLevel, liveStreak } from '../lib/progress.ts'
 import { alphabet, totalItems } from '../content/index.ts'
 import { speak } from '../lib/audio.ts'
 import { exportAll, type ExportOutcome } from '../lib/exportData.ts'
@@ -20,6 +20,7 @@ import {
   type Rate,
 } from '../lib/insights.ts'
 import { IconChart, IconCheck, IconHeart, IconShare, IconSpeaker, IconStar, IconTarget } from '../components/Icons.tsx'
+import { Illustration } from '../components/Illustration.tsx'
 import { earnedCanDos } from '../lib/milestones.ts'
 import { missionsDone } from '../lib/missions.ts'
 import './stats.css'
@@ -86,9 +87,7 @@ export function StatsScreen() {
 
         {data === null ? null : empty ? (
           <motion.section initial="hidden" animate="show" variants={enter} className="st-empty" aria-labelledby="st-empty-t">
-            <span className="st-empty__icon" aria-hidden="true">
-              <IconChart />
-            </span>
+            <Illustration name="stats" size={120} className="st-empty__art" />
             <h2 id="st-empty-t" className="t-title3">
               No stats yet
             </h2>
@@ -133,8 +132,9 @@ function Filled(props: {
   onPractise: () => void
 }) {
   const { data, level } = props
-  const words = data.memory.filter((m) => !m.itemId.startsWith('az.')).length
-  const letters = data.memory.filter((m) => m.itemId.startsWith('az.') && !m.itemId.includes('.r')).length
+  // Same rule as everywhere else in the app (Me, Home), so the numbers always agree.
+  const words = data.memory.filter((m) => isWord(m.itemId)).length
+  const letters = data.memory.filter((m) => isLetter(m.itemId)).length
   const info = useMemo(() => insights(data.events), [data.events])
   const skills = useMemo(() => bySkill(data.events), [data.events])
   const parts = useMemo(() => byTimeOfDay(data.events), [data.events])
@@ -174,7 +174,7 @@ function Filled(props: {
               </span>
               <span className="gv-row__subtitle">{level.name.en}</span>
               <div className="gv-progress st-level__bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(level.progress * 100)} aria-label="XP towards the next level">
-                <motion.div className="gv-progress__fill" initial={{ width: 0 }} animate={{ width: `${Math.max(3, level.progress * 100)}%` }} transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }} />
+                <motion.div className="gv-progress__fill" initial={{ width: 0 }} animate={{ width: `${Math.max(3, level.progress * 100)}%` }} transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }} />
               </div>
             </div>
             <span className="gv-row__accessory st-level__xp">
@@ -331,7 +331,7 @@ function CanDoSection() {
               <IconCheck />
             </span>
             <span className="gv-row__body">
-              <span className="gv-row__title st-wrap muted">Finish a unit to unlock your first I can</span>
+              <span className="gv-row__title st-wrap muted">Finish a unit to unlock your first “I can”</span>
             </span>
           </li>
         )}
@@ -616,7 +616,7 @@ function Meter({ label, extra, value, rate, show, hide, flag }: { label: string;
         onBlur={hide}
         onClick={(e) => show(e, value, tipLabel)}
       >
-        <motion.span className="st-meter__fill" initial={{ scaleX: 0 }} animate={{ scaleX: rate.accuracy }} transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }} />
+        <motion.span className="st-meter__fill" initial={{ scaleX: 0 }} animate={{ scaleX: rate.accuracy }} transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }} />
       </button>
     </li>
   )

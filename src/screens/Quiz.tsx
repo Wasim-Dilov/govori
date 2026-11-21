@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { StudyItem } from '../content/index.ts'
-import { IconCheck, IconClose, IconHeart, IconSpeaker, IconX } from '../components/Icons.tsx'
+import { IconCheck, IconClose, IconSpeaker, IconX } from '../components/Icons.tsx'
+import { Illustration } from '../components/Illustration.tsx'
 import { sfx, speak, stopSpeaking, unlockAudio } from '../lib/audio.ts'
 import { logQuiz, quizMeDeck } from '../lib/custom.ts'
 import { newSessionId } from '../lib/progress.ts'
@@ -45,7 +46,7 @@ export function QuizScreen() {
 
   const card = deck[idx]
   const her = partner || 'her'
-  const Her = partner || 'Her'
+  const She = partner || 'She'
 
   const start = () => {
     unlockAudio()
@@ -98,9 +99,7 @@ export function QuizScreen() {
 
           {phase === 'empty' && (
             <motion.div key="e" className="quiz__center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <span className="quiz__badge" aria-hidden="true">
-                <IconHeart />
-              </span>
+              <Illustration name="phrases" size={112} />
               <h1 className="t-title2">Nothing to quiz yet</h1>
               <p className="muted quiz__lead">Finish a lesson or two first. Then {her} can quiz you on what you have learned.</p>
               <button type="button" className="gv-btn gv-btn--block" onClick={() => go({ name: 'home' })}>
@@ -111,18 +110,16 @@ export function QuizScreen() {
 
           {phase === 'intro' && (
             <motion.div key="i" className="quiz__center" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
-              <span className="quiz__badge" aria-hidden="true">
-                <IconHeart />
-              </span>
+              <Illustration name="quiz" size={128} />
               <h1 className="t-title1 quiz__headline">Hand the phone to {her}</h1>
               <p className="quiz__lead muted">
-                {Her} sees {deck.length} words and phrases you have learned. You say each one out loud in Bulgarian. {Her} taps whether you got it.
+                {She} sees {deck.length} words and phrases you have learned. You say each one out loud in Bulgarian. {She} taps whether you got it.
               </p>
               <ol className="gv-list quiz__steps">
                 <li className="gv-row">
                   <span className="quiz__num">1</span>
                   <span className="gv-row__body">
-                    <span className="gv-row__title">{Her} reads the English to you</span>
+                    <span className="gv-row__title">{She} reads the English to you</span>
                   </span>
                 </li>
                 <li className="gv-row">
@@ -134,7 +131,7 @@ export function QuizScreen() {
                 <li className="gv-row">
                   <span className="quiz__num">3</span>
                   <span className="gv-row__body">
-                    <span className="gv-row__title">{Her} taps "Said it right" or "Not yet"</span>
+                    <span className="gv-row__title">{She} taps “Said it right” or “Not yet”</span>
                   </span>
                 </li>
               </ol>
@@ -145,7 +142,7 @@ export function QuizScreen() {
           )}
 
           {phase === 'card' && card && (
-            <motion.section key={card.id + idx} className="quiz__card-wrap" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}>
+            <motion.section key={card.id + idx} className="quiz__card-wrap" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}>
               <p className="t-footnote quiz__ask">Ask him: how do you say</p>
               <div className="gv-card quiz__card">
                 {card.emoji && (

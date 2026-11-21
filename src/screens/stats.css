@@ -29,20 +29,20 @@
 .st-action { color: var(--rose); }
 
 /* ---------- empty */
-.st-empty { display: grid; justify-items: center; text-align: center; gap: var(--space-3); padding: var(--space-12) var(--space-4); }
+.st-empty { display: grid; justify-items: center; text-align: center; gap: var(--space-3); padding: var(--space-8) var(--space-4) var(--space-12); }
 .st-empty p { max-width: 30ch; }
-.st-empty__icon { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--fill-secondary); color: var(--ink-muted); margin-bottom: var(--space-1); }
-.st-empty__icon svg { width: 30px; height: 30px; }
+.st-empty__art { margin-bottom: var(--space-2); }
 .st-empty .gv-btn { margin-top: var(--space-2); min-width: 180px; }
 
 /* ---------- summary */
 .st-grid { grid-template-columns: 1fr 1fr; }
 .st-accent { color: var(--rose); }
 .st-grid .gv-statcell__unit { margin-left: 4px; }
+.st-grid .gv-statcell__value { font-variant-numeric: tabular-nums; }
 
 /* ---------- level row */
 .st-level { align-items: center; }
-.st-level__num { font: 700 15px/1 var(--font-text); font-variant-numeric: tabular-nums; background: var(--rose-soft); color: var(--rose-ink); }
+.st-level__num { font: 700 15px/1 var(--font-text); font-variant-numeric: tabular-nums; background: var(--fill-secondary); color: var(--ink); }
 .st-level__bar { margin-top: 8px; }
 .st-level__xp { font-size: 15px; }
 
@@ -72,7 +72,7 @@
 .st-table tbody th { font-weight: 500; }
 
 /* ---------- svg chart chrome */
-.st-axis { font: 400 11px/1 var(--font-text); fill: var(--ink-muted); }
+.st-axis { font: 400 12px/1 var(--font-text); fill: var(--ink-muted); font-variant-numeric: tabular-nums; }
 .st-axis--strong { fill: var(--ink); font-weight: 600; }
 .st-num { font-variant-numeric: tabular-nums; }
 .st-grid { stroke: var(--separator); stroke-width: 1; }
@@ -81,14 +81,16 @@
 
 /* ---------- calendar */
 .st-cal { display: block; width: 100%; height: auto; }
-.st-heat { cursor: pointer; transition: opacity 120ms; }
+.st-heat { cursor: pointer; transition: opacity 120ms; animation: st-heat-in 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes st-heat-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .st-heat { animation: none; } }
 .st-heat:hover { opacity: 0.75; }
 .st-heat--0 { fill: var(--heat-0); }
 .st-heat--1 { fill: var(--heat-1); }
 .st-heat--2 { fill: var(--heat-2); }
 .st-heat--3 { fill: var(--heat-3); }
 .st-heat.is-today { stroke: var(--ink); stroke-width: 1.5; }
-.st-legend { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font: 400 12px/16px var(--font-text); color: var(--ink-muted); }
+.st-legend { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font: 500 13px/18px var(--font-text); color: var(--ink-muted); }
 .st-legend span:first-child { margin-right: 2px; }
 .st-legend span:last-child { margin-left: 2px; }
 .st-heat-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
@@ -111,13 +113,13 @@
 }
 .st-meter__track:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .st-meter__fill { display: block; height: 100%; width: 100%; border-radius: inherit; background: var(--mark); transform-origin: left center; }
-.st-flag { align-self: center; height: 18px; font-weight: 600; font-size: 11px; }
+.st-flag { align-self: center; height: 20px; font-weight: 600; font-size: 13px; }
 
 .st-when { display: grid; gap: var(--space-5); }
 .st-cols { display: block; width: 100%; height: auto; }
 .st-col { fill: color-mix(in oklab, var(--mark) 45%, var(--chart-surface)); }
 .st-col.is-best { fill: var(--mark); }
-.st-col-val { font: 600 12px/1 var(--font-text); fill: var(--ink); font-variant-numeric: tabular-nums; }
+.st-col-val { font: 600 13px/1 var(--font-text); fill: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* ---------- trend line */
 .st-trend { display: block; width: 100%; height: auto; overflow: visible; }
@@ -130,7 +132,7 @@
 .st-tough { gap: var(--space-3); }
 .st-tough { --row-inset: calc(var(--space-4) + 36px + var(--space-3)); }
 .st-tough__score { display: grid; justify-items: end; font-weight: 600; color: var(--ink); line-height: 20px; }
-.st-tough__right { font: 400 12px/16px var(--font-text); color: var(--ink-muted); }
+.st-tough__right { font: 500 13px/18px var(--font-text); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
 .st-practise { margin-top: var(--space-3); }
 .st-practise svg { width: 20px; height: 20px; }
 
@@ -143,5 +145,5 @@
 .st-cando__check.is-empty { background: var(--fill-secondary); color: var(--label-tertiary); }
 
 /* ---------- With her this week */
-.st-together__icon { color: var(--rose); }
+.st-together__icon { color: var(--ink-muted); }
 .st-together__n { font: 600 20px/24px var(--font-text); color: var(--ink); font-variant-numeric: tabular-nums; }

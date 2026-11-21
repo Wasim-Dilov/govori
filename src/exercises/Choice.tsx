@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import type { StudyItem } from '../content/index.ts'
 import { speak } from '../lib/audio.ts'
-import { Bg, Cue, Prompt, SpeakButton, fadeIn } from './common.tsx'
+import { Bg, Cue, Prompt, SpeakButton, curly, fadeIn } from './common.tsx'
+import { EmojiTile } from '../components/EmojiTile.tsx'
 import type { ExerciseProps } from './types.ts'
 
 type ChoiceType = 'mc_bg_en' | 'mc_en_bg' | 'listen_mc' | 'letter_sound' | 'sound_letter' | 'read_word'
@@ -34,7 +35,7 @@ export function ChoiceExercise({ ex, setAnswer, checked, translit }: ExercisePro
       case 'mc_bg_en':
         return item.en
       case 'letter_sound':
-        return `${item.letter!.upper} sounds like "${item.tr}"`
+        return `${item.letter!.upper} sounds like \u201c${item.tr}\u201d`
       case 'sound_letter':
         return `${item.letter!.upper} ${item.letter!.lower}`
       case 'read_word':
@@ -70,7 +71,7 @@ export function ChoiceExercise({ ex, setAnswer, checked, translit }: ExercisePro
   return (
     <div className="ex">
       <Header ex={ex} translit={translit} />
-      <div className={cards ? 'ex-grid' : 'ex-list'} role="group" aria-label="Answers">
+      <div className={`ex-answers ${cards ? 'ex-grid' : 'ex-list'}`} role="group" aria-label="Answers">
         {ex.options.map((o, i) => (
           <motion.button
             key={o.id}
@@ -82,11 +83,7 @@ export function ChoiceExercise({ ex, setAnswer, checked, translit }: ExercisePro
             {...fadeIn(i)}
           >
             {!cards && <span className="gv-choice__key">{i + 1}</span>}
-            {cards && (
-              <span className="gv-choice__emoji" aria-hidden="true">
-                {o.emoji}
-              </span>
-            )}
+            {cards && <EmojiTile emoji={o.emoji} size={64} track={o.trackId} />}
             <OptionLabel ex={ex} o={o} translit={translit} />
           </motion.button>
         ))}
@@ -103,7 +100,7 @@ function OptionLabel({ ex, o, translit }: { ex: ExerciseProps<ChoiceType>['ex'];
       return (
         <span className="gv-choice__text">
           <span className="ex-opt-strong">{o.tr}</span>
-          <span className="gv-choice__sub">{o.letter?.sound}</span>
+          <span className="gv-choice__sub">{curly(o.letter?.sound ?? '')}</span>
         </span>
       )
     case 'sound_letter':
@@ -142,9 +139,11 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>What does this mean?</Prompt>
-          <div className="ex-hero">
-            <SpeakButton text={item.bg} itemId={item.id} auto />
-            <Bg text={item.bg} tr={item.tr} showTr={translit} className="t-bg-word" />
+          <div className="ex-stage">
+            <div className="ex-hero">
+              <SpeakButton text={item.bg} itemId={item.id} auto />
+              <Bg text={item.bg} tr={item.tr} showTr={translit} className="t-bg-word" />
+            </div>
           </div>
         </>
       )
@@ -152,16 +151,20 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>How do you say this in Bulgarian?</Prompt>
-          <Cue emoji={item.emoji} text={item.en} />
+          <div className="ex-stage">
+            <Cue emoji={item.emoji} text={item.en} track={item.trackId} />
+          </div>
         </>
       )
     case 'listen_mc':
       return (
         <>
           <Prompt>What do you hear?</Prompt>
-          <div className="ex-listen">
-            <SpeakButton text={item.bg} itemId={item.id} size="lg" auto />
-            <SpeakButton text={item.bg} itemId={item.id} slow />
+          <div className="ex-stage">
+            <div className="ex-listen">
+              <SpeakButton text={item.bg} itemId={item.id} size="lg" auto />
+              <SpeakButton text={item.bg} itemId={item.id} slow />
+            </div>
           </div>
         </>
       )
@@ -169,11 +172,13 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>Which sound does this letter make?</Prompt>
-          <div className="ex-lettercard">
-            <span className="t-letter" lang="bg">
-              {item.letter!.upper}
-              {item.letter!.lower}
-            </span>
+          <div className="ex-stage">
+            <div className="ex-lettercard">
+              <span className="t-letter" lang="bg">
+                {item.letter!.upper}
+                {item.letter!.lower}
+              </span>
+            </div>
           </div>
         </>
       )
@@ -181,9 +186,11 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>Which letter makes this sound?</Prompt>
-          <div className="ex-soundcard">
-            <span className="ex-soundcard__sound">{item.tr}</span>
-            <span className="ex-soundcard__hint">{item.letter!.sound}</span>
+          <div className="ex-stage">
+            <div className="ex-soundcard">
+              <span className="ex-soundcard__sound">{item.tr}</span>
+              <span className="ex-soundcard__hint">{curly(item.letter!.sound)}</span>
+            </div>
           </div>
         </>
       )
@@ -191,10 +198,12 @@ function Header({ ex, translit }: { ex: ExerciseProps<ChoiceType>['ex']; transli
       return (
         <>
           <Prompt>Read this word</Prompt>
-          <div className="ex-lettercard">
-            <span className="ex-readword" lang="bg">
-              {item.bg}
-            </span>
+          <div className="ex-stage">
+            <div className="ex-lettercard">
+              <span className="ex-readword" lang="bg">
+                {item.bg}
+              </span>
+            </div>
           </div>
         </>
       )

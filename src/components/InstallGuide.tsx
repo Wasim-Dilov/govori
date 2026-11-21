@@ -1,5 +1,6 @@
 // "Add to Home Screen" steps for iPhone, drawn as a clean grouped list.
 import { BrandMark } from './BrandMark.tsx'
+import { Illustration } from './Illustration.tsx'
 import './install-guide.css'
 
 function ShareGlyph() {
@@ -27,7 +28,7 @@ const STEPS = [
 ]
 
 export function InstallGuide({ compact = false }: { compact?: boolean }) {
-  return (
+  const list = (
     <ol className={`ig${compact ? ' ig--compact' : ' gv-list'}`} aria-label="Add Govori to your Home Screen">
       {STEPS.map((s, i) => (
         <li key={s.title} className="gv-row ig-row">
@@ -43,6 +44,13 @@ export function InstallGuide({ compact = false }: { compact?: boolean }) {
         </li>
       ))}
     </ol>
+  )
+  if (compact) return list
+  return (
+    <div className="ig-wrap">
+      <Illustration name="install" size={104} className="ig-art" />
+      {list}
+    </div>
   )
 }
 

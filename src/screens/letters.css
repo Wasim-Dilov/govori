@@ -5,7 +5,7 @@
 
 .letters-summary { display: grid; gap: var(--space-3); }
 .letters-summary__row { gap: var(--space-4); min-height: 72px; }
-.letters-summary__pct { font: 600 12px/1 var(--font-text); font-variant-numeric: tabular-nums; color: var(--ink); }
+.letters-summary__pct { font: 600 11px/1 var(--font-text); letter-spacing: -0.2px; font-variant-numeric: tabular-nums; color: var(--ink); }
 .letters-summary .gv-row__subtitle { font-size: 15px; }
 
 .letters-group__head { align-items: baseline; }
@@ -14,22 +14,24 @@
 .letters-card { background: var(--linen-raised); border-radius: var(--radius-lg); padding: var(--space-3); box-shadow: var(--shadow-card); }
 .letters-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-2); }
 .letters-cell {
-  appearance: none; border: 0; margin: 0; cursor: pointer;
+  position: relative; appearance: none; border: 0; margin: 0; cursor: pointer;
   display: grid; justify-items: center; align-content: center; gap: 2px;
   aspect-ratio: 1 / 1.12; min-height: 54px; padding: 2px;
-  border-radius: var(--radius-sm); background: var(--linen-sunk); color: var(--ink);
+  border-radius: var(--radius-sm); background: var(--linen-sunk); color: var(--ink-muted);
   -webkit-tap-highlight-color: transparent;
   transition: transform 120ms var(--ease-out), background-color 150ms var(--ease-out);
 }
 .letters-cell:active { transform: scale(0.95); }
 .letters-cell:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.letters-cell__glyph { font: 600 21px/1 var(--font-text); letter-spacing: 0; white-space: nowrap; }
-.letters-cell__lower { font-weight: 400; color: var(--ink-muted); margin-left: 1px; }
+.letters-cell__glyph { font: 600 21px/1 var(--font-text); letter-spacing: 0; white-space: nowrap; color: inherit; }
+.letters-cell__lower { font-weight: 400; margin-left: 1px; opacity: 0.75; }
 .letters-cell__tr { font: 400 11px/13px var(--font-text); color: var(--ink-muted); }
-.letters-cell.is-known { background: var(--rose-soft); }
-.letters-cell.is-known .letters-cell__glyph { color: var(--rose-ink); }
-.letters-cell.is-known .letters-cell__lower,
-.letters-cell.is-known .letters-cell__tr { color: var(--rose-ink); }
+/* Learned: a crisp raised cell, the glyph in ink and a small rose dot. */
+.letters-cell.is-known {
+  background: var(--linen-raised); color: var(--ink);
+  box-shadow: 0 0 0 var(--hairline, 0.5px) var(--separator), var(--shadow-card);
+}
+.letters-cell__dot { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--rose); }
 
 /* ---------- letter sheet */
 .letter-sheet { display: grid; gap: var(--space-4); padding-bottom: var(--space-2); }

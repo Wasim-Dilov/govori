@@ -38,16 +38,18 @@ export function ClozeExercise({ ex, setAnswer, checked, translit }: ExerciseProp
   return (
     <div className="ex">
       <Prompt>Fill the gap</Prompt>
-      <Cue emoji={ex.item.emoji} text={ex.item.en} />
-      <p className="ex-cloze__sentence" lang="bg">
-        {ex.before}
-        <span className={`ex-cloze__gap ${gapState}`} aria-label={picked ? `Your word: ${picked}` : 'Missing word'}>
-          {picked ?? ' '}
-        </span>
-        {ex.after}
-      </p>
-      {translit && checked && <p className="ex-tr ex-cloze__tr">{ex.item.tr}</p>}
-      <div className="ex-cloze__options" role="group" aria-label="Words">
+      <div className="ex-stage">
+        <Cue emoji={ex.item.emoji} text={ex.item.en} track={ex.item.trackId} />
+        <p className="ex-cloze__sentence" lang="bg">
+          {ex.before}
+          <span className={`ex-cloze__gap ${gapState}`} aria-label={picked ? `Your word: ${picked}` : 'Missing word'}>
+            {picked ?? ' '}
+          </span>
+          {ex.after}
+        </p>
+        {translit && checked && <p className="ex-tr ex-cloze__tr">{ex.item.tr}</p>}
+      </div>
+      <div className="ex-answers ex-cloze__options" role="group" aria-label="Words">
         {ex.options.map((w, i) => (
           <motion.button key={w} type="button" className={`gv-tile ex-cloze__chip ${chipState(w)}`} onClick={() => choose(w)} disabled={!!checked} aria-pressed={picked === w} {...fadeIn(i)}>
             <span lang="bg">{w}</span>

@@ -7,7 +7,9 @@
 .me-avatar {
   flex: none; width: 60px; height: 60px; border-radius: 50%;
   display: grid; place-items: center;
-  background: var(--rose-soft); color: var(--rose-ink);
+  background: radial-gradient(120% 120% at 30% 20%, var(--accent), var(--accent-pressed, var(--rose-deep)));
+  color: var(--on-accent);
+  box-shadow: 0 0 0 2px var(--linen-raised), 0 0 0 3.5px color-mix(in oklab, var(--accent) 35%, transparent);
   font: 600 22px/1 var(--font-display); letter-spacing: 0.01em;
 }
 .me-avatar svg { width: 30px; height: 30px; }
@@ -40,7 +42,7 @@
 .me-code {
   display: block; margin-top: 6px; max-height: 60px; overflow: auto; padding: 8px 10px;
   border-radius: var(--radius-sm); background: var(--linen-sunk); color: var(--ink-muted);
-  font: 400 12px/16px ui-monospace, "SF Mono", Menlo, monospace; word-break: break-all; user-select: all; -webkit-user-select: all;
+  font: 400 13px/18px ui-monospace, "SF Mono", Menlo, monospace; word-break: break-all; user-select: all; -webkit-user-select: all;
 }
 .me-count { font-variant-numeric: tabular-nums; }
 .me-error { color: var(--warn-ink); }
@@ -65,7 +67,7 @@
   font: 400 17px/22px var(--font-text); outline: none;
 }
 .me-search input::placeholder { color: var(--ink-muted); }
-.me-search:focus-within { box-shadow: 0 0 0 3px var(--rose-soft); }
+.me-search:focus-within { box-shadow: 0 0 0 2px var(--pick); }
 
 /* ---------- her voice rows */
 .me-voice-row { padding-block: 9px; }
@@ -87,7 +89,7 @@
 .rec-live { display: inline-flex; align-items: center; gap: 6px; font: 500 15px/20px var(--font-text); color: var(--ink); font-variant-numeric: tabular-nums; }
 .rec-cap { color: var(--ink-muted); }
 .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rose); animation: rec-blink 1.2s ease-in-out infinite; }
-.rec-error { flex-basis: 100%; text-align: right; font: 400 12px/16px var(--font-text); color: var(--warn-ink); max-width: 200px; }
+.rec-error { flex-basis: 100%; text-align: right; font: 500 13px/18px var(--font-text); color: var(--warn-ink); max-width: 200px; }
 @keyframes rec-blink { 50% { opacity: 0.3; } }
 
 @media (prefers-reduced-motion: reduce) {
@@ -105,11 +107,19 @@
 
 /* ---------- Practise together */
 .me-nav-row { appearance: none; border: 0; width: 100%; text-align: left; font: inherit; color: inherit; background: transparent; cursor: pointer; }
-.me-row-icon {
-  flex: none; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
-  background: var(--rose); color: var(--on-rose);
+/* iOS Settings-style leading tiles: neutral unless the hue means something. */
+.me-ico { background: var(--tone); color: var(--on-tone); }
+.me-ico--plain { background: var(--fill-secondary); color: var(--ink); }
+
+/* Empty state and hero rows that carry an illustration */
+.me-empty, .me-hero { gap: var(--space-4); padding-block: var(--space-3); --row-inset: var(--space-4); }
+.me-empty__text { display: grid; gap: 2px; min-width: 0; }
+.me-pill {
+  flex: none; padding: 4px 10px; border-radius: var(--radius-full); font: 600 13px/18px var(--font-text);
+  background: var(--fill-secondary); color: var(--ink-muted);
 }
-.me-row-icon svg { width: 18px; height: 18px; }
+.me-pill.is-on { background: var(--pine-soft); color: var(--pine-ink); }
+.me-about { gap: var(--space-3); --row-inset: calc(var(--space-4) + 32px + var(--space-3)); }
 
 /* ---------- Our phrases */
 .me-phrase__emoji { flex: none; width: 30px; text-align: center; font-size: 22px; line-height: 1; }

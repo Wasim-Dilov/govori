@@ -1,7 +1,16 @@
 /* Shared exercise layout, native iOS. Components come from components.css; colours from tokens only. */
-.ex { display: grid; gap: var(--space-5); padding-block: var(--space-3) var(--space-6); }
+/* Composition: prompt at the top, the stimulus centred in the space above the answers, and the
+   answer group pinned low, 24pt above the Check bar. On short screens it all simply stacks. */
+.ex { flex: 1; display: flex; flex-direction: column; gap: var(--space-5); padding-block: var(--space-3) var(--space-6); }
 .ex-prompt { color: var(--ink); margin: 0; }
-.ex-eyebrow { font: 600 13px/18px var(--font-text); color: var(--tone-text, var(--rose)); margin: 0; }
+.ex-stage {
+  flex: 1 0 auto; display: flex; flex-direction: column; justify-content: center; gap: var(--space-4);
+  /* A little more room below than above lifts the stimulus into the upper part of the screen. */
+  padding-block: var(--space-2) min(7vh, 56px);
+}
+.ex-answers { margin-top: auto; }
+/* Eyebrows stay quiet: rose is kept for selection, the primary button and the play button. */
+.ex-eyebrow { font: 600 13px/18px var(--font-text); color: var(--ink-muted); margin: 0; }
 .ex-bg { display: inline-flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ex-tr { font: 400 15px/20px var(--font-text); color: var(--ink-muted); letter-spacing: 0; }
 .ex-opt-strong { font-weight: 600; }
@@ -10,17 +19,13 @@
 .ex-hero { display: flex; align-items: center; gap: var(--space-4); min-height: 64px; }
 .ex-hero .t-bg-word { overflow-wrap: anywhere; }
 
-/* English cue for production: a neat emoji tile and the meaning */
+/* English cue for production: a framed emoji tile and the meaning */
 .ex-cue {
-  display: flex; align-items: center; gap: var(--space-3);
-  padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg);
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-3); padding-right: var(--space-4); border-radius: var(--radius-lg);
   background: var(--linen-raised); box-shadow: var(--shadow-card);
 }
-.ex-cue__emoji {
-  flex: none; width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center;
-  background: var(--linen-sunk); font-size: 28px; line-height: 1;
-}
-.ex-cue__text { font: 600 20px/25px var(--font-display); color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.ex-cue__text { font: 600 20px/25px var(--font-display); color: var(--ink); min-width: 0; overflow-wrap: anywhere; text-wrap: balance; }
 
 /* Listening: one large play button and a quiet slow one */
 .ex-listen { display: flex; align-items: center; justify-content: center; gap: var(--space-5); padding-block: var(--space-2); }
@@ -32,38 +37,53 @@
   padding: var(--space-6) var(--space-4); border-radius: var(--radius-lg);
   background: var(--linen-raised); box-shadow: var(--shadow-card); text-align: center;
 }
-.ex-lettercard .t-letter { color: var(--ink); }
+.ex-lettercard .t-letter { color: var(--ink); font-size: 120px; line-height: 1; }
 .ex-readword { font: 600 40px/48px var(--font-text); letter-spacing: 0.01em; color: var(--ink); overflow-wrap: anywhere; }
 .ex-soundcard__sound { font: 700 40px/48px var(--font-display); color: var(--ink); }
 .ex-soundcard__hint { font: 400 15px/20px var(--font-text); color: var(--ink-muted); max-width: 30ch; }
 .ex-optletter { font: 600 26px/30px var(--font-text); }
 
-.ex-list { display: grid; gap: var(--space-2); }
+.ex-list { display: grid; gap: var(--space-3); }
 .ex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+/* Picture cards: a framed emoji over a calm label */
+.ex-grid .gv-choice--card { min-height: 140px; gap: var(--space-3); padding: var(--space-4) var(--space-3); }
+.ex-grid .gv-choice--card .gv-choice__text { font: 500 17px/22px var(--font-text); }
+.ex-list .gv-choice { min-height: 56px; }
 
-/* ---------- intro */
-.ex-intro { gap: var(--space-4); }
-.ex-introcard { display: grid; justify-items: center; gap: var(--space-2); padding: var(--space-6) var(--space-4) var(--space-5); text-align: center; }
-.ex-introcard__emoji {
-  width: 64px; height: 64px; border-radius: 16px; display: grid; place-items: center;
-  background: var(--linen-sunk); font-size: 36px; line-height: 1; margin-bottom: var(--space-2);
+/* ---------- intro: one centred hero moment */
+.ex-intro { gap: var(--space-5); }
+.ex-intro__hero {
+  flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--space-4); text-align: center; padding-block: var(--space-4) min(5vh, 40px);
 }
-.ex-introcard__bg { align-items: center; }
-.ex-introcard__en { font: 400 17px/22px var(--font-text); color: var(--ink-muted); margin: 0; }
-.ex-introcard__audio { display: flex; gap: var(--space-3); justify-content: center; margin-top: var(--space-3); }
+.ex-intro__words { display: grid; gap: var(--space-1); justify-items: center; max-width: 100%; }
+.ex-intro__bg { color: var(--ink); overflow-wrap: anywhere; text-wrap: balance; } /* type from t-bg-hero */
+.ex-intro__bg--lg { font-size: 36px; line-height: 44px; }
+.ex-intro__bg--md { font-size: 28px; line-height: 34px; }
+.ex-intro__tr { font: 400 17px/22px var(--font-text); color: var(--ink-muted); }
+.ex-intro__en { font: 400 20px/25px var(--font-text); color: var(--ink); margin-top: var(--space-1); text-wrap: balance; }
+.ex-intro__audio { display: flex; align-items: center; gap: var(--space-4); margin-top: var(--space-2); }
+.gv-iconbtn.ex-play-hero {
+  width: 64px; height: 64px; background: var(--accent); color: var(--on-accent);
+  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--accent) 80%, transparent);
+}
+.gv-iconbtn.ex-play-hero svg { width: 28px; height: 28px; }
+.ex-intro__glyph { font: 600 120px/1 var(--font-text); color: var(--ink); letter-spacing: 0.02em; }
+.ex-intro__sound { font: 600 22px/28px var(--font-display); color: var(--ink); }
+.ex-intro__bgstyle { width: 100%; max-width: 380px; }
+.ex-intro__more { display: grid; gap: var(--space-4); }
 .ex-note { display: flex; gap: var(--space-3); align-items: flex-start; text-align: left; font: 400 15px/20px var(--font-text); color: var(--ink); }
 .ex-note p { margin: 0; }
 .ex-note__mark {
-  flex: none; width: 18px; height: 18px; margin-top: 1px; background: var(--rose);
+  flex: none; width: 16px; height: 16px; margin-top: 2px; background: var(--ink-muted);
   -webkit-mask: var(--mask-star8) center / contain no-repeat; mask: var(--mask-star8) center / contain no-repeat;
 }
 .ex-section { margin-bottom: 0; }
 .ex-section .gv-section-header { margin: 0; }
 .ex-row-text { margin: 0; font: 400 15px/21px var(--font-text); }
-.ex-row-emoji { flex: none; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: var(--linen-sunk); font-size: 18px; }
-.ex-intro .gv-letter { width: 100%; }
 
-/* ---------- match */
+/* ---------- match: the grid sits low, like the other answer groups */
+.ex-stage--top { flex: 0 0 auto; margin-top: auto; padding-block: 0; }
 .ex-match {
   display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(var(--rows, 5), minmax(56px, auto));
   grid-auto-flow: column; gap: var(--space-2) var(--space-3);
@@ -89,11 +109,12 @@
 
 /* ---------- typing */
 .ex-type { gap: var(--space-4); }
+.ex-type__answers { display: grid; gap: var(--space-3); }
 .ex-type__field { display: grid; gap: var(--space-2); }
 .ex-type .gv-input { min-height: 0; height: 84px; }
 .ex-type__switch {
   justify-self: end; appearance: none; border: 0; background: none; padding: 4px 2px;
-  font: 400 15px/20px var(--font-text); color: var(--rose); cursor: pointer;
+  font: 400 15px/20px var(--font-text); color: var(--ink-muted); cursor: pointer;
 }
 .ex-type__switch:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 6px; }
 /* The Bulgarian keyboard, drawn like the iOS keyboard */
@@ -114,14 +135,55 @@
 
 @media (max-height: 720px) {
   .ex { gap: var(--space-4); }
-  .ex-lettercard, .ex-soundcard { padding-block: var(--space-4); }
-  .ex-lettercard .t-letter { font-size: 80px; line-height: 84px; }
+  .ex-stage { padding-block: 0 var(--space-2); }
+  .ex-list { gap: var(--space-2); }
+  .ex-lettercard, .ex-soundcard { padding-block: var(--space-3); }
+  .ex-lettercard .t-letter { font-size: 72px; }
+  .ex-readword, .ex-soundcard__sound { font-size: 34px; line-height: 40px; }
+  .ex-intro__hero { gap: var(--space-3); padding-block: var(--space-2); }
+  .ex-intro__bg { font-size: 36px; line-height: 44px; }
+  .ex-intro__bg--lg { font-size: 30px; line-height: 36px; }
+  .ex-intro__bg--md { font-size: 24px; line-height: 30px; }
+  .ex-intro__glyph { font-size: 96px; }
+  .ex-grid .gv-choice--card { min-height: 124px; }
+}
+@media (max-height: 700px) {
+  .ex { gap: var(--space-3); padding-block: var(--space-2) var(--space-4); }
+  .ex-cue { padding: var(--space-3); gap: var(--space-3); }
+  .ex-cue .emoji-tile { --tile: 44px !important; }
+  .ex-cue__text { font-size: 18px; line-height: 23px; }
+  .ex-list { gap: var(--space-2); }
+  .ex-list .gv-choice { min-height: 48px; padding-block: 6px; }
+  .ex-hero { min-height: 52px; }
+  .ex-grid .gv-choice--card { min-height: 112px; gap: var(--space-2); padding-block: var(--space-3); }
+  .ex-grid .gv-choice--card .emoji-tile { --tile: 52px !important; }
+  .ex-match { grid-template-rows: repeat(var(--rows, 5), minmax(48px, auto)); }
+  .ex-match .gv-choice { min-height: 48px; }
+  .ex-intro__glyph { font-size: 80px; }
+  .ex-intro__more { gap: var(--space-3); }
+  .ex-intro__more .gv-section-header { padding-top: 0; }
+}
+/* The smallest iPhones (320x568): the letter intro still fits above Continue. */
+@media (max-height: 600px) {
+  .ex-intro .ex-eyebrow { display: none; }
+  .ex-intro__hero { gap: var(--space-2); padding-block: 0; }
+  .ex-intro__glyph { font-size: 60px; }
+  .ex-intro__sound { font-size: 18px; line-height: 23px; }
+  .ex-intro__tr { font-size: 15px; line-height: 20px; }
+  .ex-intro__more { gap: var(--space-2); }
+  .ex-intro__more .gv-row { min-height: 0; padding-block: 6px; }
+  .ex-intro__more .emoji-tile { --tile: 32px !important; }
+  .ex-row-text { font-size: 14px; line-height: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .session__progress .gv-progress__fill, .ex-cloze__gap { transition: none; }
 }
 
 /* ---------- Fill the gap (cloze) */
 .ex-cloze__sentence { margin: 0; font: 600 26px/40px var(--font-text); color: var(--ink); overflow-wrap: anywhere; }
 .ex-cloze__gap {
-  display: inline-block; min-width: 4.5em; margin-inline: 2px; padding: 0 6px;
+  /* A tight line box so the underline sits just under the text baseline, not 10px below it. */
+  display: inline-block; vertical-align: baseline; line-height: 1.15; min-width: 4.5em; margin-inline: 2px; padding: 0 6px 1px;
   border-bottom: 2px solid var(--line-strong); text-align: center; color: var(--pick);
   transition: border-color 150ms, color 150ms, background-color 150ms; border-radius: 6px 6px 0 0;
 }
@@ -129,7 +191,7 @@
 .ex-cloze__gap.is-correct { border-bottom-color: var(--pine); background: var(--pine-soft); color: var(--pine-ink); }
 .ex-cloze__gap.is-wrong { border-bottom-color: var(--warn); background: var(--warn-soft); color: var(--warn-ink); }
 .ex-cloze__tr { margin: calc(-1 * var(--space-3)) 0 0; }
-.ex-cloze__options { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.ex-cloze__options { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); }
 .ex-cloze__chip { min-height: 50px; padding-inline: 18px; font-weight: 600; }
 .ex-cloze__chip.is-selected { border-color: var(--pick); background: var(--pick-soft); color: var(--pick); }
 .ex-cloze__chip.is-correct { border-color: var(--pine); background: var(--pine-soft); color: var(--pine-ink); }

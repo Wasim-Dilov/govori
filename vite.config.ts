@@ -16,7 +16,7 @@ export default defineConfig({
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // Only the Latin and Cyrillic font files are needed offline.
-        globIgnores: ['**/*-arabic-*', '**/*-hebrew-*', '**/*-greek-*', '**/*-vietnamese-*'],
+        globIgnores: ['**/*-arabic-*', '**/*-hebrew-*', '**/*-greek-*', '**/*-vietnamese-*', '**/splash/**'],
         maximumFileSizeToCacheInBytes: 3_000_000,
       },
       devOptions: { enabled: false },

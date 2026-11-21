@@ -6,6 +6,7 @@ import type { DialogueLine, Who } from '../content/types.ts'
 import { shuffle, translit } from '../lib/engine.ts'
 import { sfx, speak, stopSpeaking, voiceForWho } from '../lib/audio.ts'
 import { useApp } from '../lib/store.ts'
+import { getPartner } from '../lib/shareCard.ts'
 import { IconChat, IconCheck, IconMic, IconSpeaker, IconX } from '../components/Icons.tsx'
 import type { ExerciseProps } from './types.ts'
 import './exercises-d.css'
@@ -36,6 +37,19 @@ export function DialogueExercise({ ex, complete, translit: showTr, speaking }: E
     () => [...d.lines.map((_, index) => ({ kind: 'line' as const, index })), ...d.questions.map((_, index) => ({ kind: 'question' as const, index }))],
     [d],
   )
+
+  // His wife appears under her own name (from the share card setup) when he has entered it.
+  const [partner, setPartner] = useState<string | null>(null)
+  useEffect(() => {
+    let live = true
+    void getPartner()
+      .then((p) => live && setPartner(p?.name?.trim() || null))
+      .catch(() => undefined)
+    return () => {
+      live = false
+    }
+  }, [])
+  const castOf = (who: Who) => (who === 'wife' && partner ? { ...CAST.wife, initial: partner.charAt(0).toUpperCase(), name: partner } : CAST[who])
 
   /** The learner's version of a line (woman's form when it applies). */
   const say = (l: DialogueLine) => (l.who === 'me' && speaker === 'f' && l.f ? l.f : { bg: l.bg, tr: l.tr })
@@ -201,7 +215,7 @@ export function DialogueExercise({ ex, complete, translit: showTr, speaking }: E
             <IconChat />
           </span>
           <div className="dlg-scene__text">
-            <span className="dlg-scene__eyebrow">Conversation</span>
+            <span className="t-eyebrow dlg-scene__eyebrow">Conversation</span>
             <h2 className="dlg-scene__title">{d.title}</h2>
             <p className="dlg-scene__bg" lang="bg">
               {d.titleBg}
@@ -214,7 +228,7 @@ export function DialogueExercise({ ex, complete, translit: showTr, speaking }: E
           {revealed.map((i) => {
             const l = d.lines[i]
             const me = l.who === 'me'
-            const cast = CAST[l.who]
+            const cast = castOf(l.who)
             const words = say(l)
             const showEn = english.includes(i)
             return (
@@ -277,10 +291,10 @@ export function DialogueExercise({ ex, complete, translit: showTr, speaking }: E
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0, transition: { duration: 0.1 } }}
               >
-                <span className={`dlg-avatar gv-tone-${CAST[typing].tone}`} aria-hidden="true" lang={CAST[typing].bg ? 'bg' : undefined}>
-                  {CAST[typing].initial}
+                <span className={`dlg-avatar gv-tone-${castOf(typing).tone}`} aria-hidden="true" lang={castOf(typing).bg ? 'bg' : undefined}>
+                  {castOf(typing).initial}
                 </span>
-                <div className="dlg-bubble dlg-bubble--typing" aria-label={`${CAST[typing].name} is typing`}>
+                <div className="dlg-bubble dlg-bubble--typing" aria-label={`${castOf(typing).name} is typing`}>
                   <i />
                   <i />
                   <i />
@@ -364,7 +378,7 @@ export function DialogueExercise({ ex, complete, translit: showTr, speaking }: E
           {question && (
             <motion.div key={`q-${pos}`} className="dlg-ask" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
               <div className="dlg-ask__head">
-                <span className="dlg-ask__eyebrow">Quick check</span>
+                <span className="t-eyebrow dlg-ask__eyebrow">Quick check</span>
                 <span className="dlg-ask__title">{question.q}</span>
               </div>
               <div className="gv-list dlg-options">

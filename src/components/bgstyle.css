@@ -1,0 +1,15 @@
+/* The letter in Bulgarian print: a compact row with a word tile and a short caption. */
+.bgstyle-note.bgstyle {
+  display: flex; align-items: center; gap: var(--space-3); width: 100%; text-align: left;
+  padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); background: var(--linen-sunk);
+}
+.bgstyle__tile {
+  flex: none; min-width: 40px; height: 40px; padding-inline: 10px; display: grid; place-items: center; border-radius: 10px;
+  background: var(--bgstyle-tile, var(--linen-raised)); box-shadow: 0 0 0 var(--hairline, 0.5px) var(--separator), var(--shadow-card);
+}
+.bgstyle-note .bgstyle__glyph { font: 600 22px/1 var(--font-bgstyle); color: var(--ink); letter-spacing: 0.01em; }
+.bgstyle__text { display: grid; min-width: 0; font: 400 13px/18px var(--font-text); color: var(--ink-muted); }
+.bgstyle__cap { font: 600 13px/18px var(--font-text); color: var(--ink); }
+/* Dark mode lifts by getting lighter, so the tile takes the lighter fill there. */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bgstyle { --bgstyle-tile: var(--fill-secondary); } }
+[data-theme="dark"] .bgstyle { --bgstyle-tile: var(--fill-secondary); }

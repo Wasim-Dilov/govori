@@ -1,0 +1,20 @@
+/* EmojiTile: the one frame every vocabulary emoji sits in. Colours from tokens only. */
+.emoji-tile {
+  --tile: 44px;
+  --tile-tint: var(--linen-sunk);
+  flex: none;
+  width: var(--tile); height: var(--tile);
+  border-radius: calc(var(--tile) * 0.22);
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--tile-tint) 60%, transparent);
+  font-size: calc(var(--tile) * 0.6); line-height: 1;
+  /* Emoji glyphs sit slightly high in most fonts; nudge them to the optical centre. */
+  padding-top: calc(var(--tile) * 0.02);
+  user-select: none;
+}
+
+/* Dark mode: a neutral tile, so the emoji colours carry the picture. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .emoji-tile { background: var(--fill-secondary); }
+}
+:root[data-theme="dark"] .emoji-tile { background: var(--fill-secondary); }

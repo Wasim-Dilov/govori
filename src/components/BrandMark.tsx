@@ -1,6 +1,6 @@
 // Govori's brand mark: the Г monogram with a rhombus stitch (the шевица motif),
 // white on a rose tile, plus an optional "Govori" wordmark in the system font.
-// Colours come from CSS variables so it works in light and dark themes.
+// The tile is the fixed brand rose (--brand) in both themes; the wordmark follows the theme.
 
 const GAMMA = 'M332 236 H688 Q706 236 706 254 V354 Q706 372 688 372 H450 V770 Q450 788 432 788 H332 Q314 788 314 770 V254 Q314 236 332 236 Z'
 const STITCH = 'M638 616 L724 702 L638 788 L552 702 Z'
@@ -9,7 +9,7 @@ export function BrandMark({ size = 32, showWordmark = false, className, title = 
   return (
     <span className={className} style={{ display: 'inline-flex', alignItems: 'center', gap: size * 0.32 }}>
       <svg width={size} height={size} viewBox="0 0 1024 1024" role={showWordmark ? undefined : 'img'} aria-label={showWordmark ? undefined : title} aria-hidden={showWordmark ? true : undefined}>
-        <rect width="1024" height="1024" rx="230" fill="var(--rose, #c8234f)" />
+        <rect width="1024" height="1024" rx="230" fill="var(--brand, #c8234f)" />
         <path d={GAMMA} fill="#fff" />
         <path d={STITCH} fill="#fff" />
       </svg>

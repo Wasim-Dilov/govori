@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { curly } from '../exercises/common.tsx'
 import { motion, useReducedMotion } from 'motion/react'
 import { BgStyleNote } from '../components/BgStyle.tsx'
 import { useApp } from '../lib/store.ts'
@@ -66,7 +67,7 @@ export function LettersScreen() {
         <div className="gv-list">
           <div className="gv-row letters-summary__row">
             <GoalRing value={known} goal={total} size={44} width={3} label={`${known} of ${total} letters learned`}>
-              <span className="letters-summary__pct">{Math.round((known / total) * 100)}%</span>
+              {known < total ? <span className="letters-summary__pct">{Math.round((known / total) * 100)}%</span> : undefined}
             </GoalRing>
             <span className="gv-row__body">
               <span className="gv-row__title">
@@ -126,6 +127,7 @@ export function LettersScreen() {
                         <span className="letters-cell__lower">{l.lower}</span>
                       </span>
                       <span className="letters-cell__tr">{l.tr}</span>
+                      {isKnown && <span className="letters-cell__dot" aria-hidden="true" />}
                     </motion.button>
                   )
                 })}
@@ -165,7 +167,7 @@ function LetterCard({ letter, known }: { letter: Letter; known: boolean }) {
           {letter.lower}
         </span>
         <span className="gv-letter__sound">sounds like “{letter.tr}”</span>
-        <span className="gv-letter__hint">{letter.sound}</span>
+        <span className="gv-letter__hint">{curly(letter.sound)}</span>
         <BgStyleNote letter={letter} />
       </div>
       <p className="letter-sheet__mnemonic">

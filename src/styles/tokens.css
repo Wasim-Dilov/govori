@@ -6,7 +6,7 @@
   --fill-secondary: #e5e5ea;
   --segment-thumb: #ffffff;
   --material: #f9f9f9cc;
-  --material-thick: #ffffffeb;
+  --material-thick: #f9f9f9f2;
   --separator: #c6c6c8;
   --line: #e3e3e8;
   --line-strong: #c7c7cc;
@@ -16,6 +16,7 @@
   --accent: #c8234f;
   --accent-pressed: #a51b40;
   --on-accent: #ffffff;
+  --brand: #c8234f;
   --rose: #c8234f;
   --rose-deep: #a51b40;
   --rose-soft: #fbe8ee;
@@ -24,16 +25,22 @@
   --pick: var(--rose);
   --pick-soft: var(--rose-soft);
   --pick-deep: var(--rose-deep);
+  --select-fill: var(--linen-raised);
   --pine: #1f7a37;
   --pine-deep: #18692e;
   --pine-soft: #e5f5e9;
   --pine-ink: #18692e;
   --on-pine: #ffffff;
+  --pine-fill: #1f7a37;
+  --pine-fill-pressed: #18692e;
   --warn: #b04a05;
   --warn-deep: #8f3c04;
   --warn-soft: #fdf0e1;
   --warn-ink: #93400a;
   --on-warn: #ffffff;
+  --warn-fill: #b04a05;
+  --warn-fill-pressed: #8f3c04;
+  --on-fill: #ffffff;
   --gold: #e5a00d;
   --gold-deep: #b57b00;
   --gold-soft: #fcf3dc;
@@ -87,24 +94,31 @@
     --accent: #d12c57;
     --accent-pressed: #b02148;
     --on-accent: #ffffff;
+    --brand: #c8234f;
     --rose: #ff6b8e;
     --rose-deep: #e04f74;
-    --rose-soft: #3a1520;
+    --rose-soft: #2d1d23;
     --rose-ink: #ff8fa8;
     --on-rose: #1f0610;
     --pick: var(--rose);
     --pick-soft: var(--rose-soft);
     --pick-deep: var(--rose-deep);
+    --select-fill: #2c2c2e;
     --pine: #30d158;
     --pine-deep: #22a447;
     --pine-soft: #10301b;
     --pine-ink: #5fe07f;
     --on-pine: #04210e;
+    --pine-fill: #1e7a3c;
+    --pine-fill-pressed: #18672f;
     --warn: #ffa53d;
     --warn-deep: #e08a20;
     --warn-soft: #3a2610;
     --warn-ink: #ffbd70;
     --on-warn: #2a1600;
+    --warn-fill: #a34e00;
+    --warn-fill-pressed: #863f00;
+    --on-fill: #ffffff;
     --gold: #ffcc40;
     --gold-deep: #d9a320;
     --gold-soft: #33280b;
@@ -158,24 +172,31 @@
   --accent: #d12c57;
   --accent-pressed: #b02148;
   --on-accent: #ffffff;
+  --brand: #c8234f;
   --rose: #ff6b8e;
   --rose-deep: #e04f74;
-  --rose-soft: #3a1520;
+  --rose-soft: #2d1d23;
   --rose-ink: #ff8fa8;
   --on-rose: #1f0610;
   --pick: var(--rose);
   --pick-soft: var(--rose-soft);
   --pick-deep: var(--rose-deep);
+  --select-fill: #2c2c2e;
   --pine: #30d158;
   --pine-deep: #22a447;
   --pine-soft: #10301b;
   --pine-ink: #5fe07f;
   --on-pine: #04210e;
+  --pine-fill: #1e7a3c;
+  --pine-fill-pressed: #18672f;
   --warn: #ffa53d;
   --warn-deep: #e08a20;
   --warn-soft: #3a2610;
   --warn-ink: #ffbd70;
   --on-warn: #2a1600;
+  --warn-fill: #a34e00;
+  --warn-fill-pressed: #863f00;
+  --on-fill: #ffffff;
   --gold: #ffcc40;
   --gold-deep: #d9a320;
   --gold-soft: #33280b;
@@ -239,10 +260,12 @@
 .t-body { font-family: var(--font-text); font-size: 17px; line-height: 22px; font-weight: 400; }
 .t-callout { font-family: var(--font-text); font-size: 16px; line-height: 21px; font-weight: 400; }
 .t-subhead { font-family: var(--font-text); font-size: 15px; line-height: 20px; font-weight: 400; }
+.t-eyebrow { font-family: var(--font-text); font-size: 13px; line-height: 18px; font-weight: 600; }
 .t-footnote { font-family: var(--font-text); font-size: 13px; line-height: 18px; font-weight: 400; }
-.t-caption { font-family: var(--font-text); font-size: 12px; line-height: 16px; font-weight: 400; }
-.t-bg-word { font-family: var(--font-text); font-size: 30px; line-height: 36px; font-weight: 600; }
-.t-letter { font-family: var(--font-text); font-size: 96px; line-height: 100px; font-weight: 600; }
+.t-caption { font-family: var(--font-text); font-size: 13px; line-height: 18px; font-weight: 500; }
+.t-bg-hero { font-family: var(--font-text); font-size: 44px; line-height: 52px; font-weight: 600; letter-spacing: -0.01em; }
+.t-bg-word { font-family: var(--font-text); font-size: 34px; line-height: 40px; font-weight: 600; }
+.t-letter { font-family: var(--font-text); font-size: 120px; line-height: 124px; font-weight: 600; }
 .t-bg-alt { font-family: var(--font-bgstyle); font-size: 44px; line-height: 48px; font-weight: 600; }
 /* Aliases for older style names */
 .t-hero { font-family: var(--font-display); font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.015em; }

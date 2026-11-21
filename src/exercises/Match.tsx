@@ -54,22 +54,24 @@ export function MatchExercise({ ex, complete }: ExerciseProps<'match'>) {
   return (
     <div className="ex">
       <Prompt>Tap the matching pairs</Prompt>
-      <div className="ex-match" style={{ ['--rows' as string]: ex.items.length }}>
-        <div className="ex-match__col">
-          {left.map((it, i) => (
-            <motion.button key={it.id} type="button" className={cls('l', it.id)} onClick={() => tap('l', it.id)} disabled={done.has(it.id)} aria-pressed={sel?.side === 'l' && sel.id === it.id} {...fadeIn(i)}>
-              <span className="gv-choice__text ex-match__bg" lang="bg">
-                {ex.letters ? `${it.letter!.upper} ${it.letter!.lower}` : it.bg}
-              </span>
-            </motion.button>
-          ))}
-        </div>
-        <div className="ex-match__col">
-          {right.map((it, i) => (
-            <motion.button key={it.id} type="button" className={cls('r', it.id)} onClick={() => tap('r', it.id)} disabled={done.has(it.id)} aria-pressed={sel?.side === 'r' && sel.id === it.id} {...fadeIn(i)}>
-              <span className="gv-choice__text">{ex.letters ? `"${it.tr}"` : it.en}</span>
-            </motion.button>
-          ))}
+      <div className="ex-stage ex-stage--top">
+        <div className="ex-match" style={{ ['--rows' as string]: ex.items.length }}>
+          <div className="ex-match__col">
+            {left.map((it, i) => (
+              <motion.button key={it.id} type="button" className={cls('l', it.id)} onClick={() => tap('l', it.id)} disabled={done.has(it.id)} aria-pressed={sel?.side === 'l' && sel.id === it.id} {...fadeIn(i)}>
+                <span className="gv-choice__text ex-match__bg" lang="bg">
+                  {ex.letters ? `${it.letter!.upper} ${it.letter!.lower}` : it.bg}
+                </span>
+              </motion.button>
+            ))}
+          </div>
+          <div className="ex-match__col">
+            {right.map((it, i) => (
+              <motion.button key={it.id} type="button" className={cls('r', it.id)} onClick={() => tap('r', it.id)} disabled={done.has(it.id)} aria-pressed={sel?.side === 'r' && sel.id === it.id} {...fadeIn(i)}>
+                <span className="gv-choice__text">{ex.letters ? `\u201c${it.tr}\u201d` : it.en}</span>
+              </motion.button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

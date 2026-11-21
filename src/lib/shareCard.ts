@@ -1,4 +1,4 @@
-// "Share with her": a 1080x1350 progress card drawn on a canvas, plus the text
+// "Share with her": a progress card (1080 wide, 1080 to 1350 tall, sized to its content) drawn on a canvas, plus the text
 // version, so he can send his wife proof that he is practising. No libraries,
 // no network. The card is always light (it is sent to someone else).
 import { lessonById, study, type Speaker, type StudyItem } from '../content/index.ts'
@@ -368,72 +368,82 @@ export async function renderCard(d: CardData): Promise<Blob> {
 }
 
 async function draw(d: CardData, img: HTMLImageElement | null): Promise<Blob> {
+  // Two passes: lay everything out top to bottom (measuring text, recording the drawing), then size
+  // the canvas to the content (never shorter than square, never taller than 4:5) and draw.
   const canvas = document.createElement('canvas')
   canvas.width = CARD_W
   canvas.height = CARD_H
   const ctx = canvas.getContext('2d')!
   ctx.textBaseline = 'alphabetic'
+  const ops: (() => void)[] = []
+  const op = (fn: () => void) => ops.push(fn)
 
-  // Ground and card.
-  ctx.fillStyle = C.ground
-  ctx.fillRect(0, 0, CARD_W, CARD_H)
   const cx = 56,
     cy = 56,
-    cw = CARD_W - 112,
-    ch = CARD_H - 112
-  ctx.save()
-  ctx.shadowColor = 'rgba(0,0,0,0.07)'
-  ctx.shadowBlur = 48
-  ctx.shadowOffsetY = 12
-  roundRect(ctx, cx, cy, cw, ch, 56)
-  ctx.fillStyle = C.card
-  ctx.fill()
-  ctx.restore()
-
+    cw = CARD_W - 112
   const pad = 72
   const left = cx + pad
   const right = cx + cw - pad
   const width = right - left
-  const bottom = cy + ch - pad
 
   // Header: brand tile, wordmark, date.
   let y = cy + pad
-  drawMark(ctx, img, left, y, 76)
-  ctx.fillStyle = C.ink
-  ctx.font = font(700, 38)
-  setSpacing(ctx, -0.5)
-  ctx.fillText('Govori', left + 76 + 20, y + 51)
-  setSpacing(ctx, 0)
-  ctx.fillStyle = C.muted
-  ctx.font = font(400, 29)
-  ctx.textAlign = 'right'
-  ctx.fillText(d.date, right, y + 49)
-  ctx.textAlign = 'left'
+  {
+    const top = y
+    op(() => {
+      drawMark(ctx, img, left, top, 76)
+      ctx.fillStyle = C.ink
+      ctx.font = font(700, 38)
+      setSpacing(ctx, -0.5)
+      ctx.fillText('Govori', left + 76 + 20, top + 51)
+      setSpacing(ctx, 0)
+      ctx.fillStyle = C.muted
+      ctx.font = font(400, 29)
+      ctx.textAlign = 'right'
+      ctx.fillText(d.date, right, top + 49)
+      ctx.textAlign = 'left'
+    })
+  }
   y += 76 + 66
 
   // Eyebrow and headline.
-  ctx.fillStyle = C.rose
-  ctx.font = font(600, 30)
-  ctx.fillText(d.eyebrow, left, y)
-  ctx.fillStyle = C.ink
+  {
+    const ey = y
+    op(() => {
+      ctx.fillStyle = C.muted
+      ctx.font = font(600, 30)
+      ctx.fillText(d.eyebrow, left, ey)
+    })
+  }
   ctx.font = font(700, 62)
   setSpacing(ctx, -1.5)
   for (const line of balance(ctx, d.headline, width)) {
     y += 72
-    ctx.fillText(line, left, y)
+    const ly = y
+    op(() => {
+      ctx.fillStyle = C.ink
+      ctx.font = font(700, 62)
+      setSpacing(ctx, -1.5)
+      ctx.fillText(line, left, ly)
+      setSpacing(ctx, 0)
+    })
   }
   setSpacing(ctx, 0)
   if (d.subtitle) {
     y += 48
-    ctx.fillStyle = C.muted
-    ctx.font = font(400, 30)
-    ctx.fillText(ellipsis(ctx, d.subtitle, width), left, y)
+    const sy = y
+    op(() => {
+      ctx.fillStyle = C.muted
+      ctx.font = font(400, 30)
+      ctx.fillText(ellipsis(ctx, d.subtitle, width), left, sy)
+    })
   }
 
   // Stats as a row of quiet pills: bold value, regular label.
   y += 30
   {
     const h = 58
+    const py = y
     let x = left
     for (const st of d.stats) {
       ctx.font = font(700, 27)
@@ -442,15 +452,18 @@ async function draw(d: CardData, img: HTMLImageElement | null): Promise<Blob> {
       const lw = ctx.measureText(` ${st.label}`).width
       const w = vw + lw + 44
       if (x + w > right + 1) break
-      roundRect(ctx, x, y, w, h, h / 2)
-      ctx.fillStyle = C.panel
-      ctx.fill()
-      ctx.fillStyle = C.ink
-      ctx.font = font(700, 27)
-      ctx.fillText(st.value, x + 22, y + 39)
-      ctx.fillStyle = C.muted
-      ctx.font = font(400, 27)
-      ctx.fillText(` ${st.label}`, x + 22 + vw, y + 39)
+      const px = x
+      op(() => {
+        roundRect(ctx, px, py, w, h, h / 2)
+        ctx.fillStyle = C.panel
+        ctx.fill()
+        ctx.fillStyle = C.ink
+        ctx.font = font(700, 27)
+        ctx.fillText(st.value, px + 22, py + 39)
+        ctx.fillStyle = C.muted
+        ctx.font = font(400, 27)
+        ctx.fillText(` ${st.label}`, px + 22 + vw, py + 39)
+      })
       x += w + 12
     }
     y += h
@@ -462,82 +475,141 @@ async function draw(d: CardData, img: HTMLImageElement | null): Promise<Blob> {
     const lines = wrap(ctx, d.message, width - 64, 2)
     const h = 30 + lines.length * 40
     y += 22
-    roundRect(ctx, left, y, Math.min(width, Math.max(...lines.map((l) => ctx.measureText(l).width)) + 60), h, 26)
-    ctx.fillStyle = C.roseSoft
-    ctx.fill()
-    ctx.fillStyle = C.roseInk
-    lines.forEach((l, i) => ctx.fillText(l, left + 30, y + 46 + i * 40))
+    const my = y
+    const bw = Math.min(width, Math.max(...lines.map((l) => ctx.measureText(l).width)) + 60)
+    op(() => {
+      roundRect(ctx, left, my, bw, h, 26)
+      ctx.fillStyle = C.roseSoft
+      ctx.fill()
+      ctx.fillStyle = C.roseInk
+      ctx.font = font(500, 31)
+      lines.forEach((l, i) => ctx.fillText(l, left + 30, my + 46 + i * 40))
+    })
     y += h
   }
 
-  // "Tonight I said": the phrase from today's "Say it to her" mission.
-  if (d.said) {
-    y += 52
-    ctx.fillStyle = C.rose
-    ctx.font = font(600, 24)
-    ctx.fillText('Tonight I said', left, y)
-    ctx.fillStyle = C.ink
-    ctx.font = font(600, 40)
-    y += 50
-    ctx.fillText(ellipsis(ctx, d.said.bg, width), left, y)
-    ctx.fillStyle = C.muted
-    ctx.font = font(400, 26)
-    y += 38
-    ctx.fillText(ellipsis(ctx, `${d.said.tr ? `${d.said.tr}  ·  ` : ''}${d.said.en}`, width), left, y)
+  // The featured phrase: what he said to her tonight, else (when no words were met) the closing line, large.
+  // When the closing line is featured, the foot carries only the signature so nothing repeats.
+  const closingFeatured = !d.said && !d.words.length
+  const feature = d.said ?? (closingFeatured ? { bg: d.closing.bg, tr: '', en: d.closing.en } : undefined)
+  if (feature) {
+    y += 60
+    const fy = y
+    const label = d.said ? 'Tonight I said' : 'Today I can say'
+    op(() => {
+      ctx.fillStyle = C.muted
+      ctx.font = font(600, 24)
+      ctx.fillText(label, left, fy)
+    })
+    ctx.font = font(700, 72)
+    const big = balance(ctx, feature.bg, width).slice(0, 2)
+    for (const line of big) {
+      y += 84
+      const ly = y
+      op(() => {
+        ctx.fillStyle = C.rose
+        ctx.font = font(700, 72)
+        setSpacing(ctx, -1)
+        ctx.fillText(line, left, ly)
+        setSpacing(ctx, 0)
+      })
+    }
+    y += 44
+    const ty = y
+    op(() => {
+      ctx.fillStyle = C.muted
+      ctx.font = font(400, 28)
+      ctx.fillText(ellipsis(ctx, `${feature.tr ? `${feature.tr}  ·  ` : ''}${feature.en}`, width), left, ty)
+    })
   }
 
-  // Bottom block from the bottom up: band, then the closing line and signature.
+  // The closing block's height (hairline, closing line, English, band, padding), to fit the words above it.
+  const CLOSING = 72 + 46 + 38 + 22 + pad + cy
+  const rowH = 106
+  const wordsTop = y + 56
+  // GAP: room between the last word and the closing hairline.
+  const GAP = 16
+  const maxRows = Math.max(0, Math.floor((CARD_H - CLOSING - (wordsTop + 6) - GAP) / rowH))
+  const rows = d.words.slice(0, Math.min(5, maxRows))
+  if (rows.length) {
+    const labelY = wordsTop
+    op(() => {
+      ctx.fillStyle = C.muted
+      ctx.font = font(600, 24)
+      ctx.fillText(d.kind === 'week' ? 'New this week' : 'Today I learned', left, labelY)
+    })
+    let ry = labelY + 6
+    rows.forEach((w, i) => {
+      const rowY = ry
+      op(() => {
+        if (i > 0) {
+          ctx.fillStyle = C.line
+          ctx.fillRect(left, rowY - 2, width, 2)
+        }
+        ctx.fillStyle = C.ink
+        ctx.font = font(600, 44)
+        ctx.fillText(ellipsis(ctx, w.bg, width), left, rowY + 52)
+        ctx.font = font(400, 26)
+        ctx.fillStyle = C.muted
+        const tr = w.tr ? `${w.tr}  ·  ` : ''
+        ctx.fillText(ellipsis(ctx, `${tr}${w.en}`, width), left, rowY + 88)
+      })
+      ry += rowH
+    })
+    y = ry
+  }
+
+  // Size the card to its content: square at least, 4:5 at most.
+  const H = Math.round(Math.min(CARD_H, Math.max(CARD_W, y + (rows.length ? GAP : 24) + CLOSING)))
+  const ch = H - 112
+  const bottom = cy + ch - pad
   const bandY = bottom - 22
   const closingEnY = bandY - 38
   const closingBgY = closingEnY - 46
 
-  // Words: as many rows (up to 5) as fit between the top block and the closing line.
-  const rowH = 106
-  const labelY = y + 56
-  const rowsTop = labelY + 6
-  const room = closingBgY - 44 - 36 - rowsTop
-  const rows = d.words.slice(0, Math.max(0, Math.min(5, Math.floor((room + 12) / rowH))))
-  if (rows.length) {
-    ctx.fillStyle = C.muted
-    ctx.font = font(600, 24)
-    ctx.fillText(d.kind === 'week' ? 'New this week' : 'Today I learned', left, labelY)
-    let ry = rowsTop
-    rows.forEach((w, i) => {
-      if (i > 0) {
-        ctx.fillStyle = C.line
-        ctx.fillRect(left, ry - 2, width, 2)
-      }
-      ctx.fillStyle = C.ink
-      ctx.font = font(600, 44)
-      ctx.fillText(ellipsis(ctx, w.bg, width), left, ry + 52)
-      ctx.font = font(400, 26)
-      ctx.fillStyle = C.muted
-      const tr = w.tr ? `${w.tr}  ·  ` : ''
-      ctx.fillText(ellipsis(ctx, `${tr}${w.en}`, width), left, ry + 88)
-      ry += rowH
-    })
-  }
+  canvas.height = H
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillStyle = C.ground
+  ctx.fillRect(0, 0, CARD_W, H)
+  ctx.save()
+  ctx.shadowColor = 'rgba(0,0,0,0.07)'
+  ctx.shadowBlur = 48
+  ctx.shadowOffsetY = 12
+  roundRect(ctx, cx, cy, cw, ch, 56)
+  ctx.fillStyle = C.card
+  ctx.fill()
+  ctx.restore()
+
+  for (const fn of ops) fn()
 
   // A hairline above the closing.
   ctx.fillStyle = C.line
   ctx.fillRect(left, closingBgY - 72, width, 2)
 
-  // Closing line in Bulgarian, the English beneath, and the signature.
-  const closing = d.partnerName ? `${d.closing.bg.replace(/[.!]$/, '')}, ${d.partnerName}.` : d.closing.bg
-  ctx.fillStyle = C.rose
-  ctx.font = font(700, 46)
-  ctx.fillText(ellipsis(ctx, closing, width * 0.68), left, closingBgY)
-  ctx.fillStyle = C.muted
-  ctx.font = font(400, 27)
-  ctx.fillText(ellipsis(ctx, d.closing.en, width * 0.62), left, closingEnY)
-  if (d.signature) {
-    ctx.textAlign = 'right'
+  // Closing line in Bulgarian, the English beneath, and the signature on the right. The closing gets
+  // whatever width the signature leaves, so it only shortens when it truly has to.
+  ctx.font = font(600, 34)
+  const sig = d.signature ? ellipsis(ctx, d.signature, width * 0.3) : ''
+  const sigW = sig ? Math.max(ctx.measureText(sig).width, 140) + 32 : 0
+  if (!closingFeatured) {
+    const closing = d.partnerName ? `${d.closing.bg.replace(/[.!]$/, '')}, ${d.partnerName}.` : d.closing.bg
+    ctx.fillStyle = C.rose
+    ctx.font = font(700, 46)
+    ctx.fillText(ellipsis(ctx, closing, width - sigW), left, closingBgY)
+    ctx.fillStyle = C.muted
+    ctx.font = font(400, 27)
+    ctx.fillText(ellipsis(ctx, d.closing.en, width - sigW), left, closingEnY)
+  }
+  if (sig) {
+    // Signed on the left when the closing line is already the feature, like the end of a note.
+    ctx.textAlign = closingFeatured ? 'left' : 'right'
+    const sx = closingFeatured ? left : right
     ctx.fillStyle = C.ink
     ctx.font = font(600, 34)
-    ctx.fillText(ellipsis(ctx, d.signature, width * 0.3), right, closingBgY)
+    ctx.fillText(sig, sx, closingBgY)
     ctx.fillStyle = C.tertiary
     ctx.font = font(400, 25)
-    ctx.fillText('via Govori', right, closingEnY)
+    ctx.fillText('via Govori', sx, closingEnY)
     ctx.textAlign = 'left'
   }
 

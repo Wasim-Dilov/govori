@@ -5,13 +5,17 @@
 
 .done__hero { display: grid; justify-items: center; gap: var(--space-1); text-align: center; padding-top: var(--space-2); }
 .done__mark { margin-bottom: var(--space-3); }
-.done__check { color: var(--pine); }
+.done__check { color: var(--pine); opacity: 0; transform: scale(0.7); transition: opacity 200ms 320ms var(--ease-out), transform 260ms 320ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+.done__check.is-on { opacity: 1; transform: none; }
 .done__check svg { width: 32px; height: 32px; stroke-width: 2.5; }
+/* The ring draws itself closed. */
+.done__ring .gv-ring__value { transition: stroke-dashoffset var(--draw-ms, 500ms) cubic-bezier(0.2, 0.8, 0.2, 1); }
 .done__title { margin: 0; }
 .done__bg { margin: 0; font: 400 17px/22px var(--font-text); color: var(--ink-muted); }
 
 .done__stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .done__stats .gv-statcell { text-align: left; }
+.done__stats .gv-statcell__value { font-variant-numeric: tabular-nums; }
 
 .done__streak {
   display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; margin: 0;
@@ -25,13 +29,13 @@
 .done__perfect { margin-left: auto; font: 400 13px/18px var(--font-text); color: var(--ink-muted); }
 
 .done__news .gv-row { min-height: 60px; }
-.done__dots { display: flex; gap: 3px; align-items: center; justify-content: center; background: var(--rose-soft); }
+.done__dots { display: flex; gap: 3px; align-items: center; justify-content: center; background: var(--fill-secondary); }
 .done__dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-strong); }
 .done__dots i.on { background: var(--rose); }
 
 .done__words { margin: 0; }
 .done__word { min-height: 56px; }
-.done__play { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--rose-soft); color: var(--rose-ink); }
+.done__play { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--fill-secondary); color: var(--ink); }
 .done__play svg { width: 16px; height: 16px; }
 
 .done__foot {
@@ -44,7 +48,7 @@
 }
 
 /* Freeze news and the unit's can-do line */
-.done__frost { color: var(--trk-basics); }
+.done__frost { color: var(--ink-muted); }
 .done__cando .gv-row__title { font-weight: 600; }
 
 /* ---------- milestone sheet: shown before the summary, calm and proud */
@@ -55,11 +59,21 @@
 }
 .milestone__panel:focus { outline: none; }
 .milestone__body { display: grid; align-content: center; justify-items: center; gap: var(--space-3); text-align: center; padding-block: var(--space-6); }
-.milestone__band { --tone: var(--rose); width: 100%; max-width: 280px; margin-bottom: var(--space-4); }
-.milestone__eyebrow { font: 600 13px/18px var(--font-text); color: var(--rose); letter-spacing: 0.01em; }
-.milestone__big { font: 700 72px/1 var(--font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--ink); }
-.milestone__big span { display: block; font: 400 17px/22px var(--font-text); letter-spacing: 0; color: var(--ink-muted); margin-top: 4px; }
-.milestone__mark { margin: var(--space-2) 0; }
+.milestone__eyebrow { font: 600 13px/18px var(--font-text); color: var(--ink-muted); }
+
+/* The шевица star: one fine rose line stitched on around the number. */
+.milestone__star { position: relative; width: 200px; height: 200px; display: grid; place-items: center; margin: var(--space-1) 0 var(--space-2); }
+.milestone__star svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.milestone__star path { fill: none; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; }
+.milestone__star-line { stroke: var(--rose); stroke-width: 1.5; stroke-dashoffset: 1; animation: star-draw 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms forwards; }
+.milestone__star-back { stroke: color-mix(in srgb, var(--rose) 28%, transparent); stroke-width: 0.75; stroke-dashoffset: 1; animation: star-draw 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 320ms forwards; }
+@keyframes star-draw { to { stroke-dashoffset: 0; } }
+.milestone__star-in { position: relative; display: grid; place-items: center; }
+.milestone__num { display: grid; justify-items: center; font: 700 64px/1 var(--font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--rose); }
+.milestone__num span { font: 500 15px/20px var(--font-text); letter-spacing: 0; color: var(--ink-muted); margin-top: 2px; }
+.milestone__tick { color: var(--rose); }
+.milestone__tick svg { width: 52px; height: 52px; stroke-width: 2; }
+
 .milestone__title { margin: 0; max-width: 22ch; }
 .milestone__subtitle { font: 400 17px/22px var(--font-text); color: var(--ink-muted); max-width: 32ch; }
 .milestone__cando {
@@ -68,6 +82,17 @@
   font: 600 17px/22px var(--font-text); color: var(--ink);
 }
 .milestone__cando svg { flex: none; width: 20px; height: 20px; color: var(--rose); margin-top: 1px; }
-.milestone__proverb { margin: var(--space-3) 0 0; display: grid; gap: 4px; max-width: 32ch; }
-.milestone__proverb blockquote { margin: 0; font: 600 20px/26px var(--font-text); color: var(--ink); }
+/* The proverb sits in its own raised cell. */
+.milestone__proverb {
+  position: relative; margin: var(--space-3) 0 0; display: grid; gap: 4px; width: min(100%, 34ch);
+  padding: var(--space-4); text-align: left;
+  border-radius: var(--radius-lg); background: var(--linen-raised); box-shadow: var(--shadow-card);
+}
+.milestone__proverb blockquote { margin: 0; font: 600 19px/25px var(--font-text); color: var(--ink); text-indent: -0.4em; }
 .milestone__proverb figcaption { display: grid; gap: 2px; font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .done__check { transition: none; opacity: 1; transform: none; }
+  .done__ring .gv-ring__value { transition: none; }
+  .milestone__star-line, .milestone__star-back { animation: none; stroke-dashoffset: 0; }
+}

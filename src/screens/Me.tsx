@@ -3,7 +3,9 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { InstallGuide } from '../components/InstallGuide.tsx'
 import { Recorder } from '../components/Recorder.tsx'
-import { IconCheck, IconChevron, IconHeart, IconSpeaker, IconUser, IconX } from '../components/Icons.tsx'
+import { IconBell, IconBook, IconCheck, IconChevron, IconFlame, IconHeart, IconLetters, IconMic, IconPath, IconPlay, IconRefresh, IconShare, IconSpeaker, IconStar, IconTarget, IconUser, IconX } from '../components/Icons.tsx'
+import { BrandMark } from '../components/BrandMark.tsx'
+import { Illustration } from '../components/Illustration.tsx'
 import { allItemIds, study, trackById, tracks } from '../content/index.ts'
 import { planWeek } from '../content/plan.ts'
 import type { TrackId } from '../content/types.ts'
@@ -59,9 +61,21 @@ function Section({ title, footer, children, before }: { title?: string; footer?:
   )
 }
 
-function Row({ title, subtitle, accessory, children, className = '' }: { title: ReactNode; subtitle?: ReactNode; accessory?: ReactNode; children?: ReactNode; className?: string }) {
+/** iOS Settings-style leading tile: neutral by default, a hue only where it means something. */
+type Ico = { icon?: ReactNode; tone?: string }
+function Tile({ icon, tone }: Ico) {
+  if (!icon) return null
+  return (
+    <span className={`gv-row__icon me-ico ${tone ?? 'me-ico--plain'}`} aria-hidden="true">
+      {icon}
+    </span>
+  )
+}
+
+function Row({ title, subtitle, accessory, children, className = '', icon, tone }: { title: ReactNode; subtitle?: ReactNode; accessory?: ReactNode; children?: ReactNode; className?: string } & Ico) {
   return (
     <div className={`gv-row ${className}`}>
+      <Tile icon={icon} tone={tone} />
       <span className="gv-row__body">
         <span className="gv-row__title">{title}</span>
         {subtitle && <span className="gv-row__subtitle">{subtitle}</span>}
@@ -73,9 +87,10 @@ function Row({ title, subtitle, accessory, children, className = '' }: { title: 
 }
 
 /** A tappable row whose title is an action in the accent colour, like iOS Settings. */
-function ActionRow({ label, subtitle, onClick, disabled }: { label: ReactNode; subtitle?: ReactNode; onClick: () => void; disabled?: boolean }) {
+function ActionRow({ label, subtitle, onClick, disabled, icon, tone }: { label: ReactNode; subtitle?: ReactNode; onClick: () => void; disabled?: boolean } & Ico) {
   return (
     <button type="button" className="gv-row me-action" onClick={onClick} disabled={disabled}>
+      <Tile icon={icon} tone={tone} />
       <span className="gv-row__body">
         <span className="gv-row__title">{label}</span>
         {subtitle && <span className="gv-row__subtitle">{subtitle}</span>}
@@ -84,9 +99,10 @@ function ActionRow({ label, subtitle, onClick, disabled }: { label: ReactNode; s
   )
 }
 
-function LinkRow({ href, title, subtitle }: { href: string; title: string; subtitle?: ReactNode }) {
+function LinkRow({ href, title, subtitle, icon, tone }: { href: string; title: string; subtitle?: ReactNode } & Ico) {
   return (
     <a className="gv-row" href={href} target="_blank" rel="noreferrer">
+      <Tile icon={icon} tone={tone} />
       <span className="gv-row__body">
         <span className="gv-row__title me-link-title">{title}</span>
         {subtitle && <span className="gv-row__subtitle">{subtitle}</span>}
@@ -98,9 +114,10 @@ function LinkRow({ href, title, subtitle }: { href: string; title: string; subti
   )
 }
 
-function ToggleRow({ id, label, hint, on, onChange }: { id: string; label: string; hint?: string; on: boolean; onChange: (v: boolean) => void }) {
+function ToggleRow({ id, label, hint, on, onChange, icon, tone }: { id: string; label: string; hint?: string; on: boolean; onChange: (v: boolean) => void } & Ico) {
   return (
     <label className="gv-row me-toggle-row" htmlFor={id}>
+      <Tile icon={icon} tone={tone} />
       <span className="gv-row__body">
         <span className="gv-row__title">{label}</span>
         {hint && <span className="gv-row__subtitle">{hint}</span>}
@@ -189,7 +206,7 @@ function ProfileHeader() {
           <span className="gv-statcell__value">{summary.totalXp.toLocaleString('en-GB')}</span>
         </div>
         <div className="gv-statcell">
-          <span className="gv-statcell__label">Words met</span>
+          <span className="gv-statcell__label">Words learned</span>
           <span className="gv-statcell__value">{learned.toLocaleString('en-GB')}</span>
         </div>
       </div>
@@ -210,8 +227,9 @@ function StreakSection() {
       title="Streak"
       footer={<>A freeze covers one missed day by itself. You earn one for every 7 days you reach your daily goal, and can hold up to 2.</>}
     >
-      <Row title="Current streak" subtitle={st.frozenToday ? 'A freeze saved your streak yesterday.' : `Best: ${st.best} ${st.best === 1 ? 'day' : 'days'}`} accessory={<span className="me-value">{st.streak} {st.streak === 1 ? 'day' : 'days'}</span>} />
+      <Row icon={<IconFlame />} tone="gv-tone-gold" title="Current streak" subtitle={st.frozenToday ? 'A freeze saved your streak yesterday.' : `Best: ${st.best} ${st.best === 1 ? 'day' : 'days'}`} accessory={<span className="me-value">{st.streak} {st.streak === 1 ? 'day' : 'days'}</span>} />
       <Row
+        icon={<IconStar />}
         title="Streak freezes"
         subtitle={st.freezes >= 2 ? 'You hold the maximum.' : `Next one in ${toNext} goal ${toNext === 1 ? 'day' : 'days'}.`}
         accessory={<span className="me-value">{st.freezes} of 2</span>}
@@ -223,6 +241,8 @@ function StreakSection() {
       {st.repairable && (
         <Row
           className="me-repair"
+          icon={<IconRefresh />}
+          tone="gv-tone-warn"
           title="Repair your streak"
           subtitle={`Finish ${st.repairSessionsLeft} more ${st.repairSessionsLeft === 1 ? 'session' : 'sessions'}${deadline ? ` by ${deadline}` : ''} to bring back your ${st.best}-day streak.`}
         />
@@ -260,9 +280,7 @@ function TogetherSection() {
     <>
       <Section title="Practise together" footer={<>She reads the English, you say it in Bulgarian, and she taps whether you got it. Counts as speaking practice.</>}>
         <button type="button" className="gv-row me-nav-row" onClick={() => go({ name: 'quiz' })}>
-          <span className="me-row-icon" aria-hidden="true">
-            <IconHeart />
-          </span>
+          <Tile icon={<IconHeart />} tone="gv-tone-love" />
           <span className="gv-row__body">
             <span className="gv-row__title">Quiz me</span>
             <span className="gv-row__subtitle">Hand the phone to {her} for a 2-minute quiz</span>
@@ -301,7 +319,15 @@ function TogetherSection() {
             )}
           </div>
         ))}
-        {phrases.length === 0 && <Row title="No phrases yet" subtitle={`Add the things you and ${her} really say at home.`} />}
+        {phrases.length === 0 && (
+          <div className="gv-row me-empty">
+            <Illustration name="phrases" size={88} />
+            <span className="me-empty__text">
+              <span className="gv-row__title">No phrases yet</span>
+              <span className="gv-row__subtitle">Add the things you and {her} really say at home.</span>
+            </span>
+          </div>
+        )}
         <ActionRow label="Add a phrase" onClick={() => setAdding(true)} />
       </Section>
 
@@ -399,6 +425,7 @@ function LearningSection() {
   return (
     <Section title="Learning" footer="Focus decides what the Today card suggests. Bulgarian changes some words by who is speaking, so Govori uses the right form for you.">
       <button type="button" className="gv-row" onClick={() => setPicking((p) => !p)} aria-expanded={picking}>
+        <Tile icon={<IconPath />} tone="gv-tone-basics" />
         <span className="gv-row__body">
           <span className="gv-row__title">Focus</span>
           <span className="gv-row__subtitle">{focusLong}</span>
@@ -471,8 +498,9 @@ function LearningSection() {
           ))}
         </>
       )}
-      <Row title="Daily goal" subtitle={`${profile.dailyGoal} XP a day · a lesson is 10 to 15 XP`} accessory={<Segmented label="Daily goal" value={profile.dailyGoal} options={GOALS.map((g) => ({ v: g.xp, label: g.label }))} onPick={(v) => void setProfile({ dailyGoal: v })} />} />
+      <Row icon={<IconTarget />} title="Daily goal" subtitle={`${profile.dailyGoal} XP a day · a lesson is 10 to 15 XP`} accessory={<Segmented label="Daily goal" value={profile.dailyGoal} options={GOALS.map((g) => ({ v: g.xp, label: g.label }))} onPick={(v) => void setProfile({ dailyGoal: v })} />} />
       <Row
+        icon={<IconUser />}
         title="Address me as"
         subtitle={
           <>
@@ -491,8 +519,8 @@ function LearningSection() {
           />
         }
       />
-      <ToggleRow id="me-translit" label="Show transliteration" hint="Latin letters under the Bulgarian" on={profile.translit} onChange={(v) => void setProfile({ translit: v })} />
-      <ToggleRow id="me-speaking" label="Speaking exercises" hint="Say words out loud and hear yourself" on={profile.speaking} onChange={(v) => void setProfile({ speaking: v })} />
+      <ToggleRow id="me-translit" icon={<IconLetters />} label="Show transliteration" hint="Latin letters under the Bulgarian" on={profile.translit} onChange={(v) => void setProfile({ translit: v })} />
+      <ToggleRow id="me-speaking" icon={<IconMic />} label="Speaking exercises" hint="Say words out loud and hear yourself" on={profile.speaking} onChange={(v) => void setProfile({ speaking: v })} />
     </Section>
   )
 }
@@ -558,10 +586,11 @@ function VoiceClips({ count, label }: { count: number; label: string }) {
   const pct = Math.min(100, ((saved ?? 0) / count) * 100)
   return (
     <>
-      <Row title="Voice" accessory={label} />
-      <Row title="Bulgarian clips" accessory={count.toLocaleString('en-GB')} />
+      <Row icon={<IconSpeaker />} title="Voice" accessory={label} />
+      <Row icon={<IconPlay />} title="Bulgarian clips" accessory={count.toLocaleString('en-GB')} />
       {canCache && (
         <div className="gv-row me-offline">
+          <Tile icon={<IconRefresh />} />
           <span className="gv-row__body">
             <span className="gv-row__title">Audio for offline</span>
             <span className="gv-row__subtitle">{saved === null ? 'Checking…' : `${Math.min(saved, count).toLocaleString('en-GB')} of ${count.toLocaleString('en-GB')} saved`}</span>
@@ -643,11 +672,12 @@ function SoundSection() {
         )
       }
     >
-      <ToggleRow id="me-sfx" label="Sound effects" hint="Chimes for right and wrong answers" on={profile.sfx} onChange={(v) => void setProfile({ sfx: v })} />
+      <ToggleRow id="me-sfx" icon={<IconBell />} label="Sound effects" hint="Chimes for right and wrong answers" on={profile.sfx} onChange={(v) => void setProfile({ sfx: v })} />
       {clips && label ? (
         <VoiceClips count={clips} label={label} />
       ) : (
         <Row
+          icon={<IconSpeaker />}
           title="iPhone voice"
           subtitle={voice === null ? 'Checking this phone…' : voice ? 'Bulgarian voice ready' : 'Bulgarian voice not found yet'}
           accessory={
@@ -735,7 +765,14 @@ function RemindersSection() {
 
   return (
     <Section title="Reminders" footer={footer}>
-      <Row title="Evening reminder" subtitle={!status ? 'Checking…' : undefined} accessory={status ? (onState ? 'On' : 'Off') : undefined} />
+      <div className="gv-row me-hero">
+        <Illustration name="reminders" size={72} />
+        <span className="gv-row__body">
+          <span className="gv-row__title">Evening reminder</span>
+          <span className="gv-row__subtitle">{!status ? 'Checking…' : onState ? 'Around 19:30 Sofia time' : 'A short nudge each evening'}</span>
+        </span>
+        {status && <span className={`me-pill ${onState ? 'is-on' : ''}`}>{onState ? 'On' : 'Off'}</span>}
+      </div>
 
       {status && !status.standalone ? (
         <>
@@ -994,8 +1031,9 @@ function DataSection() {
 
   return (
     <Section title="Your data" footer={footer}>
-      <ActionRow label="Export everything" subtitle={lastExport ? `Last backup ${fmt(new Date(lastExport))}` : 'Every answer, session and setting as a JSON file'} onClick={() => void doExport()} />
+      <ActionRow icon={<IconShare />} label="Export everything" subtitle={lastExport ? `Last backup ${fmt(new Date(lastExport))}` : 'Every answer, session and setting as a JSON file'} onClick={() => void doExport()} />
       <label className="gv-row me-action me-file">
+        <Tile icon={<IconRefresh />} />
         <span className="gv-row__body">
           <span className="gv-row__title">Import a backup</span>
           <span className="gv-row__subtitle">Restore progress from a Govori export</span>
@@ -1031,7 +1069,7 @@ function DataSection() {
         </div>
       )}
       {!confirm ? (
-        <ActionRow label="Reset progress" onClick={() => setConfirm(true)} />
+        <ActionRow icon={<IconX />} label="Reset progress" onClick={() => setConfirm(true)} />
       ) : (
         <div className="gv-row me-block" role="alert">
           <span className="gv-row__body">
@@ -1055,8 +1093,17 @@ function DataSection() {
 function About() {
   return (
     <Section title="About" footer="Made for learning my wife's language.">
-      <Row title="Govori" subtitle={<span lang="bg">Говори</span>} accessory="Version 1.0" />
-      <LinkRow href="https://github.com/Wasim-Dilov/govori" title="Source code" subtitle="github.com/Wasim-Dilov/govori" />
+      <div className="gv-row me-about">
+        <BrandMark size={32} />
+        <span className="gv-row__body">
+          <span className="gv-row__title">Govori</span>
+          <span className="gv-row__subtitle" lang="bg">
+            Говори
+          </span>
+        </span>
+        <span className="gv-row__accessory">Version 1.0</span>
+      </div>
+      <LinkRow icon={<IconBook />} href="https://github.com/Wasim-Dilov/govori" title="Source code" subtitle="github.com/Wasim-Dilov/govori" />
     </Section>
   )
 }

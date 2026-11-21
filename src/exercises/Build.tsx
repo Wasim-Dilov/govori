@@ -38,27 +38,31 @@ export function BuildExercise({ ex, setAnswer, checked, translit }: ExerciseProp
   return (
     <div className="ex">
       <Prompt>Say it in Bulgarian</Prompt>
-      <Cue emoji={ex.item.emoji} text={ex.item.en} />
-      <div className={`ex-build__answer ${checked ? (checked.correct ? 'is-correct' : 'is-wrong') : ''}`} aria-label="Your answer">
-        <AnimatePresence>
-          {chosen.map((k) => {
-            const t = tiles.find((x) => x.key === k)!
-            return (
-              <motion.button key={k} layout type="button" className="gv-tile" onClick={() => remove(k)} {...tileMotion}>
-                <span lang="bg">{t.text}</span>
-                {translit && <span className="gv-tile__tr">{toLatin(t.text, 'ă')}</span>}
-              </motion.button>
-            )
-          })}
-        </AnimatePresence>
+      <div className="ex-stage">
+        <Cue emoji={ex.item.emoji} text={ex.item.en} track={ex.item.trackId} />
       </div>
-      <div className="ex-build__bank" aria-label="Word tiles">
-        {tiles.map((t) => (
-          <button key={t.key} type="button" className={`gv-tile ${chosen.includes(t.key) ? 'is-used' : ''}`} onClick={() => add(t.key, t.text)} disabled={!!checked}>
-            <span lang="bg">{t.text}</span>
-            {translit && <span className="gv-tile__tr">{toLatin(t.text, 'ă')}</span>}
-          </button>
-        ))}
+      <div className="ex-answers ex-build__group">
+        <div className={`ex-build__answer ${checked ? (checked.correct ? 'is-correct' : 'is-wrong') : ''}`} aria-label="Your answer">
+          <AnimatePresence>
+            {chosen.map((k) => {
+              const t = tiles.find((x) => x.key === k)!
+              return (
+                <motion.button key={k} layout type="button" className="gv-tile" onClick={() => remove(k)} {...tileMotion}>
+                  <span lang="bg">{t.text}</span>
+                  {translit && <span className="gv-tile__tr">{toLatin(t.text, 'ă')}</span>}
+                </motion.button>
+              )
+            })}
+          </AnimatePresence>
+        </div>
+        <div className="ex-build__bank" aria-label="Word tiles">
+          {tiles.map((t) => (
+            <button key={t.key} type="button" className={`gv-tile ${chosen.includes(t.key) ? 'is-used' : ''}`} onClick={() => add(t.key, t.text)} disabled={!!checked}>
+              <span lang="bg">{t.text}</span>
+              {translit && <span className="gv-tile__tr">{toLatin(t.text, 'ă')}</span>}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

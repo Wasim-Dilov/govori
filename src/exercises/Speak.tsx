@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { playBlob, speak, startRecording, stopSpeaking, type Recorder } from '../lib/audio.ts'
 import { IconMic, IconPlay, IconSpeaker, IconStop, IconTurtle } from '../components/Icons.tsx'
+import { EmojiTile } from '../components/EmojiTile.tsx'
 import type { ExerciseProps } from './types.ts'
 import './exercises-d.css'
 
@@ -93,9 +94,7 @@ export function SpeakExercise({ ex, complete, translit: showTr }: ExerciseProps<
       <h2 className="t-title3 spk-prompt">Say this out loud</h2>
 
       <div className="spk-card gv-card">
-        <span className="spk-card__emoji" aria-hidden="true">
-          {item.emoji}
-        </span>
+        <EmojiTile emoji={item.emoji} size={64} track={item.trackId} />
         <div className="spk-card__words">
           <p className="t-bg-word spk-card__bg" lang="bg">
             {item.bg}
@@ -174,7 +173,7 @@ export function SpeakExercise({ ex, complete, translit: showTr }: ExerciseProps<
         </AnimatePresence>
       </div>
 
-      <div className="spk-actions">
+      <div className="spk-actions ex-answers">
         {(phase === 'recorded' || phase === 'nomic') && (
           <motion.div className="spk-rate" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
             <button type="button" className="gv-btn gv-btn--block" onClick={() => rate(true)}>

@@ -1,24 +1,26 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type Ref } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useApp, trackMeta, type Screen } from '../lib/store.ts'
-import { learnedWordIds, lessonStates, practicedToday, trackCompletion, xpToday, type NodeState } from '../lib/progress.ts'
+import { learnedWordIds, lessonStates, practicedToday, trackCompletion, type NodeState } from '../lib/progress.ts'
 import { todayMeta, todayPlan, type TodayMeta } from '../lib/suggest.ts'
 import { MISSION_XP } from '../lib/missions.ts'
 import { markWeekShown, weekCardDue, weekSummary, type WeekSummary } from '../lib/milestones.ts'
 import { db, getKV, localDay, setKV } from '../lib/db.ts'
 import { dialogueById, maxLevel, study, tracks, unitById, type LessonView, type TrackView } from '../content/index.ts'
 import { planStatus } from '../content/plan.ts'
-import { TopBar, GoalRing, LargeTitle, StreakStatusBlock } from '../components/TopBar.tsx'
+import { TopBar, LargeTitle, StreakStatusBlock } from '../components/TopBar.tsx'
 import { ShareWeek } from '../components/ShareProgress.tsx'
 import { BottomSheet, FocusSheet, TrackBadge, lessonsDone } from '../components/FocusSheet.tsx'
 import { IconChat, IconCheck, IconChevron, IconLock, IconSpeaker } from '../components/Icons.tsx'
 import { clipCount, manifestReady, sfx, speak } from '../lib/audio.ts'
 import { speedRounds } from '../lib/engine.ts'
+import { EmojiTile } from '../components/EmojiTile.tsx'
 import './home.css'
 
 export function HomeScreen() {
   const viewTrack = useApp((s) => s.viewTrack)
   const welcome = useApp((s) => s.welcome)
+  const name = useApp((s) => s.profile.name)
   const [focusOpen, setFocusOpen] = useState(false)
   const [sheetLesson, setSheetLesson] = useState<LessonView | null>(null)
   const track = trackMeta(viewTrack)
@@ -30,7 +32,9 @@ export function HomeScreen() {
   return (
     <div className="screen has-navbar home">
       <TopBar />
-      <LargeTitle>Learn</LargeTitle>
+      <LargeTitle sub={greeting(name)} subLang="bg">
+        Learn
+      </LargeTitle>
       <StreakStatusBlock />
       <WelcomeBackCard />
       {/* One primary button on screen: the welcome back leads when it is showing. */}
@@ -45,6 +49,23 @@ export function HomeScreen() {
       <FocusSheet open={focusOpen} onClose={() => setFocusOpen(false)} />
       <NodeSheet lesson={sheetLesson} onClose={() => setSheetLesson(null)} />
     </div>
+  )
+}
+
+/** A warm Bulgarian greeting by time of day, with his first name when we know it. */
+function greeting(name: string, hour = new Date().getHours()) {
+  const hello = hour >= 4 && hour < 11 ? 'Добро утро' : hour >= 11 && hour < 18 ? 'Добър ден' : 'Добър вечер'
+  const first = name.trim().split(/\s+/)[0]
+  return first ? `${hello}, ${first}` : hello
+}
+
+/** A secondary action in the iOS style: ink text with a chevron, never a second rose button. */
+function HomeLink({ children, onClick, className = '' }: { children: ReactNode; onClick: () => void; className?: string }) {
+  return (
+    <button type="button" className={`home-link ${className}`} onClick={onClick}>
+      <span className="home-link__text">{children}</span>
+      <IconChevron className="home-link__chev" aria-hidden="true" />
+    </button>
   )
 }
 
@@ -169,7 +190,6 @@ function VoiceCard() {
 function TodayCard({ onChangeFocus, primary = true }: { onChangeFocus: () => void; primary?: boolean }) {
   const profile = useApp((s) => s.profile)
   const focus = useApp((s) => s.focus)
-  const summary = useApp((s) => s.summary)
   const progress = useApp((s) => s.progress)
   const dueCount = useApp((s) => s.dueCount)
   const reviewToday = useApp((s) => s.reviewToday)
@@ -209,8 +229,6 @@ function TodayCard({ onChangeFocus, primary = true }: { onChangeFocus: () => voi
   const { next } = plan0
   // The welcome back is already a warm-up: don't offer two.
   const warmup = primary ? plan0.warmup : null
-  const xp = xpToday(summary)
-  const goal = profile.dailyGoal
   const eyebrow = plan ? `Week ${week.week} · ${week.title}` : `${focus.scope === 'day' ? 'Focus today' : 'Focus this week'} · ${track.title}`
   const also = plan && week.also ? trackMeta(week.also) : null
 
@@ -244,19 +262,23 @@ function TodayCard({ onChangeFocus, primary = true }: { onChangeFocus: () => voi
       ? `${track.title} is complete`
       : 'All caught up here'
   const subtitle = next ? next.lesson.titleBg : track.titleBg
-  const detail = next
-    ? next.reason === 'levelup'
-      ? `Level ${next.level} of 3: same words, harder exercises.`
-      : next.reason === 'story'
-        ? (dialogueById.get(next.lesson.dialogueId ?? '')?.scene ?? 'Put this unit to work in a short conversation.')
-        : plan
-          ? held
-            ? `Finish a ${track.title} unit to move on to week ${week.week + 1}. ${week.goal}`
-            : week.goal
-          : track.tagline
-    : review
-      ? 'Keep it fresh with a quick review.'
-      : 'Pick another track to keep going.'
+
+  // One quiet footnote line: what follows the warm-up, why the plan is waiting, or this week's second track.
+  const footnote: ReactNode = warmup ? (
+    <span className="home-today__note">then: {next ? next.lesson.title : 'back to your path'}</span>
+  ) : plan && held ? (
+    <span className="home-today__note">Finish one {track.title} unit to move on to week {week.week + 1}</span>
+  ) : also ? (
+    <button type="button" className="home-today__also" onClick={() => setViewTrack(also.id)}>
+      Also: {also.title}
+    </button>
+  ) : next?.reason === 'levelup' ? (
+    <span className="home-today__note">
+      <LevelDots level={next.level - 1} /> Same words, harder exercises
+    </span>
+  ) : (
+    <span className="home-today__note">{next ? `Lesson ${next.lesson.index + 1} of ${track.lessons.length}` : 'Keep it fresh with a quick review'}</span>
+  )
 
   const go = () => {
     sfx.tap()
@@ -291,48 +313,21 @@ function TodayCard({ onChangeFocus, primary = true }: { onChangeFocus: () => voi
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
     >
-      <div className="home-today__top">
-        <div className="home-today__text">
-          <p className="home-today__eyebrow">{eyebrow}</p>
-          <h2 id="today-title" className="home-today__title">
-            {headline}
-          </h2>
-          <p lang="bg" className="home-today__bg">
-            {subtitle}
-          </p>
-        </div>
-        <div className="home-today__goal">
-          <GoalRing value={xp} goal={goal} size={60} width={3} label={`${xp} of ${goal} XP today`}>
-            <span className="home-today__xp">{xp}</span>
-          </GoalRing>
-          <span className="home-today__goalcap">of {goal} XP</span>
-        </div>
-      </div>
-      {next?.reason === 'levelup' ? (
-        <p className="home-today__detail">
-          <LevelDots level={next.level - 1} />
-          <span>{detail}</span>
+      <div className="home-today__text">
+        <p className="home-today__eyebrow">{eyebrow}</p>
+        <h2 id="today-title" className="home-today__title">
+          {headline}
+        </h2>
+        <p lang="bg" className="home-today__bg">
+          {subtitle}
         </p>
-      ) : (
-        <p className="home-today__detail">{detail}</p>
-      )}
-      <div className="home-today__action">
-        <button type="button" className={`gv-btn gv-btn--block${primary ? '' : ' gv-btn--tinted gv-tone-rose'}`} onClick={warmup || next || review ? go : onChangeFocus}>
-          {label}
-        </button>
-        {warmup && <p className="home-today__then">{next ? `then: ${next.lesson.title}` : 'then: back to your path'}</p>}
       </div>
+      <button type="button" className="gv-btn gv-btn--block home-today__go" onClick={warmup || next || review ? go : onChangeFocus}>
+        {label}
+      </button>
       <div className="home-today__foot">
-        {also ? (
-          <button type="button" className="gv-btn gv-btn--plain gv-btn--sm gv-tone-rose" onClick={() => setViewTrack(also.id)}>
-            <span className="home-today__also">Also: {also.title}</span>
-          </button>
-        ) : (
-          <span />
-        )}
-        <button type="button" className="gv-btn gv-btn--plain gv-btn--sm gv-tone-rose" onClick={onChangeFocus}>
-          Change focus
-        </button>
+        {footnote}
+        <HomeLink onClick={onChangeFocus}>Change</HomeLink>
       </div>
     </motion.section>
   )
@@ -387,7 +382,7 @@ function WelcomeBackCard() {
         >
           Start a 2-minute warm-up
         </button>
-        <button type="button" className="gv-btn gv-btn--plain gv-btn--sm gv-tone-rose" onClick={() => void dismissWelcome()}>
+        <button type="button" className="home-welcome__later" onClick={() => void dismissWelcome()}>
           Not now
         </button>
       </div>
@@ -413,43 +408,45 @@ function MissionCard() {
         <p id="mission-title" className="home-mission__eyebrow">
           Say it to her today
         </p>
-        <button type="button" className="gv-btn gv-btn--plain gv-btn--sm gv-tone-rose home-mission__quiz" onClick={goQuiz}>
+        <HomeLink className="home-mission__quiz" onClick={goQuiz}>
           Quiz me
-        </button>
+        </HomeLink>
       </div>
-      <div className="home-mission__phrase">
-        <div className="home-mission__text">
-          <p className="home-mission__bg" lang="bg">
-            {item.bg}
-          </p>
-          {translit && item.tr && <p className="home-mission__tr">{item.tr}</p>}
-          <p className="home-mission__en">{item.en}</p>
-        </div>
-        <button type="button" className="gv-iconbtn gv-iconbtn--sm home-mission__play" onClick={() => void speak(item.bg, { itemId: item.id })} aria-label={`Play ${item.bg}`}>
+      <div className="home-mission__text">
+        <p className="home-mission__bg" lang="bg">
+          {item.bg}
+        </p>
+        {translit && item.tr && <p className="home-mission__tr">{item.tr}</p>}
+        <p className="home-mission__en">{item.en}</p>
+      </div>
+      <div className="home-mission__actions">
+        <button type="button" className="home-mission__play" onClick={() => void speak(item.bg, { itemId: item.id })} aria-label={`Play ${item.bg}`}>
           <IconSpeaker />
         </button>
+        {done ? (
+          <p className="home-mission__done" role="status">
+            <span className="home-mission__tick" aria-hidden="true">
+              <IconCheck />
+            </span>
+            <span>Said today</span>
+            <span className="home-mission__xp">+{MISSION_XP} XP</span>
+          </p>
+        ) : (
+          <button
+            type="button"
+            className="home-mission__said"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true)
+              sfx.tap()
+              await completeMission()
+              setBusy(false)
+            }}
+          >
+            I said it
+          </button>
+        )}
       </div>
-      {done ? (
-        <p className="home-mission__done" role="status">
-          <IconCheck />
-          <span>Said today</span>
-          <span className="home-mission__xp">+{MISSION_XP} XP</span>
-        </p>
-      ) : (
-        <button
-          type="button"
-          className="gv-btn gv-btn--tinted gv-btn--block gv-tone-rose"
-          disabled={busy}
-          onClick={async () => {
-            setBusy(true)
-            sfx.tap()
-            await completeMission()
-            setBusy(false)
-          }}
-        >
-          I said it
-        </button>
-      )}
     </section>
   )
 }
@@ -511,7 +508,7 @@ function WeekCard() {
         <p className="home-week__note">
           <span lang="bg">Браво за седмицата.</span> {week.streak > 1 ? `${week.streak}-day streak going into next week.` : 'A fresh week starts tomorrow.'}
         </p>
-        <ShareWeek className="gv-btn gv-btn--tinted gv-btn--block gv-tone-rose share-trigger" />
+        <ShareWeek className="share-trigger share-trigger--text" />
       </div>
     </section>
   )
@@ -749,6 +746,8 @@ function LessonRow({
 
   const accessory = locked ? (
     <IconLock className="home-row__lock" aria-hidden="true" />
+  ) : current ? (
+    <span className="home-row__start">{story ? 'Play' : level === 0 ? 'Start' : `Level ${level + 1}`}</span>
   ) : done ? (
     <span className="gv-row__accessory">{story ? 'Played' : 'Done'}</span>
   ) : story ? (
@@ -773,7 +772,7 @@ function LessonRow({
           {locked ? <IconLock /> : <IconChat />}
         </span>
       ) : (
-        <span className={`gv-row__icon badge-slot home-row__ring${done ? ' is-done' : ''}${locked ? ' is-locked' : ''}`} aria-hidden="true">
+        <span className={`gv-row__icon badge-slot home-row__ring${done ? ' is-done' : ''}${locked ? ' is-locked' : ''}${locked || level <= 0 ? ' is-zero' : ''}`} aria-hidden="true">
           <svg className="gv-ring" viewBox="0 0 36 36" style={{ '--value': locked ? 0 : (level / max) * 100 } as CSSProperties}>
             <circle className="gv-ring__track" cx="18" cy="18" r="16" />
             <circle className="gv-ring__value" cx="18" cy="18" r="16" pathLength={100} />
@@ -788,7 +787,7 @@ function LessonRow({
         </span>
       </span>
       {accessory}
-      {!locked && <span className="gv-row__chevron" aria-hidden="true" />}
+      {!locked && !current && <span className="gv-row__chevron" aria-hidden="true" />}
     </button>
   )
 }
@@ -880,14 +879,12 @@ function NodeSheetBody({
           <ul className="gv-list node-sheet__list">
             {preview.map((p) => (
               <li key={p.id} className="gv-row">
+                <EmojiTile emoji={p.emoji} size={32} track={p.trackId} className="node-sheet__tile" />
                 <span className="gv-row__body">
                   <span className="gv-row__title" lang="bg">
                     {p.bg}
                   </span>
                   <span className="gv-row__subtitle">{p.en}</span>
-                </span>
-                <span className="node-sheet__emoji" aria-hidden="true">
-                  {p.emoji}
                 </span>
               </li>
             ))}

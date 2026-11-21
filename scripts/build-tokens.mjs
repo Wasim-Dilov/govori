@@ -96,6 +96,9 @@ const pairs = [
   ...grounds.map((g) => ['pine', g, 4.5]), ['pine-ink', 'pine-soft', 4.5], ['on-pine', 'pine', 4.5], ['on-pine', 'pine-deep', 4.5],
   ...grounds.map((g) => ['warn', g, 4.5]), ['warn-ink', 'warn-soft', 4.5], ['on-warn', 'warn', 4.5], ['on-warn', 'warn-deep', 4.5],
   ['gold-ink', 'linen-raised', 4.5], ['gold-ink', 'gold-soft', 4.5], ['on-gold', 'gold', 4.5],
+  ['on-fill', 'pine-fill', 4.5], ['on-fill', 'pine-fill-pressed', 4.5], ['on-fill', 'warn-fill', 4.5], ['on-fill', 'warn-fill-pressed', 4.5],
+  ['ink', 'select-fill', 4.5], ['rose', 'select-fill', 3], ['ink-muted', 'select-fill', 4.5],
+  ['ink', 'material-thick', 4.5], ['ink-muted', 'material-thick', 4.5],
   ['pick', 'pick-soft', 4.5], ['ink', 'pick-soft', 4.5],
   ['line-strong', 'linen-raised', 1.3],
   ...['azbuka', 'basics', 'kids', 'love', 'home', 'family', 'grammar', 'out'].flatMap((t) => [

@@ -1,7 +1,8 @@
 /* Conversation (dlg-) and speaking (spk-) exercises, native iOS. Colours come from tokens only. */
 
 /* ------------------------------------------------------------ conversation */
-.dlg { display: flex; flex-direction: column; min-height: 100%; gap: var(--space-3); }
+/* The conversation fills the screen below the lesson header: the transcript grows, the dock stays at the bottom. */
+.dlg { flex: 1; display: flex; flex-direction: column; gap: var(--space-3); }
 .dlg__scroll { flex: 1; display: grid; align-content: start; gap: var(--space-4); padding-block: var(--space-2) var(--space-4); }
 
 .dlg-scene {
@@ -9,10 +10,10 @@
   padding: var(--space-4); border-radius: var(--radius-lg);
   background: var(--linen-raised); box-shadow: var(--shadow-card);
 }
-.dlg-scene__icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--rose-soft); color: var(--rose); }
+.dlg-scene__icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--fill-secondary); color: var(--ink-muted); }
 .dlg-scene__icon svg { width: 20px; height: 20px; }
 .dlg-scene__text { display: grid; gap: 2px; min-width: 0; }
-.dlg-scene__eyebrow { font: 600 13px/18px var(--font-text); color: var(--rose); }
+.dlg-scene__eyebrow { font: 600 13px/18px var(--font-text); color: var(--ink-muted); }
 .dlg-scene__title { font: 600 20px/25px var(--font-display); margin: 0; }
 .dlg-scene__bg { font: 400 15px/20px var(--font-text); color: var(--ink-muted); margin: 0; }
 .dlg-scene__setting { font: 400 15px/20px var(--font-text); color: var(--ink); margin: var(--space-2) 0 0; }
@@ -64,7 +65,7 @@
 
 /* The dock: answers on a translucent material, pinned to the bottom */
 .dlg-dock {
-  position: sticky; bottom: 0; z-index: 4;
+  position: sticky; bottom: 0; z-index: 4; margin-top: auto;
   display: grid; gap: var(--space-3);
   margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
   padding: var(--space-3) max(16px, env(safe-area-inset-right, 0px)) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
@@ -77,9 +78,9 @@
 .dlg-progress span { display: block; height: 100%; background: var(--accent); border-radius: inherit; transition: width 0.3s var(--ease-out); }
 .dlg-ask { display: grid; gap: var(--space-2); }
 .dlg-ask__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-.dlg-ask__eyebrow { width: 100%; font: 600 13px/18px var(--font-text); color: var(--rose); }
+.dlg-ask__eyebrow { width: 100%; font: 600 13px/18px var(--font-text); color: var(--ink-muted); }
 .dlg-ask__title { font: 600 17px/22px var(--font-text); color: var(--ink); }
-.dlg-hint { appearance: none; border: 0; background: none; padding: 0; font: 400 15px/20px var(--font-text); color: var(--rose); cursor: pointer; }
+.dlg-hint { appearance: none; border: 0; background: none; padding: 0; font: 400 15px/20px var(--font-text); color: var(--ink-muted); cursor: pointer; }
 .dlg-hint__text { font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
 
 .dlg-options { box-shadow: 0 0 0 var(--hairline) var(--separator); }
@@ -100,17 +101,16 @@
 .dlg-continue { display: grid; }
 
 /* ------------------------------------------------------------ speaking */
-.spk { display: grid; gap: var(--space-5); padding-block: var(--space-3) var(--space-6); }
+.spk { flex: 1; display: flex; flex-direction: column; gap: var(--space-5); padding-block: var(--space-3) var(--space-6); }
 .spk-prompt { margin: 0; }
 .spk-card { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-3); align-items: center; }
-.spk-card__emoji { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: var(--linen-sunk); font-size: 28px; line-height: 1; }
 .spk-card__words { display: grid; gap: 2px; min-width: 0; }
 .spk-card__bg { margin: 0; overflow-wrap: anywhere; font-size: 24px; line-height: 30px; }
 .spk-card__tr { margin: 0; font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
 .spk-card__en { margin: 0; font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
 .spk-card__listen { display: grid; gap: var(--space-2); justify-items: center; }
 
-.spk-stage { display: grid; place-items: center; min-height: 196px; }
+.spk-stage { flex: 1 0 auto; display: grid; place-items: center; min-height: 196px; }
 .spk-rec { display: grid; justify-items: center; gap: var(--space-3); }
 .spk-rec__wrap { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
 .spk-rec__ring { position: absolute; inset: 0; width: 120px; height: 120px; transform: rotate(-90deg); pointer-events: none; }
@@ -133,7 +133,7 @@
 .spk-play.is-playing .gv-row__icon svg { animation: gv-pulse 0.8s ease-in-out infinite alternate; }
 .spk-again, .spk-skip {
   appearance: none; border: 0; background: none; padding: 6px; justify-self: center;
-  font: 400 15px/20px var(--font-text); color: var(--rose); cursor: pointer;
+  font: 400 15px/20px var(--font-text); color: var(--ink); cursor: pointer;
 }
 .spk-skip { color: var(--ink-muted); }
 .spk-again:focus-visible, .spk-skip:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 8px; }

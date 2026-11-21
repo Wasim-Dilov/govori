@@ -1,7 +1,8 @@
 // First-run setup in the style of an Apple setup flow: one question per screen.
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { BrandMark } from '../components/BrandMark.tsx'
+import { Illustration } from '../components/Illustration.tsx'
 import { InstallGuide } from '../components/InstallGuide.tsx'
 import { TrackBadge } from '../components/FocusSheet.tsx'
 import { IconBack, IconChat, IconCheck, IconHeart, IconPath } from '../components/Icons.tsx'
@@ -24,10 +25,11 @@ const NOTES: Record<number, string> = {
 }
 const GOALS = GOAL_OPTIONS.map((o) => ({ xp: o.xp, label: o.label, time: `${o.min} minutes a day`, note: NOTES[o.min] ?? '' }))
 
+// iOS Settings-style tiles: one hue each, used sparingly.
 const FEATURES = [
-  { Icon: IconHeart, title: 'Words that matter at home', text: 'Sweet words for her, what the kids need, and the in-laws at the table.' },
-  { Icon: IconPath, title: 'A few minutes a day', text: 'A 12-week plan with short lessons that build on each other.' },
-  { Icon: IconChat, title: 'Real conversations', text: 'Practise each unit in a short dialogue with the family.' },
+  { Icon: IconHeart, tone: 'gv-tone-love', title: 'Words that matter at home', text: 'Sweet words for her, what the kids need, and the in-laws at the table.' },
+  { Icon: IconPath, tone: 'gv-tone-basics', title: 'A few minutes a day', text: 'A 12-week plan with short lessons that build on each other.' },
+  { Icon: IconChat, tone: 'gv-tone-family', title: 'Real conversations', text: 'Practise each unit in a short dialogue with the family.' },
 ]
 
 export function OnboardingScreen() {
@@ -42,6 +44,13 @@ export function OnboardingScreen() {
   }, [])
 
   const [i, setI] = useState(0)
+  // Short screens (iPhone SE and similar) get a smaller welcome illustration so nothing sits under the footer.
+  const [short, setShort] = useState(() => typeof window !== 'undefined' && window.innerHeight <= 700)
+  useEffect(() => {
+    const onResize = () => setShort(window.innerHeight <= 700)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
   const [dir, setDir] = useState(1)
   const [name, setName] = useState('')
   const [speaker, setSpeaker] = useState<'m' | 'f' | null>(null)
@@ -116,16 +125,17 @@ export function OnboardingScreen() {
           >
             {step === 'welcome' && (
               <div className="ob-welcome">
-                <BrandMark size={88} className="ob-welcome__mark" />
+                <Illustration name="welcome" size={short ? 120 : 184} className="ob-welcome__halo">
+                  <BrandMark size={short ? 58 : 88} className="ob-welcome__mark" />
+                </Illustration>
                 <h1 className="ob-welcome__title">
                   Welcome to <span lang="bg">Говори</span>
                 </h1>
                 <p className="ob-welcome__sub">Bulgarian for your family, a few minutes a day.</p>
-                <div className="gv-shevitsa gv-shevitsa--sm gv-tone-rose ob-welcome__band" aria-hidden="true" />
                 <ul className="ob-features">
-                  {FEATURES.map(({ Icon, title, text }) => (
+                  {FEATURES.map(({ Icon, tone, title, text }) => (
                     <li key={title}>
-                      <span className="ob-features__icon" aria-hidden="true">
+                      <span className={`ob-features__icon ${tone}`} aria-hidden="true">
                         <Icon />
                       </span>
                       <span>

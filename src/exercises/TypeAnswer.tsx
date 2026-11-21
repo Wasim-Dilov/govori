@@ -38,68 +38,74 @@ export function TypeExercise({ ex, setAnswer, checked }: ExerciseProps<'type_bg'
       {ex.type === 'type_bg' ? (
         <>
           <Prompt>Write this in Bulgarian</Prompt>
-          <Cue emoji={ex.item.emoji} text={ex.item.en} />
+          <div className="ex-stage">
+            <Cue emoji={ex.item.emoji} text={ex.item.en} track={ex.item.trackId} />
+          </div>
         </>
       ) : (
         <>
           <Prompt>Type what you hear</Prompt>
-          <div className="ex-listen">
-            <SpeakButton text={ex.item.bg} itemId={ex.item.id} size="lg" auto />
-            <SpeakButton text={ex.item.bg} itemId={ex.item.id} slow />
+          <div className="ex-stage">
+            <div className="ex-listen">
+              <SpeakButton text={ex.item.bg} itemId={ex.item.id} size="lg" auto />
+              <SpeakButton text={ex.item.bg} itemId={ex.item.id} slow />
+            </div>
           </div>
         </>
       )}
-      <div className="ex-type__field">
-        <label className="sr-only" htmlFor="ex-type-input">
-          Your answer in Bulgarian
-        </label>
-        <textarea
-          id="ex-type-input"
-          ref={ref}
-          className="gv-input"
-          lang="bg"
-          value={text}
-          onChange={(e) => update(e.target.value)}
-          readOnly={cyrKb || !!checked}
-          inputMode={cyrKb ? 'none' : 'text'}
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck={false}
-          rows={2}
-          placeholder={cyrKb ? 'Tap the letters below' : 'Cyrillic or Latin letters both work'}
-        />
-        <button
-          type="button"
-          className="ex-type__switch"
-          onClick={() => {
-            setCyrKb((v) => !v)
-            setTimeout(() => ref.current?.focus(), 50)
-          }}
-        >
-          {cyrKb ? 'Use my keyboard' : 'Use the Bulgarian keyboard'}
-        </button>
-      </div>
-      {cyrKb && !checked && (
-        <div className="ex-kbd" role="group" aria-label="Bulgarian keyboard">
-          {ROWS.map((row, i) => (
-            <div key={i} className="ex-kbd__row">
-              {row.map((k) => (
-                <button key={k} type="button" className="gv-key" onClick={() => key(k)} lang="bg">
-                  {k}
-                </button>
-              ))}
-            </div>
-          ))}
-          <div className="ex-kbd__row">
-            <button type="button" className="gv-key gv-key--wide ex-kbd__space" onClick={() => key(' ')}>
-              space
-            </button>
-            <button type="button" className="gv-key gv-key--wide ex-kbd__del" onClick={back} aria-label="Delete">
-              <IconDelete />
-            </button>
-          </div>
+      <div className="ex-answers ex-type__answers">
+        <div className="ex-type__field">
+          <label className="sr-only" htmlFor="ex-type-input">
+            Your answer in Bulgarian
+          </label>
+          <textarea
+            id="ex-type-input"
+            ref={ref}
+            className="gv-input"
+            lang="bg"
+            value={text}
+            onChange={(e) => update(e.target.value)}
+            readOnly={cyrKb || !!checked}
+            inputMode={cyrKb ? 'none' : 'text'}
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            rows={2}
+            placeholder={cyrKb ? 'Tap the letters below' : 'Cyrillic or Latin letters both work'}
+          />
+          <button
+            type="button"
+            className="ex-type__switch"
+            onClick={() => {
+              setCyrKb((v) => !v)
+              setTimeout(() => ref.current?.focus(), 50)
+            }}
+          >
+            {cyrKb ? 'Use my keyboard' : 'Use the Bulgarian keyboard'}
+          </button>
         </div>
-      )}
+        {cyrKb && !checked && (
+          <div className="ex-kbd" role="group" aria-label="Bulgarian keyboard">
+            {ROWS.map((row, i) => (
+              <div key={i} className="ex-kbd__row">
+                {row.map((k) => (
+                  <button key={k} type="button" className="gv-key" onClick={() => key(k)} lang="bg">
+                    {k}
+                  </button>
+                ))}
+              </div>
+            ))}
+            <div className="ex-kbd__row">
+              <button type="button" className="gv-key gv-key--wide ex-kbd__space" onClick={() => key(' ')}>
+                space
+              </button>
+              <button type="button" className="gv-key gv-key--wide ex-kbd__del" onClick={back} aria-label="Delete">
+                <IconDelete />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

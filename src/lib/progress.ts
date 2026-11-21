@@ -202,10 +202,14 @@ export async function strongestItemIds(limit = 8): Promise<string[]> {
     .map((m) => m.itemId)
 }
 
-const isWord = (id: string) => {
+/** The one rule for what counts as a learned word: words and phrases (not letters, reading words or conversation lines). */
+export const isWord = (id: string) => {
   const k = study(id)?.kind
   return k === 'word' || k === 'phrase'
 }
+
+/** Cyrillic letters (not reading-practice words). */
+export const isLetter = (id: string) => study(id)?.kind === 'letter'
 
 /** Words and phrases met so far (letters, reading words and conversation lines don't count). */
 export async function learnedCount(): Promise<number> {

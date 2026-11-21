@@ -50,6 +50,8 @@ export function SessionScreen() {
   /** "Can't listen now": skip listening exercises for the rest of this session (not counted). */
   const [noListen, setNoListen] = useState(false)
   const score = useRef({ correct: 0, total: 0 })
+  // The quit sheet takes focus itself (not its button) so no focus ring flashes when it opens.
+  const focusSheet = useCallback((el: HTMLDivElement | null) => el?.focus({ preventScroll: true }), [])
   const exStart = useRef(Date.now())
   const finishing = useRef(false)
 
@@ -214,9 +216,16 @@ export function SessionScreen() {
         </span>
       </header>
 
-      <main className="session__body flow__pad">
+      <main className={`session__body flow__pad ${step.ex.type === 'dialogue' ? 'session__body--flush' : ''}`}>
         <AnimatePresence mode="wait">
-          <motion.div key={step.key + idx} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}>
+          <motion.div
+            key={step.key + idx}
+            className="session__stage"
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+          >
             {step.attempt > 1 && (
               <p className="session__retry">
                 <IconRefresh />
@@ -249,8 +258,8 @@ export function SessionScreen() {
                 className={`gv-feedback session__sheet ${checked.correct ? '' : 'gv-feedback--wrong'}`}
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+                exit={{ y: '100%', transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } }}
+                transition={{ type: 'spring', stiffness: 500, damping: 40 }}
                 role="status"
               >
                 <div className="gv-feedback__head">
@@ -318,6 +327,8 @@ export function SessionScreen() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="quit-title"
+              tabIndex={-1}
+              ref={focusSheet}
             >
               <div className="gv-sheet__grip" />
               <h2 id="quit-title" className="t-title3">
@@ -325,7 +336,7 @@ export function SessionScreen() {
               </h2>
               <p className="session__quittext">You'll lose the progress from this lesson. Two more minutes keeps your streak going.</p>
               <div className="session__quitbtns">
-                <button type="button" className="gv-btn gv-btn--block" onClick={() => setConfirmQuit(false)} autoFocus>
+                <button type="button" className="gv-btn gv-btn--block" onClick={() => setConfirmQuit(false)}>
                   Keep learning
                 </button>
                 <button type="button" className="gv-btn gv-btn--plain gv-btn--block" onClick={quit}>
