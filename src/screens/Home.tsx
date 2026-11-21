@@ -10,7 +10,7 @@ import { TopBar, GoalRing } from '../components/TopBar.tsx'
 import { BottomSheet, FocusSheet } from '../components/FocusSheet.tsx'
 import { Mascot } from '../components/Mascot.tsx'
 import { IconBolt, IconChat, IconCheck, IconLock, IconRefresh, IconStar, IconTarget } from '../components/Icons.tsx'
-import { sfx, speak } from '../lib/audio.ts'
+import { clipCount, manifestReady, sfx, speak } from '../lib/audio.ts'
 import { speedRounds } from '../lib/engine.ts'
 import { IconSpeaker } from '../components/Icons.tsx'
 import './home.css'
@@ -70,9 +70,12 @@ function VoiceCard() {
   const [dismissed, setDismissed] = useState<boolean | null>(null)
   const [testing, setTesting] = useState(false)
   const [found, setFound] = useState(false)
+  // Microsoft voice clips make the phone's own Bulgarian voice unnecessary.
+  const [clips, setClips] = useState<number | null>(null)
 
   useEffect(() => {
     let live = true
+    void manifestReady().then(() => live && setClips(clipCount()))
     getKV<string | null>('voiceCard', null).then((v) => live && setDismissed(v === 'dismissed'))
     // He may leave for Settings and come back with the voice downloaded.
     const onVisible = () => document.visibilityState === 'visible' && void checkVoice()
@@ -90,7 +93,7 @@ function VoiceCard() {
     else if (voice && wasMissing.current && dismissed === false) setFound(true)
   }, [voice, dismissed])
 
-  if (dismissed !== false || (voice !== false && !found)) return null
+  if (clips !== 0 || dismissed !== false || (voice !== false && !found)) return null
 
   const dismiss = () => {
     setDismissed(true)

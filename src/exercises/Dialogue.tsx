@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { DialogueLine, Who } from '../content/types.ts'
 import { shuffle, translit } from '../lib/engine.ts'
-import { sfx, speak, stopSpeaking } from '../lib/audio.ts'
+import { sfx, speak, stopSpeaking, voiceForWho } from '../lib/audio.ts'
 import { useApp } from '../lib/store.ts'
 import { IconCheck, IconSpeaker } from '../components/Icons.tsx'
 import type { ExerciseProps } from './types.ts'
@@ -92,7 +92,7 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
         setRevealed((r) => (r.includes(step.index) ? r : [...r, step.index]))
         setReady(true)
         setPlaying(step.index)
-        await speak(l.bg)
+        await speak(l.bg, { voice: voiceForWho(l.who, speaker) })
         if (id === run.current) setPlaying(null)
       }, 700)
       return () => {
@@ -143,7 +143,7 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
       setRevealed((r) => [...r, step.index])
       setReady(true)
       setPlaying(step.index)
-      await speak(say(line).bg)
+      await speak(say(line).bg, { voice: voiceForWho(line.who, speaker) })
       if (id === run.current) setPlaying(null)
     }, 450)
   }
@@ -180,7 +180,7 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
   async function replay(i: number) {
     const l = d.lines[i]
     setPlaying(i)
-    await speak(say(l).bg)
+    await speak(say(l).bg, { voice: voiceForWho(l.who, speaker) })
     setPlaying((p) => (p === i ? null : p))
   }
 

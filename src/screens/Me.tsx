@@ -8,7 +8,7 @@ import { IconBell, IconFlame, IconHeart, IconMic, IconSpeaker, IconStar, IconTar
 import { allItemIds, study, trackById, tracks } from '../content/index.ts'
 import { planWeek } from '../content/plan.ts'
 import type { TrackId } from '../content/types.ts'
-import { hasBulgarianVoice, sfx, speak } from '../lib/audio.ts'
+import { clipCount, clipUrls, hasBulgarianVoice, manifestReady, sfx, speak } from '../lib/audio.ts'
 import { db, getKV } from '../lib/db.ts'
 import { exportAll } from '../lib/exportData.ts'
 import { readBackup, restoreBackup, type Backup, type BackupSummary } from '../lib/importData.ts'
@@ -227,6 +227,90 @@ function LearningSection() {
   )
 }
 
+const VOICE_CACHE = 'govori-voices'
+
+/** The Microsoft voice: how many clips exist, how many are saved on the phone, and saving the rest. */
+function VoiceClips({ count }: { count: number }) {
+  const [saved, setSaved] = useState<number | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const canCache = typeof caches !== 'undefined'
+
+  useEffect(() => {
+    if (!canCache) return
+    let live = true
+    void caches
+      .open(VOICE_CACHE)
+      .then((c) => c.keys())
+      .then((keys) => live && setSaved(keys.filter((r) => r.url.endsWith('.mp3')).length))
+      .catch(() => live && setSaved(0))
+    return () => {
+      live = false
+    }
+  }, [canCache])
+
+  async function saveAll() {
+    setBusy(true)
+    setError('')
+    try {
+      const cache = await caches.open(VOICE_CACHE)
+      const have = new Set((await cache.keys()).map((r) => new URL(r.url).pathname))
+      const todo = clipUrls().filter((u) => !have.has(new URL(u, location.href).pathname))
+      let done = count - todo.length
+      setSaved(done)
+      let failed = 0
+      const worker = async () => {
+        while (todo.length) {
+          const url = todo.shift()!
+          try {
+            const res = await fetch(url)
+            if (res.ok) await cache.put(url, res)
+            else failed++
+          } catch {
+            failed++
+          }
+          done++
+          setSaved(done)
+        }
+      }
+      await Promise.all([worker(), worker(), worker(), worker()])
+      const keys = await cache.keys()
+      setSaved(keys.filter((r) => r.url.endsWith('.mp3')).length)
+      if (failed) setError(`${failed} clips could not be saved. Check the connection and try again.`)
+    } catch {
+      setError('This phone would not let Govori save audio. Try again from the Home Screen app.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const all = saved !== null && saved >= count
+  return (
+    <>
+      <Row label="Voice: Kalina (Microsoft)" hint={`${count.toLocaleString()} Bulgarian clips, natural neural voices`}>
+        <span className="me-voice-badge" aria-hidden="true">
+          <IconSpeaker />
+        </span>
+      </Row>
+      {canCache && (
+        <div className="me-offline">
+          <div className="me-offline__head">
+            <span className="t-body-strong">Audio for offline</span>
+            <span className="muted t-caption">{saved === null ? 'Checking…' : `${Math.min(saved, count)} of ${count} saved`}</span>
+          </div>
+          <div className="gv-progress gv-tone-basics" role="progressbar" aria-valuemin={0} aria-valuemax={count} aria-valuenow={saved ?? 0} aria-label="Audio saved for offline">
+            <div className="gv-progress__fill" style={{ width: `${Math.max(4, Math.min(100, ((saved ?? 0) / count) * 100))}%` }} />
+          </div>
+          <button type="button" className="gv-btn gv-btn--quiet gv-btn--sm gv-btn--block" onClick={() => void saveAll()} disabled={busy || all}>
+            {all ? 'All audio saved' : busy ? 'Saving…' : 'Save all audio for offline'}
+          </button>
+          {error && <p className="me-error t-caption">{error}</p>}
+        </div>
+      )}
+    </>
+  )
+}
+
 function SoundSection() {
   const profile = useApp((s) => s.profile)
   const setProfile = useApp((s) => s.setProfile)
@@ -252,6 +336,15 @@ function SoundSection() {
     }
   }, [voice])
 
+  const [clips, setClips] = useState<number | null>(null)
+  useEffect(() => {
+    let live = true
+    void manifestReady().then(() => live && setClips(clipCount()))
+    return () => {
+      live = false
+    }
+  }, [])
+
   async function test() {
     setTesting(true)
     await speak('Здравей! Как си?')
@@ -261,6 +354,9 @@ function SoundSection() {
   return (
     <Section icon={<IconSpeaker />} tone="basics" title="Sound">
       <Toggle label="Sound effects" hint="Chimes for right and wrong answers" on={profile.sfx} onChange={(v) => void setProfile({ sfx: v })} />
+      {clips ? <VoiceClips count={clips} /> : null}
+      {clips ? null : (
+      <>
       <Row
         label="Bulgarian voice"
         hint={voice === null ? 'Checking this phone…' : voice ? 'Ready on this phone' : 'Not found on this phone yet'}
@@ -283,6 +379,8 @@ function SoundSection() {
             <li>Come back and tap the speaker to test it.</li>
           </ol>
         </div>
+      )}
+      </>
       )}
     </Section>
   )

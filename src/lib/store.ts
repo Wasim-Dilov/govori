@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { trackById, type Speaker } from '../content/index.ts'
 import type { TrackId } from '../content/types.ts'
 import { planWeek } from '../content/plan.ts'
-import { bulgarianVoiceStatus, setSfx, unlockAudio } from './audio.ts'
+import { bulgarianVoiceStatus, hasClip, manifestReady, setSfx, unlockAudio } from './audio.ts'
 import { getKV, localDay, setKV, type LessonProgress, type Summary } from './db.ts'
 import { buildLesson, buildMistakes, buildPractice, buildSpeedRound, type BuildEnv, type LessonPlan } from './engine.ts'
 import {
@@ -282,7 +282,8 @@ async function buildEnv(): Promise<BuildEnv> {
   ])
   const cached = useApp.getState().voice
   const voice = cached ?? (await useApp.getState().checkVoice())
-  return { known: new Set(known as string[]), recorded: new Set(recorded as string[]), voice }
+  await manifestReady()
+  return { known: new Set(known as string[]), recorded: new Set(recorded as string[]), voice, hasClip: (text: string) => hasClip(text) }
 }
 
 /** Open a session, or explain why there is nothing to do instead of showing an empty screen. */

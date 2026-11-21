@@ -163,3 +163,10 @@
 .me-backup-nudge .me-row-hint { color: var(--ink); }
 .me-file { position: relative; cursor: pointer; }
 .me-file:focus-within { box-shadow: 0 var(--ledge-md) 0 var(--tone-deep), var(--focus-ring); }
+
+/* Microsoft voice clips */
+.me-voice-badge { width: 40px; height: 40px; border-radius: var(--radius-sm); display: grid; place-items: center; background: var(--trk-basics-soft); color: var(--trk-basics); }
+.me-voice-badge svg { width: 22px; height: 22px; }
+.me-offline { display: grid; gap: var(--space-2); padding-block: var(--space-2); }
+.me-offline__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
+.me-error { color: var(--rose-ink); }

@@ -49,6 +49,8 @@ export interface BuildEnv {
   voice?: boolean
   /** Ids with a recording (e.g. his wife's voice): these can still be listened to without a voice. */
   recorded?: Set<string>
+  /** True when a Microsoft voice clip exists for this Bulgarian text. */
+  hasClip?: (text: string) => boolean
 }
 
 // Set at the start of each public builder; the helpers below read it.
@@ -59,11 +61,11 @@ function useEnv(e: BuildEnv | undefined, inPlay: string[]) {
   fallbackTurn = 0
 }
 const isKnown = (id: string) => !!env.known?.has(id) || env.inPlay.has(id)
-const canListen = (id: string) => env.voice !== false || !!env.recorded?.has(id)
+const canListen = (item: StudyItem) => env.voice !== false || !!env.recorded?.has(item.id) || !!env.hasClip?.(item.bg)
 
 /** Swap a listening exercise for a reading one when this item can't be heard. */
 function listenable(type: ExerciseType, item: StudyItem): ExerciseType {
-  if ((type === 'listen_mc' || type === 'listen_type') && !canListen(item.id)) {
+  if ((type === 'listen_mc' || type === 'listen_type') && !canListen(item)) {
     if (type === 'listen_type') return 'type_bg'
     return item.kind === 'reading' ? 'mc_en_bg' : 'mc_bg_en'
   }

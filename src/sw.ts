@@ -5,6 +5,8 @@
 import { clientsClaim } from 'workbox-core'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
+import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies'
+import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 
 declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: Array<{ url: string; revision: string | null } | string>
@@ -14,6 +16,17 @@ self.skipWaiting()
 clientsClaim()
 cleanupOutdatedCaches()
 precacheAndRoute(self.__WB_MANIFEST)
+
+// Microsoft voice clips: kept once heard (or saved in bulk from Me), the index refreshed quietly.
+// The app reads the shared cache name 'govori-voices' when saving every clip for offline use.
+registerRoute(
+  ({ url }) => url.pathname.includes('/voices/') && url.pathname.endsWith('.mp3'),
+  new CacheFirst({ cacheName: 'govori-voices', plugins: [new CacheableResponsePlugin({ statuses: [200] })] }),
+)
+registerRoute(
+  ({ url }) => url.pathname.endsWith('/voices/manifest.json'),
+  new StaleWhileRevalidate({ cacheName: 'govori-voices-index', plugins: [new CacheableResponsePlugin({ statuses: [200] })] }),
+)
 
 // Offline: any navigation inside the app falls back to the precached shell.
 try {

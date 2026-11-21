@@ -1,0 +1,64 @@
+name: Generate Bulgarian voices
+
+# Makes a Microsoft Azure neural voice clip for every Bulgarian word, phrase and
+# conversation line, commits them to public/voices, then redeploys the site.
+# Needs the secret AZURE_SPEECH_KEY and the variable AZURE_SPEECH_REGION.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/**'
+      - 'scripts/generate-voices.mjs'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: voices
+  cancel-in-progress: false
+
+jobs:
+  voices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      HAS_KEY: ${{ secrets.AZURE_SPEECH_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Generate clips
+        env:
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ vars.AZURE_SPEECH_REGION }}
+          GIT_COMMIT: '1'
+        run: node scripts/generate-voices.mjs
+      - name: Commit the rest
+        id: commit
+        run: |
+          git add public/voices
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No new clips to commit."
+          else
+            git commit -q -m "Update Bulgarian voice clips [skip ci]"
+            git pull -q --rebase origin main
+            git push -q origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Redeploy the site
+        # A push made with the workflow token does not trigger the deploy workflow on its own.
+        if: always() && env.HAS_KEY == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main --repo "${{ github.repository }}"
