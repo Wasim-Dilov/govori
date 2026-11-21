@@ -1,16 +1,37 @@
 name: Generate Bulgarian voices
 
-# Makes a Microsoft Azure neural voice clip for every Bulgarian word, phrase and
-# conversation line, commits them to public/voices, then redeploys the site.
-# Needs the secret AZURE_SPEECH_KEY and the variable AZURE_SPEECH_REGION.
+# Makes a natural voice clip for every Bulgarian word, phrase and conversation line
+# (ElevenLabs, or Microsoft Azure), commits them to public/voices, then redeploys the site.
+#
+# ElevenLabs: secret ELEVENLABS_API_KEY; variables ELEVENLABS_VOICE_F, ELEVENLABS_VOICE_M
+#             (optional ELEVENLABS_VOICE_KID, _ELDER_F, _ELDER_M, ELEVENLABS_MODEL).
+# Azure:      secret AZURE_SPEECH_KEY; variable AZURE_SPEECH_REGION.
+# Optional variable TTS_PROVIDER (elevenlabs or azure) when both keys are set.
+#
+# Modes (Run workflow): full makes every missing clip; list shows Bulgarian voices to choose
+# from; sample makes 8 test sentences for each voice in "sample_voices".
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'full = voice the app, list = show Bulgarian voices, sample = test sentences'
+        type: choice
+        options: [full, list, sample]
+        default: full
+      sample_voices:
+        description: 'For sample: comma separated voice ids, or public_owner_id:voice_id for library voices'
+        type: string
+        default: ''
   push:
     branches: [main]
     paths:
       - 'src/content/**'
       - 'scripts/generate-voices.mjs'
+      - 'scripts/voices-elevenlabs.mjs'
+  # Free ElevenLabs plans get new characters each month: carry on where the last run stopped.
+  schedule:
+    - cron: '17 6 2 * *'
 
 permissions:
   contents: write
@@ -20,12 +41,29 @@ concurrency:
   group: voices
   cancel-in-progress: false
 
+env:
+  MODE: ${{ inputs.mode || 'full' }}
+  HAS_KEY: ${{ secrets.ELEVENLABS_API_KEY != '' || secrets.AZURE_SPEECH_KEY != '' }}
+  TTS_PROVIDER: ${{ vars.TTS_PROVIDER }}
+  ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+  # eleven_v4 falls back to eleven_multilingual_v2 automatically if the API does not offer it.
+  ELEVENLABS_MODEL: ${{ vars.ELEVENLABS_MODEL || 'eleven_v4' }}
+  # Voices chosen with the user (repository variables override these defaults):
+  # Milena for words, phrases and the women; Georgi for the men and his own lines; Mimi for the kids.
+  # The free plan has 3 voice slots, so тъща, баба and тъст use Milena and Georgi unless
+  # ELEVENLABS_VOICE_ELDER_F / _ELDER_M are set and a slot is free.
+  ELEVENLABS_VOICE_F: ${{ vars.ELEVENLABS_VOICE_F || 'M1ydWt7KnBCiuv4CnEDC' }}
+  ELEVENLABS_VOICE_M: ${{ vars.ELEVENLABS_VOICE_M || '31jwlwrRwpOA5yGuVAby' }}
+  ELEVENLABS_VOICE_KID: ${{ vars.ELEVENLABS_VOICE_KID || 'CBDgRB8OyxYGowoi5iXR' }}
+  ELEVENLABS_VOICE_ELDER_F: ${{ vars.ELEVENLABS_VOICE_ELDER_F || '' }}
+  ELEVENLABS_VOICE_ELDER_M: ${{ vars.ELEVENLABS_VOICE_ELDER_M || '' }}
+  AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+  AZURE_SPEECH_REGION: ${{ vars.AZURE_SPEECH_REGION }}
+
 jobs:
   voices:
     runs-on: ubuntu-latest
     timeout-minutes: 300
-    env:
-      HAS_KEY: ${{ secrets.AZURE_SPEECH_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,13 +75,44 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: Generate clips
+
+      # ---------------------------------------------------------------- list
+      - name: List Bulgarian voices
+        if: env.MODE == 'list'
+        run: node scripts/generate-voices.mjs --list-voices
+
+      # ---------------------------------------------------------------- sample
+      - name: Make voice samples
+        if: env.MODE == 'sample'
         env:
-          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
-          AZURE_SPEECH_REGION: ${{ vars.AZURE_SPEECH_REGION }}
+          SAMPLE_VOICES: ${{ inputs.sample_voices || vars.ELEVENLABS_SAMPLE_VOICES }}
+        run: node scripts/generate-voices.mjs --sample
+      - name: Upload samples
+        if: env.MODE == 'sample'
+        uses: actions/upload-artifact@v4
+        with:
+          name: voice-samples
+          path: sample-voices/
+      - name: Publish samples to the voice-samples branch
+        if: env.MODE == 'sample'
+        run: |
+          cp -r sample-voices "$RUNNER_TEMP/samples"
+          git switch --orphan voice-samples
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r "$RUNNER_TEMP/samples/." .
+          git add -A
+          git commit -q -m "Voice samples $(date -u +%Y-%m-%d)"
+          git push -f -q origin HEAD:voice-samples
+          echo "Samples: https://github.com/${{ github.repository }}/tree/voice-samples" >> "$GITHUB_STEP_SUMMARY"
+
+      # ---------------------------------------------------------------- full
+      - name: Generate clips
+        if: env.MODE == 'full'
+        env:
           GIT_COMMIT: '1'
         run: node scripts/generate-voices.mjs
       - name: Commit the rest
+        if: env.MODE == 'full'
         id: commit
         run: |
           git add public/voices
@@ -58,7 +127,7 @@ jobs:
           fi
       - name: Redeploy the site
         # A push made with the workflow token does not trigger the deploy workflow on its own.
-        if: always() && env.HAS_KEY == 'true'
+        if: always() && env.MODE == 'full' && env.HAS_KEY == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy.yml --ref main --repo "${{ github.repository }}"
