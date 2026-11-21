@@ -10,9 +10,9 @@ export const out: Track = {
     // ---------------------------------------------------------------- Unit 1: At the café
     { id: 'out.kafe', kind: 'word', bg: 'кафе', tr: 'kafé', en: 'coffee', emoji: '☕', note: 'Usually a short espresso. Ask for "дълго кафе" if you want it longer.' },
     { id: 'out.chay', kind: 'word', bg: 'чай', tr: 'chay', en: 'tea', emoji: '🍵', note: 'Herbal teas are popular: mint, chamomile and mountain tea.' },
-    { id: 'out.sok', kind: 'word', bg: 'газирана вода', tr: 'gazírana vodá', en: 'sparkling water', emoji: '🥤', alt: ['fizzy water', 'soda water', 'carbonated water'] },
+    { id: 'out.gazirana-voda', kind: 'word', bg: 'газирана вода', tr: 'gazírana vodá', en: 'sparkling water', emoji: '🥤', alt: ['fizzy water', 'soda water', 'carbonated water'] },
     { id: 'out.bira', kind: 'word', bg: 'бира', tr: 'bíra', en: 'beer', emoji: '🍺' },
-    { id: 'out.vino', kind: 'word', bg: 'лимонада', tr: 'limonáda', en: 'lemonade', emoji: '🍋', alt: ['a lemonade'] },
+    { id: 'out.limonada', kind: 'word', bg: 'лимонада', tr: 'limonáda', en: 'lemonade', emoji: '🍋', alt: ['a lemonade'] },
 
     { id: 'out.zahar', kind: 'word', bg: 'захар', tr: 'záhar', en: 'sugar', emoji: '🍬' },
     { id: 'out.led', kind: 'word', bg: 'лед', tr: 'led', en: 'ice', emoji: '🧊' },
@@ -47,9 +47,9 @@ export const out: Track = {
     { id: 'out.zadrazhte-restoto', kind: 'phrase', bg: 'Задръжте рестото.', tr: 'zadrắzhte réstoto', en: 'Keep the change.', emoji: '🪙', alt: ['keep the change'], note: 'A tip of about 10% is normal in restaurants.' },
 
     // ---------------------------------------------------------------- Unit 3: At the market
-    { id: 'out.domati', kind: 'word', bg: 'чушки', tr: 'chúshki', en: 'peppers', emoji: '🫑', alt: ['pepper', 'bell peppers', 'sweet peppers'] },
-    { id: 'out.krastavitsi', kind: 'word', bg: 'праскови', tr: 'práskovi', en: 'peaches', emoji: '🍑', alt: ['peach', 'the peaches'] },
-    { id: 'out.yabalki', kind: 'word', bg: 'ягоди', tr: 'yágodi', en: 'strawberries', emoji: '🍓', alt: ['strawberry', 'the strawberries'] },
+    { id: 'out.chushki', kind: 'word', bg: 'чушки', tr: 'chúshki', en: 'peppers', emoji: '🫑', alt: ['pepper', 'bell peppers', 'sweet peppers'] },
+    { id: 'out.praskovi', kind: 'word', bg: 'праскови', tr: 'práskovi', en: 'peaches', emoji: '🍑', alt: ['peach', 'the peaches'] },
+    { id: 'out.yagodi', kind: 'word', bg: 'ягоди', tr: 'yágodi', en: 'strawberries', emoji: '🍓', alt: ['strawberry', 'the strawberries'] },
     { id: 'out.chereshi', kind: 'word', bg: 'череши', tr: 'cheréshi', en: 'cherries', emoji: '🍒', alt: ['cherry', 'sweet cherries'] },
     { id: 'out.dinya', kind: 'word', bg: 'диня', tr: 'dínya', en: 'watermelon', emoji: '🍉', alt: ['a watermelon'] },
 
@@ -70,8 +70,8 @@ export const out: Track = {
     { id: 'out.nalyavo', kind: 'word', bg: 'наляво', tr: 'nalyávo', en: 'left', emoji: '⬅️', alt: ['to the left', 'on the left'], note: 'ляв means left, so наляво is "to the left".' },
     { id: 'out.nadyasno', kind: 'word', bg: 'надясно', tr: 'nadyásno', en: 'right', emoji: '➡️', alt: ['to the right', 'on the right'], note: 'десен means right, so надясно is "to the right".' },
     { id: 'out.napravo', kind: 'word', bg: 'направо', tr: 'naprávo', en: 'straight on', emoji: '⬆️', alt: ['straight', 'straight ahead', 'directly'], note: 'Also means "directly" or "frankly".' },
-    { id: 'out.tuk', kind: 'word', bg: 'ъгъл', tr: 'ắgăl', en: 'corner', emoji: '↪️', alt: ['the corner', 'a corner'], note: 'На ъгъла: at the corner.' },
-    { id: 'out.tam', kind: 'word', bg: 'светофар', tr: 'svetofár', en: 'traffic light', emoji: '🚦', alt: ['traffic lights', 'lights', 'the traffic light'] },
+    { id: 'out.agal', kind: 'word', bg: 'ъгъл', tr: 'ắgăl', en: 'corner', emoji: '↪️', alt: ['the corner', 'a corner'], note: 'На ъгъла: at the corner.' },
+    { id: 'out.svetofar', kind: 'word', bg: 'светофар', tr: 'svetofár', en: 'traffic light', emoji: '🚦', alt: ['traffic lights', 'lights', 'the traffic light'] },
 
     { id: 'out.taksi', kind: 'word', bg: 'такси', tr: 'taksí', en: 'taxi', emoji: '🚕', alt: ['cab', 'a taxi'] },
     { id: 'out.gara', kind: 'word', bg: 'гара', tr: 'gára', en: 'station', emoji: '🚉', alt: ['train station', 'railway station', 'bus station'], note: "Sofia's main station is Централна гара." },
@@ -97,8 +97,8 @@ export const out: Track = {
     { id: 'out.zima', kind: 'word', bg: 'зима', tr: 'zíma', en: 'winter', emoji: '⛄' },
     { id: 'out.prolet', kind: 'word', bg: 'пролет', tr: 'prólet', en: 'spring', emoji: '🌸' },
     { id: 'out.esen', kind: 'word', bg: 'есен', tr: 'ésen', en: 'autumn', emoji: '🍂', alt: ['fall'] },
-    { id: 'out.toplo', kind: 'word', bg: 'сезон', tr: 'sezón', en: 'season', emoji: '🍂', alt: ['the season', 'a season'] },
-    { id: 'out.studeno', kind: 'word', bg: 'градуси', tr: 'grádusi', en: 'degrees', emoji: '🌡️', alt: ['degree', 'the degrees'], note: 'Колко градуса е навън? How many degrees is it outside?' },
+    { id: 'out.sezon', kind: 'word', bg: 'сезон', tr: 'sezón', en: 'season', emoji: '🍂', alt: ['the season', 'a season'] },
+    { id: 'out.gradusi', kind: 'word', bg: 'градуси', tr: 'grádusi', en: 'degrees', emoji: '🌡️', alt: ['degree', 'the degrees'], note: 'Колко градуса е навън? How many degrees is it outside?' },
 
     { id: 'out.dnes-e-goreshto', kind: 'phrase', bg: 'Днес е горещо.', tr: 'dnes e goréshto', en: "It's hot today.", emoji: '🔥', alt: ["it's hot today", 'it is hot today', 'today it is hot', "today it's hot"] },
     { id: 'out.studeno-mi-e', kind: 'phrase', bg: 'Студено ми е.', tr: 'studéno mi e', en: "I'm cold.", emoji: '🥶', alt: ["i'm cold", 'i am cold', 'i feel cold'], note: 'Literally "it is cold to me". Same pattern: топло ми е, I am warm.' },
@@ -114,11 +114,11 @@ export const out: Track = {
     { id: 'out.pochivka', kind: 'word', bg: 'почивка', tr: 'pochívka', en: 'holiday', emoji: '🧳', alt: ['vacation', 'rest', 'break'] },
 
     { id: 'out.selo', kind: 'word', bg: 'село', tr: 'sélo', en: 'village', emoji: '🏡', alt: ['countryside'] },
-    { id: 'out.gradina', kind: 'word', bg: 'двор', tr: 'dvor', en: 'yard', emoji: '🏡', alt: ['courtyard', 'garden', 'the yard'] },
+    { id: 'out.dvor', kind: 'word', bg: 'двор', tr: 'dvor', en: 'yard', emoji: '🏡', alt: ['courtyard', 'garden', 'the yard'] },
     { id: 'out.kuche', kind: 'word', bg: 'куче', tr: 'kúche', en: 'dog', emoji: '🐕' },
     { id: 'out.kokoshka', kind: 'word', bg: 'кокошка', tr: 'kokóshka', en: 'hen', emoji: '🐔', alt: ['chicken'] },
     { id: 'out.loze', kind: 'word', bg: 'лозе', tr: 'lóze', en: 'vineyard', emoji: '🍇', alt: ['vines'], note: 'Many families have a vineyard and make their own wine and rakia.' },
-    { id: 'out.rakiya', kind: 'word', bg: 'грозде', tr: 'grózde', en: 'grapes', emoji: '🍇', alt: ['grape', 'the grapes'], note: 'From the грозде at the лозе comes the homemade ракия.' },
+    { id: 'out.grozde', kind: 'word', bg: 'грозде', tr: 'grózde', en: 'grapes', emoji: '🍇', alt: ['grape', 'the grapes'], note: 'From the грозде at the лозе comes the homemade ракия.' },
 
     { id: 'out.otivame-na-more', kind: 'phrase', bg: 'Отиваме на море!', tr: 'otívame na moré', en: "We're going to the seaside!", emoji: '🚗', alt: ["we're going to the seaside", 'we are going to the seaside', "we're going to the sea", 'we are going to the sea'], note: 'Bulgarians go "на море" every summer, usually to the Black Sea.' },
     { id: 'out.vodata-e-topla', kind: 'phrase', bg: 'Водата е топла.', tr: 'vodáta e tópla', en: 'The water is warm.', emoji: '🌊', alt: ['the water is warm', "the water's warm"], note: 'топла is feminine to agree with вода.' },
@@ -135,7 +135,7 @@ export const out: Track = {
       description: 'Order coffee, tea and juice like a local.',
       emoji: '☕',
       lessons: [
-        { id: 'out.u1.l1', title: 'Drinks', titleBg: 'Напитки', items: ['out.kafe', 'out.chay', 'out.sok', 'out.bira', 'out.vino'] },
+        { id: 'out.u1.l1', title: 'Drinks', titleBg: 'Напитки', items: ['out.kafe', 'out.chay', 'out.gazirana-voda', 'out.bira', 'out.limonada'] },
         { id: 'out.u1.l2', title: 'At the table', titleBg: 'На масата', items: ['out.zahar', 'out.led', 'out.chasha', 'out.servityor', 'out.menyu'] },
         { id: 'out.u1.l3', title: 'Ordering', titleBg: 'Поръчка', items: ['out.edno-kafe-molya', 'out.dva-chaya', 'out.kafe-s-mlyako', 'out.bez-zahar', 'out.mozhe-li-menyuto'] },
       ],
@@ -159,7 +159,7 @@ export const out: Track = {
       description: 'Fruit, vegetables, kilos and prices.',
       emoji: '🛒',
       lessons: [
-        { id: 'out.u3.l1', title: 'Fruit and veg', titleBg: 'Плодове и зеленчуци', items: ['out.domati', 'out.krastavitsi', 'out.yabalki', 'out.chereshi', 'out.dinya'] },
+        { id: 'out.u3.l1', title: 'Fruit and veg', titleBg: 'Плодове и зеленчуци', items: ['out.chushki', 'out.praskovi', 'out.yagodi', 'out.chereshi', 'out.dinya'] },
         { id: 'out.u3.l2', title: 'Prices', titleBg: 'Цени', items: ['out.tsena', 'out.kilo', 'out.torbichka', 'out.pari', 'out.evtino', 'out.skapo'] },
         { id: 'out.u3.l3', title: 'Buying', titleBg: 'Пазаруване', items: ['out.kolko-struva-kilo', 'out.edno-kilo-domati', 'out.mozhe-li-torbichka', 'out.mnogo-e-skapo', 'out.shte-vzema-dve'] },
       ],
@@ -171,7 +171,7 @@ export const out: Track = {
       description: 'Left, right, straight on, and how far it is.',
       emoji: '🚕',
       lessons: [
-        { id: 'out.u4.l1', title: 'Directions', titleBg: 'Посоки', items: ['out.nalyavo', 'out.nadyasno', 'out.napravo', 'out.tuk', 'out.tam'] },
+        { id: 'out.u4.l1', title: 'Directions', titleBg: 'Посоки', items: ['out.nalyavo', 'out.nadyasno', 'out.napravo', 'out.agal', 'out.svetofar'] },
         { id: 'out.u4.l2', title: 'Places', titleBg: 'Места', items: ['out.taksi', 'out.gara', 'out.letishte', 'out.ulitsa', 'out.daleche', 'out.blizo'] },
         { id: 'out.u4.l3', title: 'Asking the way', titleBg: 'Как да стигна?', items: ['out.kade-e-garata', 'out.daleche-li-e', 'out.zaviyte-nalyavo', 'out.do-letishteto', 'out.sprete-tuk'] },
       ],
@@ -184,7 +184,7 @@ export const out: Track = {
       emoji: '⛅',
       lessons: [
         { id: 'out.u5.l1', title: 'The sky', titleBg: 'Небето', items: ['out.slantse', 'out.dazhd', 'out.snyag', 'out.vyatar', 'out.oblak'] },
-        { id: 'out.u5.l2', title: 'Seasons', titleBg: 'Сезони', items: ['out.lyato', 'out.zima', 'out.prolet', 'out.esen', 'out.toplo', 'out.studeno'] },
+        { id: 'out.u5.l2', title: 'Seasons', titleBg: 'Сезони', items: ['out.lyato', 'out.zima', 'out.prolet', 'out.esen', 'out.sezon', 'out.gradusi'] },
         { id: 'out.u5.l3', title: 'Talking weather', titleBg: 'Какво е времето?', items: ['out.dnes-e-goreshto', 'out.studeno-mi-e', 'out.vali-snyag', 'out.utre-shte-vali', 'out.oblechi-se-toplo'] },
       ],
     },
@@ -196,7 +196,7 @@ export const out: Track = {
       emoji: '🏖️',
       lessons: [
         { id: 'out.u6.l1', title: 'Sea and mountains', titleBg: 'Море и планина', items: ['out.more', 'out.plazh', 'out.planina', 'out.hotel', 'out.pochivka'] },
-        { id: 'out.u6.l2', title: 'The village', titleBg: 'Селото', items: ['out.selo', 'out.gradina', 'out.kuche', 'out.kokoshka', 'out.loze', 'out.rakiya'] },
+        { id: 'out.u6.l2', title: 'The village', titleBg: 'Селото', items: ['out.selo', 'out.dvor', 'out.kuche', 'out.kokoshka', 'out.loze', 'out.grozde'] },
         { id: 'out.u6.l3', title: 'Holiday plans', titleBg: 'Планове за почивка', items: ['out.otivame-na-more', 'out.vodata-e-topla', 'out.hayde-da-pluvame', 'out.utre-na-selo', 'out.tuk-e-krasivo', 'out.shte-mi-lipsva'] },
       ],
     },
@@ -211,16 +211,16 @@ export const out: Track = {
       emoji: '☕',
       lines: [
         { who: 'waiter', bg: 'Добър ден! Какво ще пиете?', tr: 'dóbăr den! kakvó shte píete', en: 'Good afternoon! What would you like to drink?' },
-        { who: 'me', bg: 'Едно кафе и един сок, моля.', tr: 'ednó kafé i edín sok, mólya', en: 'One coffee and one juice, please.', wrong: ['Един чай и едно кафе, моля.', 'Едно кафе и една бира, моля.'] },
+        { who: 'me', bg: 'Едно кафе и една лимонада, моля.', tr: 'ednó kafé i edná limonáda, mólya', en: 'One coffee and one lemonade, please.', wrong: ['Един чай и едно кафе, моля.', 'Едно кафе и една бира, моля.'] },
         { who: 'waiter', bg: 'С мляко ли да е кафето?', tr: 's mlyáko li da e kaféto', en: 'Would you like the coffee with milk?' },
         { who: 'me', bg: 'Не, без мляко, но със захар.', tr: 'ne, bez mlyáko, no săs záhar', en: 'No, without milk, but with sugar.', wrong: ['Да, с мляко, но без захар.', 'Не, без захар и без лед.'] },
-        { who: 'son', bg: 'Тате, искам сок с лед!', tr: 'táte, ískam sok s led', en: 'Dad, I want juice with ice!' },
-        { who: 'me', bg: 'Добре. И лед за сока, моля.', tr: 'dobré. i led za sóka, mólya', en: 'OK. And ice for the juice, please.', wrong: ['Добре. И захар за кафето, моля.', 'Не. Сокът е без лед.'] },
+        { who: 'son', bg: 'Тате, искам лимонада с лед!', tr: 'táte, ískam limonáda s led', en: 'Dad, I want lemonade with ice!' },
+        { who: 'me', bg: 'Добре. И лед за лимонадата, моля.', tr: 'dobré. i led za limonádata, mólya', en: 'OK. And ice for the lemonade, please.', wrong: ['Добре. И захар за кафето, моля.', 'Не. Лимонадата е без лед.'] },
         { who: 'waiter', bg: 'Веднага!', tr: 'vednága', en: 'Right away!' },
       ],
       questions: [
-        { q: 'What did your son want?', options: ['Juice with ice', 'A hot chocolate', 'Water with lemon'], answer: 0 },
-        { q: 'What did the waiter say at the end?', options: ['Right away!', 'We are closed.', 'Here is the bill.'], answer: 0 },
+        { q: 'What did your son want?', options: ['Lemonade with ice', 'A hot chocolate', 'Water with lemon'], answer: 0 },
+        { q: 'What did the waiter say at the end?', options: ['Right away!', 'We are closed', 'Here is the bill'], answer: 0 },
       ],
     },
     {

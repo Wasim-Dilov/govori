@@ -19,3 +19,5 @@
 .session__scrim { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; background: color-mix(in srgb, var(--ink) 45%, transparent); }
 .session__quit { width: 100%; max-width: 520px; display: grid; gap: var(--space-3); justify-items: center; text-align: center; }
 .session__storytitle { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-muted); }
+.session__nolisten { appearance: none; border: 0; background: none; display: block; margin: calc(-1 * var(--space-2)) auto var(--space-4); padding: 10px 14px; border-radius: var(--radius-sm); font: 700 14px/18px var(--font-text); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); cursor: pointer; }
+.session__nolisten:focus-visible { outline: none; box-shadow: var(--focus-ring); }

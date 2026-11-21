@@ -26,6 +26,41 @@ export function hasBulgarianVoice(): boolean | null {
   return voicesLoaded ? !!voice : null
 }
 
+let statusPromise: Promise<boolean> | null = null
+
+/**
+ * Whether this device can speak Bulgarian. Waits briefly for the voice list,
+ * which some browsers fill in asynchronously. No voices at all counts as no.
+ */
+export function bulgarianVoiceStatus(timeoutMs = 1500): Promise<boolean> {
+  if (typeof speechSynthesis === 'undefined') return Promise.resolve(false)
+  pickVoice()
+  if (voicesLoaded) return Promise.resolve(!!voice)
+  if (!statusPromise)
+    statusPromise = new Promise<boolean>((resolve) => {
+      const done = () => {
+        pickVoice()
+        if (!voicesLoaded) return false
+        clearInterval(poll)
+        clearTimeout(timer)
+        speechSynthesis.removeEventListener?.('voiceschanged', onChange)
+        resolve(!!voice)
+        return true
+      }
+      const onChange = () => void done()
+      speechSynthesis.addEventListener?.('voiceschanged', onChange)
+      // Safari fills the list without always firing voiceschanged.
+      const poll = setInterval(done, 150)
+      const timer = setTimeout(() => {
+        clearInterval(poll)
+        speechSynthesis.removeEventListener?.('voiceschanged', onChange)
+        statusPromise = null
+        resolve(false)
+      }, timeoutMs)
+    })
+  return statusPromise
+}
+
 let currentAudio: HTMLAudioElement | null = null
 const urlCache = new Map<string, string>()
 

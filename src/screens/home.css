@@ -243,3 +243,16 @@
 .home-today__stars i.on { background: var(--gold); }
 .home-today__stars i.next { background: var(--tone, var(--rose)); opacity: 0.55; }
 .home-today__chip svg { width: 20px; height: 20px; }
+
+/* ---------- Bulgarian voice card */
+.home-voice { display: grid; gap: var(--space-3); margin-top: var(--space-4); border-color: var(--pick); background: var(--pick-soft); }
+.home-voice--ok { border-color: var(--pine); background: var(--pine-soft); justify-items: start; }
+.home-voice--ok .home-voice__title { color: var(--pine-ink); }
+.home-voice__head { display: flex; gap: var(--space-3); align-items: flex-start; }
+.home-voice__icon { flex: none; width: 40px; height: 40px; border-radius: var(--radius-sm); display: grid; place-items: center; background: var(--pick); color: var(--on-track); }
+.home-voice__icon svg { width: 22px; height: 22px; }
+.home-voice__title { font: 700 17px/22px var(--font-display); color: var(--ink); }
+.home-voice__body, .home-voice__alt { font: 500 15px/20px var(--font-text); color: var(--ink); }
+.home-voice__alt { color: var(--ink-muted); }
+.home-voice__steps { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; font: 600 15px/20px var(--font-text); color: var(--ink); }
+.home-voice__actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }

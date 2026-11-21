@@ -10,7 +10,9 @@ import { TopBar, GoalRing } from '../components/TopBar.tsx'
 import { BottomSheet, FocusSheet } from '../components/FocusSheet.tsx'
 import { Mascot } from '../components/Mascot.tsx'
 import { IconBolt, IconChat, IconCheck, IconLock, IconRefresh, IconStar, IconTarget } from '../components/Icons.tsx'
-import { sfx } from '../lib/audio.ts'
+import { sfx, speak } from '../lib/audio.ts'
+import { speedRounds } from '../lib/engine.ts'
+import { IconSpeaker } from '../components/Icons.tsx'
 import './home.css'
 
 /** Horizontal offsets (px) for nodes within a unit: a gentle wave. */
@@ -30,6 +32,7 @@ export function HomeScreen() {
     <div className="screen home">
       <TopBar onOpenFocus={() => setFocusOpen(true)} />
       <TodayCard onChangeFocus={() => setFocusOpen(true)} />
+      <VoiceCard />
       <PracticeRow />
       <TrackChips />
       <Path track={track} onOpen={setSheetLesson} />
@@ -53,6 +56,94 @@ async function protectStorage() {
   } catch {
     /* storage API unavailable: nothing to do */
   }
+}
+
+// ------------------------------------------------------------- Bulgarian voice
+
+/**
+ * Shown once when the phone has no Bulgarian voice: listening exercises are swapped for
+ * reading ones until he downloads it. Dismissal is remembered in kv "voiceCard".
+ */
+function VoiceCard() {
+  const voice = useApp((s) => s.voice)
+  const checkVoice = useApp((s) => s.checkVoice)
+  const [dismissed, setDismissed] = useState<boolean | null>(null)
+  const [testing, setTesting] = useState(false)
+  const [found, setFound] = useState(false)
+
+  useEffect(() => {
+    let live = true
+    getKV<string | null>('voiceCard', null).then((v) => live && setDismissed(v === 'dismissed'))
+    // He may leave for Settings and come back with the voice downloaded.
+    const onVisible = () => document.visibilityState === 'visible' && void checkVoice()
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      live = false
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [checkVoice])
+
+  // Only celebrate a voice that was missing and has now appeared.
+  const wasMissing = useRef(false)
+  useEffect(() => {
+    if (voice === false) wasMissing.current = true
+    else if (voice && wasMissing.current && dismissed === false) setFound(true)
+  }, [voice, dismissed])
+
+  if (dismissed !== false || (voice !== false && !found)) return null
+
+  const dismiss = () => {
+    setDismissed(true)
+    void setKV('voiceCard', 'dismissed')
+  }
+  const test = async () => {
+    setTesting(true)
+    await speak('Здравей! Как си?')
+    const ok = await checkVoice()
+    setTesting(false)
+    if (ok) setFound(true)
+  }
+
+  if (found)
+    return (
+      <section className="gv-card home-voice home-voice--ok" aria-live="polite">
+        <p className="home-voice__title">Bulgarian voice found</p>
+        <p className="home-voice__body">Listening exercises are back on.</p>
+        <button type="button" className="gv-btn gv-btn--sm gv-tone-pine" onClick={dismiss}>
+          Great
+        </button>
+      </section>
+    )
+
+  return (
+    <section className="gv-card home-voice" aria-labelledby="voice-title">
+      <div className="home-voice__head">
+        <span className="home-voice__icon" aria-hidden="true">
+          <IconSpeaker />
+        </span>
+        <div>
+          <p id="voice-title" className="home-voice__title">
+            Add the Bulgarian voice
+          </p>
+          <p className="home-voice__body">Your iPhone needs it to read words out loud. Until then, Govori swaps listening exercises for reading ones.</p>
+        </div>
+      </div>
+      <ol className="home-voice__steps">
+        <li>Open the Settings app</li>
+        <li>Accessibility, then Spoken Content, then Voices</li>
+        <li>Choose Bulgarian and download a voice</li>
+      </ol>
+      <p className="home-voice__alt">Or ask your wife to record words for you in Me, under Her voice.</p>
+      <div className="home-voice__actions">
+        <button type="button" className="gv-btn gv-btn--sm gv-tone-pick" onClick={() => void test()} disabled={testing}>
+          {testing ? 'Listening…' : 'Test voice'}
+        </button>
+        <button type="button" className="gv-btn gv-btn--ghost gv-btn--sm" onClick={dismiss}>
+          Not now
+        </button>
+      </div>
+    </section>
+  )
 }
 
 // ------------------------------------------------------------- Today
@@ -260,7 +351,7 @@ function PracticeRow() {
       title: 'Speed round',
       tone: 'gold',
       Icon: IconBolt,
-      meta: words >= 5 ? '3 quick rounds' : `Learn ${5 - words} more words`,
+      meta: words >= 5 ? `${speedRounds(words)} quick round${speedRounds(words) === 1 ? '' : 's'}` : `Learn ${5 - words} more words`,
       badge: null,
       disabled: words < 5,
       run: startSpeedRound,

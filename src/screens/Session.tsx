@@ -47,6 +47,8 @@ export function SessionScreen() {
   const [combo, setCombo] = useState(0)
   const [confirmQuit, setConfirmQuit] = useState(false)
   const [elapsed, setElapsed] = useState(0)
+  /** "Can't listen now": skip listening exercises for the rest of this session (not counted). */
+  const [noListen, setNoListen] = useState(false)
   const score = useRef({ correct: 0, total: 0 })
   const exStart = useRef(Date.now())
   const finishing = useRef(false)
@@ -179,6 +181,7 @@ export function SessionScreen() {
   if (!session || !step) return null
   const common = { setAnswer: setPending, checked: checked ? { correct: checked.correct } : null, complete: onComplete, translit: profile.translit, speaking: profile.speaking }
   const selfCompleting = SELF_COMPLETING.has(step.ex.type)
+  const isListen = step.ex.type === 'listen_mc' || step.ex.type === 'listen_type'
 
   return (
     <div className={`flow session ${trackTone}`}>
@@ -213,7 +216,19 @@ export function SessionScreen() {
         <AnimatePresence mode="wait">
           <motion.div key={step.key + idx} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: 'spring', stiffness: 380, damping: 34 }}>
             {step.attempt > 1 && <p className="session__retry t-caption">Let's try this one again</p>}
-            <ExerciseView ex={step.ex} common={common} />
+            <ExerciseView ex={step.ex} common={common} skip={noListen && isListen} />
+            {isListen && !checked && !noListen && (
+              <button
+                type="button"
+                className="session__nolisten"
+                onClick={() => {
+                  setPending(null)
+                  setNoListen(true)
+                }}
+              >
+                Can't listen now
+              </button>
+            )}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -297,7 +312,8 @@ export function SessionScreen() {
 
 type Common = Omit<Parameters<typeof ChoiceExercise>[0], 'ex'>
 
-function ExerciseView({ ex, common }: { ex: Exercise; common: Common }) {
+function ExerciseView({ ex, common, skip }: { ex: Exercise; common: Common; skip?: boolean }) {
+  if (skip) return <SkipSpeak complete={common.complete} />
   switch (ex.type) {
     case 'intro':
       return <IntroExercise ex={ex} {...common} />

@@ -39,7 +39,7 @@ export const grammar: Track = {
     { id: 'grammar.detsata', kind: 'word', bg: 'децата', tr: 'detsáta', en: 'the kids', emoji: '👧', alt: ['the children'], note: 'Plurals ending in -а add -та instead: деца, децата.' },
     { id: 'grammar.klyuchovete', kind: 'word', bg: 'ключовете', tr: 'klyuchovéte', en: 'the keys', emoji: '🔑' },
 
-    { id: 'grammar.kade-sa-klyuchovete', kind: 'phrase', bg: 'Къде е колата?', tr: 'kădé e koláta', en: "Where's the car?", emoji: '🚗', alt: ['where is the car', "where's the car", 'wheres the car'], note: 'кола (car) + -та = колата (the car).' },
+    { id: 'grammar.kade-e-kolata', kind: 'phrase', bg: 'Къде е колата?', tr: 'kădé e koláta', en: "Where's the car?", emoji: '🚗', alt: ['where is the car', "where's the car", 'wheres the car'], note: 'кола (car) + -та = колата (the car).' },
     { id: 'grammar.kafeto-e-gotovo', kind: 'phrase', bg: 'Кафето е готово.', tr: 'kaféto e gotóvo', en: 'The coffee is ready.', emoji: '☕', alt: ["the coffee's ready", 'coffee is ready', "coffee's ready"], note: 'кафе is an it-word, so кафето, and готово matches it.' },
     { id: 'grammar.detsata-spyat', kind: 'phrase', bg: 'Децата спят.', tr: 'detsáta spyat', en: 'The kids are asleep.', emoji: '😴', alt: ['the kids are sleeping', 'the children are sleeping', 'the children are asleep', 'the kids sleep'] },
     { id: 'grammar.vecheryata-e-na-masata', kind: 'phrase', bg: 'Вечерята е на масата.', tr: 'vechéryata e na másata', en: 'Dinner is on the table.', emoji: '🍲', alt: ['the dinner is on the table', "dinner's on the table"], note: 'Bulgarian says "the dinner" where English says just "dinner".' },
@@ -53,12 +53,12 @@ export const grammar: Track = {
     { id: 'grammar.ne-e-problem', kind: 'phrase', bg: 'Не е проблем.', tr: 'ne e problém', en: 'No problem.', emoji: '👌', alt: ["it's not a problem", 'it is not a problem', 'not a problem', 'no problem'] },
 
     { id: 'grammar.iskash-li', kind: 'phrase', bg: 'Искаш ли?', tr: 'ískash li', en: 'Do you want some?', emoji: '🍫', alt: ['do you want', 'want some', 'would you like some', 'do you want some'], note: 'ли turns a sentence into a yes/no question. It goes right after the word you are asking about.' },
-    { id: 'grammar.gotova-li-si', kind: 'phrase', bg: 'Свободна ли си довечера?', tr: 'svobódna li si dovéchera', en: 'Are you free tonight?', emoji: '🗓️', alt: ['are you free tonight', 'are you free this evening'], note: 'Ли comes right after the word you are asking about: свободна ли си.' },
+    { id: 'grammar.svobodna-li-si-dovechera', kind: 'phrase', bg: 'Свободна ли си довечера?', tr: 'svobódna li si dovéchera', en: 'Are you free tonight?', emoji: '🗓️', alt: ['are you free tonight', 'are you free this evening'], note: 'Ли comes right after the word you are asking about: свободна ли си.' },
     { id: 'grammar.ima-li-mlyako', kind: 'phrase', bg: 'Има ли мляко?', tr: 'íma li mlyáko', en: 'Is there any milk?', emoji: '🥛', alt: ['is there milk', 'do we have milk', 'is there any milk', 'have we got milk', 'do we have any milk'] },
     { id: 'grammar.mozhe-li', kind: 'phrase', bg: 'Може ли?', tr: 'mózhe li', en: 'May I?', emoji: '🙏', alt: ['can i', 'may i', 'is it ok', 'is that ok', 'could i'], note: 'Handy everywhere: reaching for food, taking a seat, asking for the bill.' },
     { id: 'grammar.znaesh-li', kind: 'phrase', bg: 'Знаеш ли?', tr: 'znáesh li', en: 'Do you know?', emoji: '💡', alt: ['you know', 'do you know'] },
 
-    { id: 'grammar.nali', kind: 'word', bg: 'нали', tr: 'nalí', en: 'right?', emoji: '🤝', alt: ['right', "isn't it", 'isnt it', "don't you", 'is it'], note: 'нали is a tag question, like "isn\'t it?" or "right?" at the end of a sentence.' },
+    { id: 'grammar.nali', kind: 'word', bg: 'нали?', tr: 'nalí', en: 'right?', emoji: '🤝', alt: ['right', "isn't it", 'isnt it', "don't you", 'is it'], note: 'нали is a tag question, like "isn\'t it?" or "right?" at the end of a sentence.' },
     { id: 'grammar.hubavo-e-nali', kind: 'phrase', bg: 'Хубаво е, нали?', tr: 'húbavo e, nalí', en: "It's nice, isn't it?", emoji: '🌅', alt: ["it's nice isn't it", 'it is nice isnt it', "it's lovely isn't it", "it's nice right", 'it is nice right'] },
     { id: 'grammar.ne-sam-gladen', kind: 'phrase', bg: 'Не съм гладен.', tr: 'ne săm gláden', en: "I'm not hungry.", emoji: '🍽️', alt: ['i am not hungry'], f: { bg: 'Не съм гладна.', tr: 'ne săm gládna' }, note: 'With съм, не comes first: не съм.' },
     { id: 'grammar.ne-se-pritesnyavay', kind: 'phrase', bg: 'Не се притеснявай.', tr: 'ne se pritesnyávay', en: "Don't worry.", emoji: '😌', alt: ['do not worry', 'no worries'] },
@@ -85,8 +85,8 @@ export const grammar: Track = {
 
     // ---------------------------------------------------------------- Unit 5: The future
     { id: 'grammar.shte', kind: 'word', bg: 'ще', tr: 'shte', en: 'will', emoji: '🔮', note: 'Put ще before the verb for the future: ще ям, ще ядеш. ще itself never changes.' },
-    { id: 'grammar.utre', kind: 'word', bg: 'догодина', tr: 'dogodína', en: 'next year', emoji: '🎆', alt: ['the next year'], note: 'Ще ходим в България догодина: we will go to Bulgaria next year.' },
-    { id: 'grammar.dovechera', kind: 'word', bg: 'по-късно', tr: 'po-kắsno', en: 'later', emoji: '⏰', alt: ['later on'], note: 'Ще ти се обадя по-късно: I will call you later.' },
+    { id: 'grammar.dogodina', kind: 'word', bg: 'догодина', tr: 'dogodína', en: 'next year', emoji: '🎆', alt: ['the next year'], note: 'Ще ходим в България догодина: we will go to Bulgaria next year.' },
+    { id: 'grammar.po-kasno', kind: 'word', bg: 'по-късно', tr: 'po-kắsno', en: 'later', emoji: '⏰', alt: ['later on'], note: 'Ще ти се обадя по-късно: I will call you later.' },
     { id: 'grammar.shte-doyda', kind: 'phrase', bg: 'Ще дойда.', tr: 'shte dóyda', en: "I'll come.", emoji: '🚶', alt: ['i will come', "i'll be there", 'i will be there'] },
     { id: 'grammar.shte-vidim', kind: 'phrase', bg: 'Ще видим.', tr: 'shte vídim', en: "We'll see.", emoji: '👀', alt: ['we will see'] },
 
@@ -94,7 +94,7 @@ export const grammar: Track = {
     { id: 'grammar.nyama-da-zakasneya', kind: 'phrase', bg: 'Няма да закъснея.', tr: 'nyáma da zakăsnéya', en: "I won't be late.", emoji: '⏱️', alt: ['i will not be late'] },
     { id: 'grammar.shte-sgotvya-vecherya', kind: 'phrase', bg: 'Ще сготвя вечеря.', tr: 'shte sgótvya vechérya', en: "I'll cook dinner.", emoji: '🍝', alt: ['i will cook dinner', "i'll make dinner", 'i will make dinner'] },
     { id: 'grammar.shte-ti-se-obadya', kind: 'phrase', bg: 'Ще ти се обадя.', tr: 'shte ti se obádya', en: "I'll call you.", emoji: '📞', alt: ['i will call you', "i'll give you a call", "i'll phone you", 'i will phone you'] },
-    { id: 'grammar.utre-shte-vali', kind: 'phrase', bg: 'Утре ще ходим на море.', tr: 'útre shte hódim na moré', en: "Tomorrow we'll go to the seaside.", emoji: '🏖️', alt: ['tomorrow we will go to the seaside', "tomorrow we'll go to the sea", 'tomorrow we will go to the sea', "we'll go to the seaside tomorrow", 'we will go to the seaside tomorrow'] },
+    { id: 'grammar.utre-shte-hodim-na-more', kind: 'phrase', bg: 'Утре ще ходим на море.', tr: 'útre shte hódim na moré', en: "Tomorrow we'll go to the seaside.", emoji: '🏖️', alt: ['tomorrow we will go to the seaside', "tomorrow we'll go to the sea", 'tomorrow we will go to the sea', "we'll go to the seaside tomorrow", 'we will go to the seaside tomorrow'] },
 
     { id: 'grammar.shte-se-varna-skoro', kind: 'phrase', bg: 'Ще се върна скоро.', tr: 'shte se vắrna skóro', en: "I'll be back soon.", emoji: '🔙', alt: ['i will be back soon', "i'll come back soon", 'i will come back soon'] },
     { id: 'grammar.dovechera-shte-gledame-film', kind: 'phrase', bg: 'Довечера ще гледаме филм.', tr: 'dovéchera shte glédame film', en: "Tonight we'll watch a film.", emoji: '🍿', alt: ['tonight we will watch a film', "we'll watch a film tonight", "we'll watch a movie tonight", 'tonight we will watch a movie', "tonight we'll watch a movie"] },
@@ -143,7 +143,7 @@ export const grammar: Track = {
       lessons: [
         { id: 'grammar.u2.l1', title: 'She-words and it-words', titleBg: '-та и -то', items: ['grammar.zhenata', 'grammar.vodata', 'grammar.kuhnyata', 'grammar.deteto', 'grammar.legloto'] },
         { id: 'grammar.u2.l2', title: 'He-words and plurals', titleBg: '-ът и -те', items: ['grammar.hlyabat', 'grammar.telefonat', 'grammar.obuvkite', 'grammar.detsata', 'grammar.klyuchovete'] },
-        { id: 'grammar.u2.l3', title: 'Around the house', titleBg: 'Вкъщи', items: ['grammar.kade-sa-klyuchovete', 'grammar.kafeto-e-gotovo', 'grammar.detsata-spyat', 'grammar.vecheryata-e-na-masata', 'grammar.day-mi-hlyaba'] },
+        { id: 'grammar.u2.l3', title: 'Around the house', titleBg: 'Вкъщи', items: ['grammar.kade-e-kolata', 'grammar.kafeto-e-gotovo', 'grammar.detsata-spyat', 'grammar.vecheryata-e-na-masata', 'grammar.day-mi-hlyaba'] },
       ],
     },
     {
@@ -154,7 +154,7 @@ export const grammar: Track = {
       emoji: '❔',
       lessons: [
         { id: 'grammar.u3.l1', title: 'Saying no', titleBg: 'Не', items: ['grammar.ne-iskam', 'grammar.ne-znam', 'grammar.ne-moga', 'grammar.nyama', 'grammar.ne-e-problem'] },
-        { id: 'grammar.u3.l2', title: 'Asking with ли', titleBg: 'Ли', items: ['grammar.iskash-li', 'grammar.gotova-li-si', 'grammar.ima-li-mlyako', 'grammar.mozhe-li', 'grammar.znaesh-li'] },
+        { id: 'grammar.u3.l2', title: 'Asking with ли', titleBg: 'Ли', items: ['grammar.iskash-li', 'grammar.svobodna-li-si-dovechera', 'grammar.ima-li-mlyako', 'grammar.mozhe-li', 'grammar.znaesh-li'] },
         { id: 'grammar.u3.l3', title: 'Right?', titleBg: 'Нали?', items: ['grammar.nali', 'grammar.hubavo-e-nali', 'grammar.ne-sam-gladen', 'grammar.ne-se-pritesnyavay', 'grammar.ne-e-vyarno'] },
       ],
     },
@@ -177,8 +177,8 @@ export const grammar: Track = {
       description: 'Talk about plans with ще and няма да.',
       emoji: '🔮',
       lessons: [
-        { id: 'grammar.u5.l1', title: 'Will', titleBg: 'Ще', items: ['grammar.shte', 'grammar.utre', 'grammar.dovechera', 'grammar.shte-doyda', 'grammar.shte-vidim'] },
-        { id: 'grammar.u5.l2', title: "Won't", titleBg: 'Няма да', items: ['grammar.nyama-da', 'grammar.nyama-da-zakasneya', 'grammar.shte-sgotvya-vecherya', 'grammar.shte-ti-se-obadya', 'grammar.utre-shte-vali'] },
+        { id: 'grammar.u5.l1', title: 'Will', titleBg: 'Ще', items: ['grammar.shte', 'grammar.dogodina', 'grammar.po-kasno', 'grammar.shte-doyda', 'grammar.shte-vidim'] },
+        { id: 'grammar.u5.l2', title: "Won't", titleBg: 'Няма да', items: ['grammar.nyama-da', 'grammar.nyama-da-zakasneya', 'grammar.shte-sgotvya-vecherya', 'grammar.shte-ti-se-obadya', 'grammar.utre-shte-hodim-na-more'] },
         { id: 'grammar.u5.l3', title: 'Weekend plans', titleBg: 'Планове', items: ['grammar.shte-se-varna-skoro', 'grammar.dovechera-shte-gledame-film', 'grammar.shte-hodim-li-na-more', 'grammar.nyama-da-zabravya', 'grammar.shte-bade-hubavo'] },
       ],
     },

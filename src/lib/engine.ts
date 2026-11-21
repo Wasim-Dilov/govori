@@ -41,18 +41,65 @@ export function shuffle<T>(xs: T[]): T[] {
   return a
 }
 
+/** What the learner already knows and what this device can do. Passed in by the store. */
+export interface BuildEnv {
+  /** Ids the learner has met (spaced-repetition memory). Distractors come from here first. */
+  known?: Set<string>
+  /** False when the phone has no Bulgarian voice: listening exercises are swapped out. */
+  voice?: boolean
+  /** Ids with a recording (e.g. his wife's voice): these can still be listened to without a voice. */
+  recorded?: Set<string>
+}
+
+// Set at the start of each public builder; the helpers below read it.
+let env: BuildEnv & { inPlay: Set<string> } = { inPlay: new Set() }
+let fallbackTurn = 0
+function useEnv(e: BuildEnv | undefined, inPlay: string[]) {
+  env = { ...e, inPlay: new Set(inPlay) }
+  fallbackTurn = 0
+}
+const isKnown = (id: string) => !!env.known?.has(id) || env.inPlay.has(id)
+const canListen = (id: string) => env.voice !== false || !!env.recorded?.has(id)
+
+/** Swap a listening exercise for a reading one when this item can't be heard. */
+function listenable(type: ExerciseType, item: StudyItem): ExerciseType {
+  if ((type === 'listen_mc' || type === 'listen_type') && !canListen(item.id)) {
+    if (type === 'listen_type') return 'type_bg'
+    return item.kind === 'reading' ? 'mc_en_bg' : 'mc_bg_en'
+  }
+  return type
+}
+
+/**
+ * Pick n wrong answers. Words the learner has met come first, then the same
+ * track, then anything; at most one never-seen word when 3+ known ones exist.
+ */
 function distractors(item: StudyItem, pool: StudyItem[], n: number): StudyItem[] {
   const seen = new Set([norm(item.en), norm(item.bg)])
-  const sameKind = shuffle(pool.filter((p) => p.id !== item.id && p.kind === item.kind))
-  const other = shuffle(pool.filter((p) => p.id !== item.id && p.kind !== item.kind))
+  const cands = pool.filter((p) => p.id !== item.id)
+  const known = (p: StudyItem) => isKnown(p.id)
+  const tiers = [
+    cands.filter((p) => known(p) && p.kind === item.kind),
+    cands.filter((p) => !known(p) && p.kind === item.kind && p.trackId === item.trackId),
+    cands.filter((p) => known(p) && p.kind !== item.kind),
+    cands.filter((p) => !known(p) && p.kind === item.kind),
+    cands.filter((p) => !known(p) && p.kind !== item.kind),
+  ].map(shuffle)
+  const knownTotal = cands.filter(known).length
+  let unknown = 0
   const out: StudyItem[] = []
-  for (const p of [...sameKind, ...other]) {
-    if (out.length >= n) break
-    if (seen.has(norm(p.en)) || seen.has(norm(p.bg))) continue
-    seen.add(norm(p.en))
-    seen.add(norm(p.bg))
-    out.push(p)
-  }
+  for (const tier of tiers)
+    for (const p of tier) {
+      if (out.length >= n) return out
+      if (out.includes(p) || seen.has(norm(p.en)) || seen.has(norm(p.bg))) continue
+      if (!known(p)) {
+        if (knownTotal >= 3 && unknown >= 1) continue
+        unknown++
+      }
+      seen.add(norm(p.en))
+      seen.add(norm(p.bg))
+      out.push(p)
+    }
   return out
 }
 
@@ -79,8 +126,14 @@ function buildEx(item: StudyItem, pool: StudyItem[]): Exercise {
 
 function poolAround(ids: string[], speaker: Speaker, kind: 'words' | 'letters'): StudyItem[] {
   const base = kind === 'letters' ? allLetterIds : allItemIds
-  const extra = shuffle(base.filter((id) => !ids.includes(id))).slice(0, 24)
-  return [...ids, ...extra].map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x)
+  const baseSet = new Set(base)
+  const inIds = new Set(ids)
+  const known = shuffle([...(env.known ?? [])].filter((id) => baseSet.has(id) && !inIds.has(id))).slice(0, 40)
+  const tracks = new Set(ids.map((id) => id.split('.')[0]))
+  const sameTrack = shuffle(base.filter((id) => !inIds.has(id) && tracks.has(id.split('.')[0]))).slice(0, 16)
+  const extra = shuffle(base.filter((id) => !inIds.has(id))).slice(0, 16)
+  const all = [...new Set([...ids, ...known, ...sameTrack, ...extra])]
+  return all.map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x)
 }
 
 // ------------------------------------------------------------- lesson building
@@ -92,8 +145,11 @@ const WORD_MIX: Record<number, ExerciseType[]> = {
   3: ['type_bg', 'listen_type', 'build', 'speak'],
 }
 
-function wordExercise(type: ExerciseType, item: StudyItem, pool: StudyItem[]): Exercise {
+function wordExercise(requested: ExerciseType, item: StudyItem, pool: StudyItem[]): Exercise {
   const isPhrase = item.kind === 'phrase'
+  let type = listenable(requested, item)
+  // A single word can't be built from tiles: practise recall by typing or by ear instead.
+  if (type === 'build' && tilesFor(item).length < 2) type = listenable(fallbackTurn++ % 2 === 0 ? 'type_bg' : 'listen_mc', item)
   switch (type) {
     case 'mc_bg_en':
       return { type, item, options: options(item, pool), cards: !isPhrase }
@@ -103,7 +159,7 @@ function wordExercise(type: ExerciseType, item: StudyItem, pool: StudyItem[]): E
     case 'listen_mc':
       return { type, item, options: options(item, pool) }
     case 'build':
-      return tilesFor(item).length >= 2 ? buildEx(item, pool) : { type: 'mc_en_bg', item, options: options(item, pool), cards: false }
+      return buildEx(item, pool)
     case 'type_bg':
     case 'listen_type':
     case 'speak':
@@ -113,7 +169,8 @@ function wordExercise(type: ExerciseType, item: StudyItem, pool: StudyItem[]): E
   }
 }
 
-export function buildWordLesson(lesson: LessonView, level: number, speaker: Speaker, reviewIds: string[] = []): LessonPlan {
+export function buildWordLesson(lesson: LessonView, level: number, speaker: Speaker, reviewIds: string[] = [], e?: BuildEnv): LessonPlan {
+  useEnv(e, [...lesson.itemIds, ...reviewIds])
   const items = lesson.itemIds.map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x)
   const pool = poolAround([...lesson.itemIds, ...reviewIds], speaker, 'words')
   const mix = WORD_MIX[Math.min(3, Math.max(1, level))]
@@ -128,9 +185,16 @@ export function buildWordLesson(lesson: LessonView, level: number, speaker: Spea
     ex.push({ type: 'match', items: shuffle(items).slice(0, 5), letters: false })
     for (const it of shuffle(items)) ex.push(wordExercise(rand(mix.slice(1)), it, pool))
   } else {
+    // Two different exercise types per item, after fallbacks, so recall really is mixed.
     for (const it of shuffle(items)) {
-      const types = shuffle(mix).slice(0, 2)
-      for (const t of types) ex.push(wordExercise(t, it, pool))
+      const used = new Set<ExerciseType>()
+      for (const t of shuffle(mix)) {
+        if (used.size >= 2) break
+        const e = wordExercise(t, it, pool)
+        if (used.has(e.type)) continue
+        used.add(e.type)
+        ex.push(e)
+      }
     }
     ex.splice(Math.floor(ex.length / 2), 0, { type: 'match', items: shuffle(items).slice(0, 5), letters: false })
   }
@@ -143,7 +207,8 @@ export function buildWordLesson(lesson: LessonView, level: number, speaker: Spea
   return { lesson, kind: 'lesson', level, exercises: plan.slice(0, 16), newItems: level === 1 ? items : [] }
 }
 
-export function buildLetterLesson(lesson: LessonView, level: number, speaker: Speaker): LessonPlan {
+export function buildLetterLesson(lesson: LessonView, level: number, speaker: Speaker, e?: BuildEnv): LessonPlan {
+  useEnv(e, lesson.itemIds)
   const all = lesson.itemIds.map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x)
   const letters = all.filter((x) => x.kind === 'letter')
   const reading = all.filter((x) => x.kind === 'reading')
@@ -172,14 +237,22 @@ export function buildLetterLesson(lesson: LessonView, level: number, speaker: Sp
     if (matchItems.length >= 3) ex.push({ type: 'match', items: matchItems, letters: true })
     for (const r of shuffle(reading)) {
       ex.push({ type: 'read_word', item: r, options: options(r, readPool) })
-      if (level === 3) ex.push({ type: 'listen_type', item: r })
-      else ex.push({ type: 'listen_mc', item: r, options: options(r, readPool) })
+      ex.push(readingExercise(level === 3 ? 'listen_type' : 'listen_mc', r, readPool))
     }
   }
   return { lesson, kind: 'letters', level, exercises: (level === 1 ? ex : spread(ex)).slice(0, 16), newItems: level === 1 ? letters : [] }
 }
 
-export function buildLesson(lessonId: string, level: number, speaker: Speaker, reviewIds: string[] = []): LessonPlan {
+/** A reading word heard or read: listening falls back to reading when there's no voice. */
+function readingExercise(requested: 'listen_mc' | 'listen_type' | 'read_word', r: StudyItem, readPool: StudyItem[]): Exercise {
+  const type = listenable(requested, r)
+  if (type === 'listen_type' || type === 'type_bg') return { type, item: r }
+  if (type === 'listen_mc') return { type, item: r, options: options(r, readPool) }
+  if (type === 'mc_en_bg') return { type, item: r, options: options(r, readPool), cards: false }
+  return { type: 'read_word', item: r, options: options(r, readPool) }
+}
+
+export function buildLesson(lessonId: string, level: number, speaker: Speaker, reviewIds: string[] = [], e?: BuildEnv): LessonPlan {
   const lesson = lessonById.get(lessonId)
   if (!lesson) throw new Error(`Unknown lesson ${lessonId}`)
   if (lesson.kind === 'story') {
@@ -187,11 +260,12 @@ export function buildLesson(lessonId: string, level: number, speaker: Speaker, r
     if (!dialogue) throw new Error(`Unknown dialogue ${lesson.dialogueId}`)
     return { lesson, kind: 'story', level: 1, exercises: [{ type: 'dialogue', dialogue }], newItems: [] }
   }
-  return lesson.kind === 'letters' ? buildLetterLesson(lesson, level, speaker) : buildWordLesson(lesson, level, speaker, reviewIds)
+  return lesson.kind === 'letters' ? buildLetterLesson(lesson, level, speaker, e) : buildWordLesson(lesson, level, speaker, reviewIds, e)
 }
 
 /** A review session from spaced-repetition due items, weakest first. Weak exercise types get extra weight. */
-export function buildPractice(ids: string[], speaker: Speaker, weakTypes: ExerciseType[] = []): LessonPlan {
+export function buildPractice(ids: string[], speaker: Speaker, weakTypes: ExerciseType[] = [], e?: BuildEnv): LessonPlan {
+  useEnv(e, ids)
   const items = ids.map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x)
   const words = items.filter((i) => i.kind === 'word' || i.kind === 'phrase')
   const letters = items.filter((i) => i.kind === 'letter')
@@ -204,22 +278,25 @@ export function buildPractice(ids: string[], speaker: Speaker, weakTypes: Exerci
   const ex: Exercise[] = []
   for (const it of words.slice(0, 10)) ex.push(wordExercise(rand(prefer), it, pool))
   for (const l of letters.slice(0, 4)) ex.push({ type: rand(['letter_sound', 'sound_letter'] as const), item: l, options: options(l, letterPool) })
-  for (const r of reading.slice(0, 4)) ex.push({ type: rand(['read_word', 'listen_mc'] as const), item: r, options: options(r, readPool) })
+  for (const r of reading.slice(0, 4)) ex.push(readingExercise(rand(['read_word', 'listen_mc'] as const), r, readPool))
   if (words.length >= 4) ex.splice(3, 0, { type: 'match', items: shuffle(words).slice(0, 5), letters: false })
   return { lesson: null, kind: 'practice', level: 0, exercises: spread(ex).slice(0, 14), newItems: [] }
 }
 
-/** Three timed rounds of matching pairs from words the learner knows. */
+/** How many speed rounds a number of learned words allows: one per 5 words, at most 3. */
+export const speedRounds = (learnedWords: number) => Math.min(3, Math.floor(learnedWords / 5))
+
+/** Up to three timed rounds of matching pairs from words the learner knows. */
 export function buildSpeedRound(ids: string[], speaker: Speaker): LessonPlan {
   const items = shuffle(ids).map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x && x.kind !== 'letter' && x.kind !== 'reading')
   const rounds: Exercise[] = []
-  for (let i = 0; i + 5 <= items.length && rounds.length < 3; i += 5) rounds.push({ type: 'match', items: items.slice(i, i + 5), letters: false })
+  for (let i = 0; rounds.length < speedRounds(items.length); i += 5) rounds.push({ type: 'match', items: items.slice(i, i + 5), letters: false })
   return { lesson: null, kind: 'speed', level: 0, exercises: rounds, newItems: [] }
 }
 
 /** Re-test items answered wrongly in the last two weeks. */
-export function buildMistakes(ids: string[], speaker: Speaker): LessonPlan {
-  const plan = buildPractice(ids, speaker, ['type_bg', 'build'])
+export function buildMistakes(ids: string[], speaker: Speaker, e?: BuildEnv): LessonPlan {
+  const plan = buildPractice(ids, speaker, ['type_bg', 'build'], e)
   return { ...plan, kind: 'mistakes' }
 }
 

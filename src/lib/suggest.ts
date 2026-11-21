@@ -30,17 +30,26 @@ export function todayMeta(sessionsToday: SessionRecord[]): TodayMeta {
   return { sessionsToday: lessons.length, lastWasNew: !!last && (last.kind === 'story' || last.level <= 1) }
 }
 
-/** A lesson in the current or previous unit that is due a level-up: level 1 or 2, last done 20+ hours ago. */
-export function levelUpCandidate(track: TrackView, progress: Record<string, LessonProgress>, unitId: string | null, now = Date.now()): LessonView | null {
-  const ui = unitId ? track.units.findIndex((u) => u.id === unitId) : track.units.length - 1
+/**
+ * A lesson due a level-up: level 1 or 2, last done 20+ hours ago. Looks in the current and
+ * previous unit first (lowest level, then oldest); with `anywhere` (or no unit), the oldest
+ * eligible lesson in the whole track, so early units are not forgotten when he comes back.
+ */
+export function levelUpCandidate(track: TrackView, progress: Record<string, LessonProgress>, unitId: string | null, now = Date.now(), anywhere = false): LessonView | null {
+  const eligible = (l: LessonView) => {
+    if (l.kind === 'story') return false
+    const p = progress[l.id]
+    return !!p && p.level >= 1 && p.level < maxLevel(l) && now - p.completedAt >= LEVEL_UP_GAP_MS
+  }
+  if (anywhere || !unitId) {
+    const pool = track.lessons.filter(eligible).sort((a, b) => progress[a.id].completedAt - progress[b.id].completedAt)
+    return pool[0] ?? null
+  }
+  const ui = track.units.findIndex((u) => u.id === unitId)
   const units = track.units.slice(Math.max(0, ui - 1), ui + 1)
   const pool = units
     .flatMap((u) => u.lessons)
-    .filter((l) => {
-      if (l.kind === 'story') return false
-      const p = progress[l.id]
-      return !!p && p.level >= 1 && p.level < maxLevel(l) && now - p.completedAt >= LEVEL_UP_GAP_MS
-    })
+    .filter(eligible)
     .sort((a, b) => progress[a.id].level - progress[b.id].level || progress[a.id].completedAt - progress[b.id].completedAt)
   return pool[0] ?? null
 }
@@ -60,7 +69,7 @@ export function suggestNext(track: TrackView, progress: Record<string, LessonPro
   if (!isNew) return { ...base, reason: 'levelup' }
 
   if (today.sessionsToday >= 1 && today.lastWasNew) {
-    const c = levelUpCandidate(track, progress, base.lesson.unitId, now)
+    const c = levelUpCandidate(track, progress, base.lesson.unitId, now) ?? levelUpCandidate(track, progress, null, now, true)
     if (c) return { lesson: c, level: progress[c.id].level + 1, reason: 'levelup' }
   }
   return { ...base, reason: base.lesson.kind === 'story' ? 'story' : 'new' }

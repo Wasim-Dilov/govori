@@ -3,9 +3,9 @@ import { create } from 'zustand'
 import { trackById, type Speaker } from '../content/index.ts'
 import type { TrackId } from '../content/types.ts'
 import { planWeek } from '../content/plan.ts'
-import { setSfx, unlockAudio } from './audio.ts'
+import { bulgarianVoiceStatus, setSfx, unlockAudio } from './audio.ts'
 import { getKV, localDay, setKV, type LessonProgress, type Summary } from './db.ts'
-import { buildLesson, buildMistakes, buildPractice, buildSpeedRound, type LessonPlan } from './engine.ts'
+import { buildLesson, buildMistakes, buildPractice, buildSpeedRound, type BuildEnv, type LessonPlan } from './engine.ts'
 import {
   DEFAULT_SUMMARY,
   allLessonProgress,
@@ -87,6 +87,11 @@ interface State {
   viewTrack: TrackId
   /** A short message shown at the bottom of the screen for a few seconds. */
   toast: { id: number; text: string } | null
+  /** Whether the phone can speak Bulgarian (null until checked). */
+  voice: boolean | null
+
+  /** Re-check the Bulgarian voice (e.g. after he downloads it). */
+  checkVoice(): Promise<boolean>
 
   init(): Promise<void>
   refresh(): Promise<void>
@@ -131,6 +136,13 @@ export const useApp = create<State>((set, get) => ({
   screen: { name: 'home' },
   viewTrack: 'azbuka',
   toast: null,
+  voice: null,
+
+  async checkVoice() {
+    const voice = await bulgarianVoiceStatus()
+    set({ voice })
+    return voice
+  },
 
   async init() {
     const profile = { ...DEFAULT_PROFILE, ...(await getKV<Partial<Profile>>('profile', {})) }
@@ -139,6 +151,7 @@ export const useApp = create<State>((set, get) => ({
     applyTheme(profile.theme)
     setSfx(profile.sfx)
     set({ profile, focus })
+    void get().checkVoice()
     await get().refresh()
     set({ ready: true, viewTrack: get().focusTrack(), screen: profile.onboarded ? { name: 'home' } : { name: 'onboarding' } })
   },
@@ -192,7 +205,7 @@ export const useApp = create<State>((set, get) => ({
     const review = await reviewPool(trackId === 'azbuka' ? null : trackId, [], 3)
     let plan: LessonPlan
     try {
-      plan = buildLesson(lessonId, level, profile.speaker, review)
+      plan = buildLesson(lessonId, level, profile.speaker, review, await buildEnv())
     } catch {
       return get().showToast("That lesson couldn't be opened. Try another one.")
     }
@@ -206,14 +219,14 @@ export const useApp = create<State>((set, get) => ({
     if (!fallback.length) return get().showToast('Nothing to review yet. Finish a lesson first.')
     // Lean on the skills the learner finds hardest.
     const weak = weakTypes(await db.events.where('ts').above(Date.now() - 30 * 86_400_000).toArray())
-    startPlan(buildPractice(fallback, get().profile.speaker, weak), get().viewTrack, 'Nothing to review yet. Finish a lesson first.')
+    startPlan(buildPractice(fallback, get().profile.speaker, weak, await buildEnv()), get().viewTrack, 'Nothing to review yet. Finish a lesson first.')
   },
 
   async startMistakes() {
     unlockAudio()
     const ids = await recentMistakes(12)
     if (!ids.length) return get().showToast('No mistakes to fix. Nice work.')
-    startPlan(buildMistakes(ids, get().profile.speaker), get().viewTrack, 'No mistakes to fix. Nice work.')
+    startPlan(buildMistakes(ids, get().profile.speaker, await buildEnv()), get().viewTrack, 'No mistakes to fix. Nice work.')
   },
 
   async startSpeedRound() {
@@ -256,6 +269,17 @@ export const useApp = create<State>((set, get) => ({
     }, 3200)
   },
 }))
+
+/** What the engine needs to pick fair options and avoid exercises this phone can't play. */
+async function buildEnv(): Promise<BuildEnv> {
+  const [known, recorded] = await Promise.all([
+    db.memory.toCollection().primaryKeys().catch(() => [] as string[]),
+    db.recordings.toCollection().primaryKeys().catch(() => [] as string[]),
+  ])
+  const cached = useApp.getState().voice
+  const voice = cached ?? (await useApp.getState().checkVoice())
+  return { known: new Set(known as string[]), recorded: new Set(recorded as string[]), voice }
+}
 
 /** Open a session, or explain why there is nothing to do instead of showing an empty screen. */
 function startPlan(plan: LessonPlan, trackId: TrackId, emptyMessage: string) {

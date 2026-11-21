@@ -38,8 +38,8 @@ export const basics: Track = {
     { id: 'basics.zhaden', kind: 'word', bg: 'жаден', tr: 'zháden', en: 'thirsty', emoji: '🥤', f: { bg: 'жадна', tr: 'zhádna' } },
     { id: 'basics.umoren', kind: 'word', bg: 'уморен', tr: 'umorén', en: 'tired', emoji: '😴', alt: ['sleepy', 'exhausted'], f: { bg: 'уморена', tr: 'umoréna' } },
     { id: 'basics.voda', kind: 'word', bg: 'вода', tr: 'vodá', en: 'water', emoji: '💧' },
-    { id: 'basics.hlyab', kind: 'word', bg: 'ям', tr: 'yam', en: 'I eat', emoji: '🍽️', alt: ['eat', 'i am eating', "i'm eating", 'im eating'], note: 'Ям is "I eat"; ядеш is "you eat".' },
-    { id: 'basics.kafe', kind: 'word', bg: 'пия', tr: 'píya', en: 'I drink', emoji: '🥤', alt: ['drink', 'i am drinking', "i'm drinking", 'im drinking'], note: 'Пия is "I drink"; пиеш is "you drink".' },
+    { id: 'basics.yam', kind: 'word', bg: 'ям', tr: 'yam', en: 'I eat', emoji: '🍽️', alt: ['eat', 'i am eating', "i'm eating", 'im eating'], note: 'Ям is "I eat"; ядеш is "you eat".' },
+    { id: 'basics.piya', kind: 'word', bg: 'пия', tr: 'píya', en: 'I drink', emoji: '🥤', alt: ['drink', 'i am drinking', "i'm drinking", 'im drinking'], note: 'Пия is "I drink"; пиеш is "you drink".' },
 
     { id: 'basics.kak-si', kind: 'phrase', bg: 'Как си?', tr: 'kak si', en: 'How are you?', emoji: '🙂', alt: ['how are you', "how're you"], note: 'To one person you know. To her parents: Как сте?' },
     { id: 'basics.dobre-sam', kind: 'phrase', bg: 'Добре съм.', tr: 'dobré săm', en: "I'm fine.", emoji: '😌', alt: ["i'm fine", 'i am fine', 'im fine', "i'm good", 'i am good', 'im good', "i'm ok", "i'm okay", "i'm well", 'i am well'] },
@@ -82,9 +82,9 @@ export const basics: Track = {
 
     { id: 'basics.kolko-struva', kind: 'phrase', bg: 'Колко струва?', tr: 'kólko strúva', en: 'How much is it?', emoji: '💰', alt: ['how much is it', 'how much does it cost', 'how much', 'what does it cost'] },
     { id: 'basics.kolko-e-chasat', kind: 'phrase', bg: 'Колко е часът?', tr: 'kólko e chasắt', en: 'What time is it?', emoji: '🕐', alt: ['what time is it', "what's the time", 'what is the time'] },
-    { id: 'basics.oshte-pet-minuti', kind: 'phrase', bg: 'Колко време?', tr: 'kólko vréme', en: 'How long?', emoji: '⏳', alt: ['how long', 'how much time', 'for how long'] },
+    { id: 'basics.kolko-vreme', kind: 'phrase', bg: 'Колко време?', tr: 'kólko vréme', en: 'How long?', emoji: '⏳', alt: ['how long', 'how much time', 'for how long'] },
     { id: 'basics.dve-kafeta', kind: 'phrase', bg: 'Две кафета, моля.', tr: 'dve kaféta, mólya', en: 'Two coffees, please.', emoji: '✌️', alt: ['two coffees please', '2 coffees please', 'two coffees'], note: 'Кафе becomes кафета in the plural.' },
-    { id: 'basics.kade-si', kind: 'word', bg: 'Защо?', tr: 'zashtó', en: 'Why?', emoji: '🤔', alt: ['why'] },
+    { id: 'basics.zashto', kind: 'word', bg: 'Защо?', tr: 'zashtó', en: 'Why?', emoji: '🤔', alt: ['why'] },
     { id: 'basics.koga', kind: 'word', bg: 'Кога?', tr: 'kogá', en: 'When?', emoji: '📅', alt: ['when'], bgAlt: ['кога'] },
 
     // ---------------------------------------------------------------- Unit 5: Days and plans
@@ -123,7 +123,7 @@ export const basics: Track = {
     { id: 'basics.beshe-hubav-den', kind: 'phrase', bg: 'Беше хубав ден.', tr: 'béshe húbav den', en: 'It was a nice day.', emoji: '🥰', alt: ['it was a nice day', 'it was a good day', 'it was a lovely day', 'a nice day', 'it was nice'] },
     { id: 'basics.denyat-beshe-truden', kind: 'phrase', bg: 'Денят беше труден.', tr: 'denyát béshe trúden', en: 'The day was hard.', emoji: '😫', alt: ['the day was hard', 'the day was difficult', 'it was a hard day', 'it was a tough day', 'the day was tough'], note: 'Ден becomes денят: -ят is "the" for words like this.' },
     { id: 'basics.mnogo-sam-zaet-dnes', kind: 'phrase', bg: 'Много съм зает днес.', tr: 'mnógo săm zaét dnes', en: "I'm very busy today.", emoji: '⏱️', alt: ["i'm very busy today", 'i am very busy today', 'im very busy today', "i'm really busy today", "i'm so busy today"], f: { bg: 'Много съм заета днес.', tr: 'mnógo săm zaéta dnes' } },
-    { id: 'basics.zashto-si-tazhna', kind: 'phrase', bg: 'Какво стана?', tr: 'kakvó stána', en: 'What happened?', emoji: '🤔', alt: ['what happened', "what's happened", 'whats happened'] },
+    { id: 'basics.kakvo-stana', kind: 'phrase', bg: 'Какво стана?', tr: 'kakvó stána', en: 'What happened?', emoji: '🤔', alt: ['what happened', "what's happened", 'whats happened'] },
     { id: 'basics.vsichko-e-nared', kind: 'phrase', bg: 'Всичко е наред.', tr: 'vsíchko e naréd', en: "Everything's OK.", emoji: '✅', alt: ["everything's ok", 'everything is ok', 'everything is okay', "everything's fine", 'everything is fine', 'everything is alright', "it's all good"], note: 'Your go-to reassurance. Literally "everything is in order".' },
 
     // ---------------------------------------------------------------- Unit 7: Where is it?
@@ -187,7 +187,7 @@ export const basics: Track = {
       emoji: '🙂',
       lessons: [
         { id: 'basics.u2.l1', title: 'Me and you', titleBg: 'Аз и ти', items: ['basics.az', 'basics.ti', 'basics.vie', 'basics.kak', 'basics.kakvo'] },
-        { id: 'basics.u2.l2', title: 'Hungry and thirsty', titleBg: 'Гладен и жаден', items: ['basics.gladen', 'basics.zhaden', 'basics.umoren', 'basics.voda', 'basics.hlyab', 'basics.kafe'] },
+        { id: 'basics.u2.l2', title: 'Hungry and thirsty', titleBg: 'Гладен и жаден', items: ['basics.gladen', 'basics.zhaden', 'basics.umoren', 'basics.voda', 'basics.yam', 'basics.piya'] },
         { id: 'basics.u2.l3', title: 'Small talk', titleBg: 'Малко приказки', items: ['basics.kak-si', 'basics.dobre-sam', 'basics.a-ti', 'basics.umoren-sam', 'basics.iskash-li-kafe', 'basics.kakvo-pravish'] },
       ],
     },
@@ -212,7 +212,7 @@ export const basics: Track = {
       lessons: [
         { id: 'basics.u4.l1', title: 'One to five', titleBg: 'От едно до пет', items: ['basics.edno', 'basics.dve', 'basics.tri', 'basics.chetiri', 'basics.pet'] },
         { id: 'basics.u4.l2', title: 'Six to ten', titleBg: 'От шест до десет', items: ['basics.shest', 'basics.sedem', 'basics.osem', 'basics.devet', 'basics.deset'] },
-        { id: 'basics.u4.l3', title: 'Questions', titleBg: 'Въпроси', items: ['basics.kolko-struva', 'basics.kolko-e-chasat', 'basics.oshte-pet-minuti', 'basics.dve-kafeta', 'basics.kade-si', 'basics.koga'] },
+        { id: 'basics.u4.l3', title: 'Questions', titleBg: 'Въпроси', items: ['basics.kolko-struva', 'basics.kolko-e-chasat', 'basics.kolko-vreme', 'basics.dve-kafeta', 'basics.zashto', 'basics.koga'] },
       ],
     },
     {
@@ -236,7 +236,7 @@ export const basics: Track = {
       lessons: [
         { id: 'basics.u6.l1', title: 'Feelings', titleBg: 'Чувства', items: ['basics.radvam-se', 'basics.tazhen', 'basics.yadosan', 'basics.spokoen', 'basics.zaet'] },
         { id: 'basics.u6.l2', title: 'Good day, bad day', titleBg: 'Хубав ден, лош ден', items: ['basics.den', 'basics.rabota', 'basics.truden', 'basics.hubav', 'basics.losh'] },
-        { id: 'basics.u6.l3', title: 'After work', titleBg: 'След работа', items: ['basics.kak-mina-denyat', 'basics.beshe-hubav-den', 'basics.denyat-beshe-truden', 'basics.mnogo-sam-zaet-dnes', 'basics.zashto-si-tazhna', 'basics.vsichko-e-nared'] },
+        { id: 'basics.u6.l3', title: 'After work', titleBg: 'След работа', items: ['basics.kak-mina-denyat', 'basics.beshe-hubav-den', 'basics.denyat-beshe-truden', 'basics.mnogo-sam-zaet-dnes', 'basics.kakvo-stana', 'basics.vsichko-e-nared'] },
       ],
     },
     {

@@ -48,13 +48,13 @@ export const home: Track = {
 
     // ---------------------------------------------------------------- Unit 3: taking care of her
     { id: 'home.umorena', kind: 'word', bg: 'уморена', tr: 'umoréna', en: 'tired', emoji: '😴', note: 'Feminine, for your wife. About a man you say уморен.' },
-    { id: 'home.pochivka', kind: 'word', bg: 'диван', tr: 'diván', en: 'sofa', emoji: '🛋️', alt: ['couch', 'the sofa', 'settee'] },
-    { id: 'home.chay', kind: 'word', bg: 'вана', tr: 'vána', en: 'bath', emoji: '🛁', alt: ['bathtub', 'a bath', 'tub'], note: 'Искаш ли топла вана? Do you want a hot bath?' },
-    { id: 'home.kafe', kind: 'word', bg: 'свещи', tr: 'sveshtí', en: 'candles', emoji: '🕯️', alt: ['candle', 'some candles'] },
+    { id: 'home.divan', kind: 'word', bg: 'диван', tr: 'diván', en: 'sofa', emoji: '🛋️', alt: ['couch', 'the sofa', 'settee'] },
+    { id: 'home.vana', kind: 'word', bg: 'вана', tr: 'vána', en: 'bath', emoji: '🛁', alt: ['bathtub', 'a bath', 'tub'], note: 'Искаш ли топла вана? Do you want a hot bath?' },
+    { id: 'home.sveshti', kind: 'word', bg: 'свещи', tr: 'sveshtí', en: 'candles', emoji: '🕯️', alt: ['candle', 'some candles'] },
     { id: 'home.masazh', kind: 'word', bg: 'масаж', tr: 'masázh', en: 'massage', emoji: '💆', alt: ['a massage'] },
 
     { id: 'home.sedni', kind: 'word', bg: 'седни', tr: 'sední', en: 'sit down', emoji: '🪑', alt: ['sit'], note: 'To someone you know well. To an elder, say седнете.' },
-    { id: 'home.pochini-si', kind: 'phrase', bg: 'почини си', tr: 'pochiní si', en: 'have a rest', emoji: '😌', alt: ['rest', 'take a rest', 'get some rest', 'relax'] },
+    { id: 'home.pochini-si', kind: 'phrase', bg: 'Почини си.', tr: 'pochiní si', en: 'Have a rest.', emoji: '😌', alt: ['rest', 'take a rest', 'get some rest', 'relax'] },
     { id: 'home.kazhi', kind: 'word', bg: 'кажи ми', tr: 'kazhí mi', en: 'tell me', emoji: '💬', alt: ['tell me about it', 'talk to me'], note: 'Кажи ми какво има: tell me what is wrong.' },
     { id: 'home.ostavi', kind: 'word', bg: 'остави', tr: 'ostávi', en: 'leave it', emoji: '✋', alt: ['leave', 'leave that'], note: 'Остави, аз ще го направя = Leave it, I will do it.' },
     { id: 'home.ela', kind: 'word', bg: 'ела', tr: 'elá', en: 'come', emoji: '👋', alt: ['come here', 'come on'] },
@@ -78,7 +78,7 @@ export const home: Track = {
     { id: 'home.parzha', kind: 'word', bg: 'пържа', tr: 'pắrzha', en: 'I fry', emoji: '🍟', alt: ['fry', 'i am frying', 'to fry'] },
     { id: 'home.peka', kind: 'word', bg: 'пека', tr: 'peká', en: 'I bake', emoji: '🥧', alt: ['bake', 'i roast', 'roast', 'i am baking', 'to bake'] },
     { id: 'home.opitvam', kind: 'word', bg: 'опитвам', tr: 'opítvam', en: 'I taste', emoji: '👅', alt: ['taste', 'i try', 'try', 'i am tasting', 'to taste'], note: 'It also means "I try": опитвам се = I am trying.' },
-    { id: 'home.vkusno', kind: 'word', bg: 'солено', tr: 'solenó', en: 'salty', emoji: '🧂', alt: ['too salty', 'it is salty'] },
+    { id: 'home.soleno', kind: 'word', bg: 'солено', tr: 'solenó', en: 'salty', emoji: '🧂', alt: ['too salty', 'it is salty'] },
 
     { id: 'home.kakvo-da-narezha', kind: 'phrase', bg: 'Какво да нарежа?', tr: 'kakvó da narézha', en: 'What should I chop?', emoji: '🥕', alt: ['what should i cut', 'what shall i chop', 'what shall i cut', 'what do i chop', 'what can i chop'] },
     { id: 'home.shte-narezha-luka', kind: 'phrase', bg: 'Аз ще нарежа лука.', tr: 'az shte narézha lúka', en: 'I will chop the onion.', emoji: '😢', alt: ['i will cut the onion', 'i will chop the onions', 'i will cut the onions', 'i will slice the onion'], note: 'Лука is "the onion": Bulgarian puts "the" on the end of the word.' },
@@ -95,7 +95,7 @@ export const home: Track = {
     { id: 'home.otvertka', kind: 'word', bg: 'отвертка', tr: 'otvértka', en: 'screwdriver', emoji: '🪛', alt: ['a screwdriver', 'the screwdriver'] },
 
     { id: 'home.gradina', kind: 'word', bg: 'градина', tr: 'gradína', en: 'garden', emoji: '🌳', alt: ['yard', 'the garden', 'backyard'] },
-    { id: 'home.tsvetya', kind: 'word', bg: 'рози', tr: 'rózi', en: 'roses', emoji: '🌹', alt: ['rose', 'the roses'], note: 'The Bulgarian rose is famous: rose oil comes from the Valley of Roses.' },
+    { id: 'home.rozi', kind: 'word', bg: 'рози', tr: 'rózi', en: 'roses', emoji: '🌹', alt: ['rose', 'the roses'], note: 'The Bulgarian rose is famous: rose oil comes from the Valley of Roses.' },
     { id: 'home.treva', kind: 'word', bg: 'трева', tr: 'trevá', en: 'grass', emoji: '🌱', alt: ['lawn', 'the grass', 'the lawn'] },
     { id: 'home.polivam', kind: 'word', bg: 'поливам', tr: 'polívam', en: 'I water', emoji: '🪴', alt: ['water', 'i am watering', 'to water', 'i water the plants'] },
     { id: 'home.popravyam', kind: 'word', bg: 'поправям', tr: 'poprávyam', en: 'I fix', emoji: '🔧', alt: ['fix', 'i repair', 'repair', 'i am fixing', 'to fix'], note: 'After ще use поправя: ще го поправя = I will fix it.' },
@@ -109,17 +109,17 @@ export const home: Track = {
     { id: 'home.peralnyata-ne-raboti', kind: 'phrase', bg: 'Пералнята не работи.', tr: 'perálnyata ne rabóti', en: 'The washing machine is not working.', emoji: '😩', alt: ['the washing machine does not work', 'the washing machine is broken', 'the washer is not working', 'the washer does not work'] },
 
     // ---------------------------------------------------------------- Unit 6: planning the week
-    { id: 'home.dnes', kind: 'word', bg: 'сутрин', tr: 'sútrin', en: 'in the morning', emoji: '🌅', alt: ['mornings', 'the morning', 'morning'] },
-    { id: 'home.utre', kind: 'word', bg: 'вечер', tr: 'vécher', en: 'in the evening', emoji: '🌆', alt: ['evenings', 'the evening', 'evening'] },
-    { id: 'home.dovechera', kind: 'word', bg: 'вдругиден', tr: 'vdrúgiden', en: 'the day after tomorrow', emoji: '📆', alt: ['day after tomorrow'] },
-    { id: 'home.sabota', kind: 'word', bg: 'след работа', tr: 'sled rabóta', en: 'after work', emoji: '💼', alt: ['after my work'] },
-    { id: 'home.nedelya', kind: 'word', bg: 'другата седмица', tr: 'drúgata sédmitsa', en: 'next week', emoji: '📅', alt: ['the next week', 'the following week'] },
-    { id: 'home.uikend', kind: 'word', bg: 'по обяд', tr: 'po obyád', en: 'at lunchtime', emoji: '🕛', alt: ['at noon', 'around noon', 'lunchtime', 'at lunch'] },
+    { id: 'home.sutrin', kind: 'word', bg: 'сутрин', tr: 'sútrin', en: 'in the morning', emoji: '🌅', alt: ['mornings', 'the morning', 'morning'] },
+    { id: 'home.vecher', kind: 'word', bg: 'вечер', tr: 'vécher', en: 'in the evening', emoji: '🌆', alt: ['evenings', 'the evening', 'evening'] },
+    { id: 'home.vdrugiden', kind: 'word', bg: 'вдругиден', tr: 'vdrúgiden', en: 'the day after tomorrow', emoji: '📆', alt: ['day after tomorrow'] },
+    { id: 'home.sled-rabota', kind: 'word', bg: 'след работа', tr: 'sled rabóta', en: 'after work', emoji: '💼', alt: ['after my work'] },
+    { id: 'home.drugata-sedmitsa', kind: 'word', bg: 'другата седмица', tr: 'drúgata sédmitsa', en: 'next week', emoji: '📅', alt: ['the next week', 'the following week'] },
+    { id: 'home.po-obyad', kind: 'word', bg: 'по обяд', tr: 'po obyád', en: 'at lunchtime', emoji: '🕛', alt: ['at noon', 'around noon', 'lunchtime', 'at lunch'] },
 
     { id: 'home.film', kind: 'word', bg: 'филм', tr: 'film', en: 'film', emoji: '🎬', alt: ['movie', 'a film', 'a movie'] },
     { id: 'home.razhodka', kind: 'word', bg: 'разходка', tr: 'razhódka', en: 'walk', emoji: '🚶', alt: ['a walk', 'stroll', 'a stroll'] },
-    { id: 'home.gosti', kind: 'word', bg: 'приятели', tr: 'priyáteli', en: 'friends', emoji: '🧑‍🤝‍🧑', alt: ['our friends', 'some friends'] },
-    { id: 'home.vecherya', kind: 'word', bg: 'настолна игра', tr: 'nastólna igrá', en: 'board game', emoji: '🎲', alt: ['a board game', 'game', 'boardgame'] },
+    { id: 'home.priyateli', kind: 'word', bg: 'приятели', tr: 'priyáteli', en: 'friends', emoji: '🧑‍🤝‍🧑', alt: ['our friends', 'some friends'] },
+    { id: 'home.nastolna-igra', kind: 'word', bg: 'настолна игра', tr: 'nastólna igrá', en: 'board game', emoji: '🎲', alt: ['a board game', 'game', 'boardgame'] },
     { id: 'home.planove', kind: 'word', bg: 'планове', tr: 'plánove', en: 'plans', emoji: '📋', alt: ['plan', 'the plans'] },
 
     { id: 'home.kakvo-shte-pravim-v-sabota', kind: 'phrase', bg: 'Какво ще правим в събота?', tr: 'kakvó shte právim v sắbota', en: 'What are we doing on Saturday?', emoji: '🎈', alt: ['what will we do on saturday', 'what shall we do on saturday', 'what are we doing saturday', 'what are we going to do on saturday'] },
@@ -161,7 +161,7 @@ export const home: Track = {
       description: 'Let her put her feet up while you handle things.',
       emoji: '🛋️',
       lessons: [
-        { id: 'home.u3.l1', title: 'Cosy evening', titleBg: 'Уютна вечер', items: ['home.umorena', 'home.pochivka', 'home.chay', 'home.kafe', 'home.masazh'] },
+        { id: 'home.u3.l1', title: 'Cosy evening', titleBg: 'Уютна вечер', items: ['home.umorena', 'home.divan', 'home.vana', 'home.sveshti', 'home.masazh'] },
         { id: 'home.u3.l2', title: 'Short and sweet', titleBg: 'Кратко и мило', items: ['home.sedni', 'home.pochini-si', 'home.kazhi', 'home.ostavi', 'home.ela'] },
         { id: 'home.u3.l3', title: 'I have got this', titleBg: 'Почини си', items: ['home.sedni-az-shte-go-napravya', 'home.tryabva-li-ti-neshto', 'home.pochini-si-skapa', 'home.iskash-li-chay', 'home.shte-slozha-detsata'] },
       ],
@@ -174,7 +174,7 @@ export const home: Track = {
       emoji: '🥘',
       lessons: [
         { id: 'home.u4.l1', title: 'In the kitchen', titleBg: 'В кухнята', items: ['home.nozh', 'home.tendzhera', 'home.tigan', 'home.furna', 'home.sol', 'home.luk'] },
-        { id: 'home.u4.l2', title: 'Chop and stir', titleBg: 'Режа и бъркам', items: ['home.rezha', 'home.barkam', 'home.parzha', 'home.peka', 'home.opitvam', 'home.vkusno'] },
+        { id: 'home.u4.l2', title: 'Chop and stir', titleBg: 'Режа и бъркам', items: ['home.rezha', 'home.barkam', 'home.parzha', 'home.peka', 'home.opitvam', 'home.soleno'] },
         { id: 'home.u4.l3', title: 'Dinner is ready', titleBg: 'Вечерята е готова', items: ['home.kakvo-da-narezha', 'home.shte-narezha-luka', 'home.razbarkay-supata', 'home.tryabva-li-oshte-sol', 'home.vnimavay-goreshto-e', 'home.vecheryata-e-gotova'] },
       ],
     },
@@ -186,7 +186,7 @@ export const home: Track = {
       emoji: '🔨',
       lessons: [
         { id: 'home.u5.l1', title: 'Door and window', titleBg: 'Врата и прозорец', items: ['home.vrata', 'home.prozorets', 'home.kran', 'home.krushka', 'home.otvertka'] },
-        { id: 'home.u5.l2', title: 'In the garden', titleBg: 'В градината', items: ['home.gradina', 'home.tsvetya', 'home.treva', 'home.polivam', 'home.popravyam', 'home.raboti'] },
+        { id: 'home.u5.l2', title: 'In the garden', titleBg: 'В градината', items: ['home.gradina', 'home.rozi', 'home.treva', 'home.polivam', 'home.popravyam', 'home.raboti'] },
         { id: 'home.u5.l3', title: 'I will fix it', titleBg: 'Ще го поправя', items: ['home.kranat-teche', 'home.shte-go-popravya', 'home.krushkata-izgorya', 'home.shte-smenya-krushkata', 'home.shte-poleya-tsvetyata', 'home.peralnyata-ne-raboti'] },
       ],
     },
@@ -197,8 +197,8 @@ export const home: Track = {
       description: 'Evenings, weekends and who picks up the kids.',
       emoji: '🗓️',
       lessons: [
-        { id: 'home.u6.l1', title: 'When?', titleBg: 'Кога?', items: ['home.dnes', 'home.utre', 'home.dovechera', 'home.sabota', 'home.nedelya', 'home.uikend'] },
-        { id: 'home.u6.l2', title: 'Plans', titleBg: 'Планове', items: ['home.film', 'home.razhodka', 'home.gosti', 'home.vecherya', 'home.planove'] },
+        { id: 'home.u6.l1', title: 'When?', titleBg: 'Кога?', items: ['home.sutrin', 'home.vecher', 'home.vdrugiden', 'home.sled-rabota', 'home.drugata-sedmitsa', 'home.po-obyad'] },
+        { id: 'home.u6.l2', title: 'Plans', titleBg: 'Планове', items: ['home.film', 'home.razhodka', 'home.priyateli', 'home.nastolna-igra', 'home.planove'] },
         { id: 'home.u6.l3', title: 'This weekend', titleBg: 'Този уикенд', items: ['home.kakvo-shte-pravim-v-sabota', 'home.da-gledame-film-dovechera', 'home.utre-shte-doydat-gosti', 'home.v-nedelya-razhodka', 'home.shte-vzema-detsata', 'home.ne-moga-utre'] },
       ],
     },

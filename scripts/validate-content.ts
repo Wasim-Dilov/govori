@@ -60,6 +60,125 @@ function checkBg(bg: string, where: string) {
 function checkStyle(text: string | undefined, where: string) {
   if (text && /[—§]/.test(text)) err(`${where}: contains an em dash or § sign: "${text}"`)
 }
+// ------------------------------------------------------------ House style: ids
+// Item ids are progress keys, so they never change once a learner has data. Each id's slug spells
+// the item's transliteration (accents removed): every 3+ letter part of the slug must appear in it.
+const plainLatin = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/y/g, 'i').replace(/[^a-z\s-]/g, ' ')
+function checkSlug(trackId: string, id: string, tr: string, where: string) {
+  const parts = id.slice(trackId.length + 1).replace(/y/g, 'i').split('-').filter((x) => x.length >= 3)
+  const words = plainLatin(tr).split(/[\s-]+/).filter(Boolean)
+  const near = (a: string, b: string) => {
+    const n = Math.min(4, a.length, b.length)
+    return a === b || (n >= 3 && a.slice(0, n) === b.slice(0, n))
+  }
+  const missing = parts.filter((x) => !words.some((w) => near(x, w)))
+  if (missing.length) warn(`${where}: id does not match its content (${missing.join(', ')} not in "${tr}"); the slug should spell the transliteration`)
+}
+
+// ------------------------------------------------------------ House style: punctuation
+// Words: no full stop in either language; a ? or ! only when both languages have it.
+// Phrases: a sentence (capitalised Bulgarian) ends with . ? or ! and the English ends with the same mark;
+//   a fragment (lowercase Bulgarian, e.g. "за теб" / "for you") has no final mark in either language.
+// Dialogue lines are sentences, the English mirroring the Bulgarian mark. Questions end with "?".
+// Answer options and titles never end with a full stop. Scenes end with a full stop.
+// A trailing parenthetical such as "(to a boy)" is ignored when finding the final mark.
+const coreText = (x: string) => x.trim().replace(/\s*\([^)]*\)\s*$/, '').trim()
+const finalMark = (x: string) => {
+  const c = coreText(x).slice(-1)
+  return /[.!?…]/.test(c) ? c : ''
+}
+const startsLower = (x: string) => {
+  const c = x.trim().charAt(0)
+  return c !== c.toLocaleUpperCase('bg')
+}
+function checkPunct(kind: 'word' | 'phrase' | 'line', bg: string, en: string, where: string, fBg?: string) {
+  const b = finalMark(bg)
+  const e = finalMark(en)
+  if (kind === 'word') {
+    if (b === '.' || e === '.') err(`${where}: a word takes no full stop ("${bg}" / "${en}")`)
+    else if (b !== e) err(`${where}: Bulgarian and English end differently ("${bg}" / "${en}")`)
+  } else if (kind === 'phrase' && startsLower(bg)) {
+    if (b || e) err(`${where}: a lowercase fragment takes no final punctuation ("${bg}" / "${en}")`)
+    if (!startsLower(en)) err(`${where}: a fragment's English starts lowercase ("${en}")`)
+  } else {
+    if (!b) err(`${where}: a sentence ends with . ? or ! ("${bg}")`)
+    else if (b !== e) err(`${where}: the English must end with the same mark as the Bulgarian ("${bg}" / "${en}")`)
+    if (kind === 'phrase' && startsLower(en)) err(`${where}: a sentence's English starts with a capital ("${en}")`)
+  }
+  if (fBg !== undefined && finalMark(fBg) !== b) err(`${where}: the woman's form ends differently from the man's ("${fBg}")`)
+}
+const noFullStop = (x: string | undefined, where: string) => {
+  if (x && /\.\s*$/.test(x)) err(`${where}: no full stop at the end ("${x}")`)
+}
+
+// ------------------------------------------------------------ Dialogue vocabulary
+// A "me" line should mostly reuse words the track has taught by that unit. Words are compared loosely:
+// common endings are stripped and stems compared on their first 4 letters. Very common words are ignored.
+const COMMON = new Set(
+  ('аз ти той тя то ние вие те да не и е съм си сме сте са ще ли много моля благодаря а но или че за на в във с със ' +
+    'от до по при към без под над пред след през мен теб него нея нас вас тях ми му ни ви им ме го я ги се ' +
+    'това тази този тези там тук сега вече още само така също какво къде кога защо колко как кой коя кое кои ' +
+    'нещо всичко всички нищо добре хайде нали може трябва има няма мой моя мое мои моят моята моето твой твоя твое ' +
+    'твоите твоята твоето наш наша наше наши нашата нашето ваш ваша свой своя един една едно когато повече малко ' +
+    'разбира хубаво хубав беше бях бяха ето даже просто после преди ами ако дали значи супер')
+    .split(' '),
+)
+const ENDINGS = ['ите', 'ата', 'ото', 'ове', 'ета', 'ът', 'ят', 'та', 'то', 'те', 'ия', 'а', 'я', 'и', 'е', 'о', 'у', 'ъ']
+const lemma = (w: string) => {
+  for (const e of ENDINGS) if (w.endsWith(e) && w.length - e.length >= 3) return w.slice(0, -e.length)
+  return w
+}
+const sameStem = (a: string, b: string) => {
+  const n = Math.min(4, a.length, b.length)
+  return n >= 3 && a.slice(0, n) === b.slice(0, n)
+}
+// Words a conversation may use without the track teaching them, by dialogue id. Each entry says why.
+const UNTAUGHT_OK: Record<string, string[]> = {
+  'basics.d3': ['коза'], // the joke turns on a word he has not learned yet
+  'basics.d5': ['спим'], // said to a child at bedtime; clear from the scene
+  'basics.d6': ['почивай'], // taught in Home (почини си); a natural imperative here
+  'basics.d7': ['скъпа', 'браво', 'миличка', 'обичам'], // endearments and praise taught in Love and Kids
+  'basics.d8': ['чужбина'], // small-talk answer, understood from context
+  'love.d1': ['приятен'], // "Приятен ден" is a set phrase
+  'love.d4': ['бутилка', 'червено', 'наздраве', 'удоволствие'], // ordering wine and a toast; set phrases
+  'love.d5': ['хотел', 'баба', 'гледа'], // international word; баба is taught in Family
+  'love.d6': ['готова'], // "when you're ready": the line would lose its warmth without it
+  'love.d7': ['говоря'], // taught in Basics; the anniversary line is the payoff
+  'home.d4': ['вкусно'], // the natural thing to say when tasting; taught in Family
+  'home.d5': ['проблем', 'окося'], // "Няма проблем" is a set phrase; mowing fits the garden scene
+  'home.d6': ['проблем', 'пуканки'], // set phrase; popcorn for film night
+  'family.d4': ['скоро'], // taught in Love
+  'grammar.d1': ['уморен'], // taught in Basics; the reply "И аз" depends on it
+  'grammar.d2': ['вратата'], // shows the article on a new noun, which is the unit's point
+  'grammar.d4': ['измия', 'чиниите', 'избереш'], // chores and choices from Home; the unit drills мога да + verb
+  'grammar.d5': ['събота', 'неделя'], // days of the week are taught in Basics
+  'grammar.d6': ['заповядайте'], // polite set phrase, taught in Family and Out
+  'out.d3': ['половин'], // "half a kilo" at the market
+  'out.d4': ['извинете', 'шипка', 'минути'], // polite opener, a street name, and minutes from Basics
+  'out.d5': ['шапката', 'вратата', 'обичам'], // everyday words in a snow-day scene
+  'out.d6': ['ракия'], // the village scene ends with rakia
+}
+function checkDialogueVocab(t: Track) {
+  const items = new Map(t.items.map((i) => [i.id, i]))
+  const taught: string[] = []
+  for (const u of t.units) {
+    for (const l of u.lessons)
+      for (const id of l.items) {
+        const it = items.get(id)
+        if (!it) continue
+        for (const x of [it.bg, it.f?.bg, ...(it.bgAlt ?? [])]) if (x) for (const w of tokensBg(x)) taught.push(lemma(w))
+      }
+    const d = (t.dialogues ?? []).find((x) => x.unitId === u.id)
+    if (!d) continue
+    const ok = new Set(UNTAUGHT_OK[d.id] ?? [])
+    d.lines.forEach((line, i) => {
+      if (line.who !== 'me') return
+      const unknown = tokensBg(line.bg).filter((w) => w.length >= 4 && !COMMON.has(w) && !ok.has(w) && !taught.some((x) => sameStem(lemma(w), x)))
+      if (unknown.length) warn(`${d.id} line ${i + 1}: "me" line uses words not taught in ${t.id} by ${u.id}: ${unknown.join(', ')}`)
+    })
+  }
+}
+
 // ------------------------------------------------------------ Cross-track checks
 // The same Bulgarian word must carry the same stress everywhere.
 // Add a word here only if it truly has two stresses with two meanings (e.g. 'пара': пára steam / пaрá coin).
@@ -193,6 +312,8 @@ function validateDialogues(t: Track) {
     checkBg(d.titleBg ?? '', `${where} titleBg`)
     checkStyle(d.title, `${where} title`)
     checkStyle(d.scene, `${where} scene`)
+    noFullStop(d.title, `${where} title`)
+    if (d.scene && finalMark(d.scene) !== '.') err(`${where}: the scene ends with a full stop ("${d.scene}")`)
     const lines = d.lines ?? []
     if (lines.length < 5 || lines.length > 9) err(`${where}: has ${lines.length} lines (want 5 to 9)`)
     const meLines = lines.filter((l) => l.who === 'me')
@@ -205,6 +326,7 @@ function validateDialogues(t: Track) {
       noteStress(l.bg, l.tr, lw)
       if (!l.en) err(`${lw}: missing en`)
       checkStyle(l.en, lw)
+      if (l.en) checkPunct('line', l.bg, l.en, lw, l.f?.bg)
       if (l.f) {
         if (l.who !== 'me') warn(`${lw}: f form on a line not spoken by "me"`)
         checkBg(l.f.bg, `${lw} (f)`)
@@ -232,9 +354,13 @@ function validateDialogues(t: Track) {
       const qw = `${where} question ${i + 1}`
       if (!q.q) err(`${qw}: missing q`)
       checkStyle(q.q, qw)
+      if (q.q && !/\?\s*$/.test(q.q)) err(`${qw}: a question ends with "?" ("${q.q}")`)
       if (!Array.isArray(q.options) || q.options.length !== 3) err(`${qw}: needs exactly 3 options`)
       else {
-        q.options.forEach((o) => checkStyle(o, `${qw} option`))
+        q.options.forEach((o) => {
+          checkStyle(o, `${qw} option`)
+          noFullStop(o, `${qw} option`)
+        })
         if (new Set(q.options.map((o) => o.toLowerCase())).size !== 3) err(`${qw}: options repeat`)
       }
       if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer >= (q.options?.length ?? 0)) err(`${qw}: answer index ${q.answer} is out of range`)
@@ -261,6 +387,8 @@ function validateTrack(t: Track, minUnits: number, target: number) {
     if (!item.emoji) err(`${where}: missing emoji`)
     checkStyle(item.en, where)
     checkStyle(item.note, `${where} note`)
+    checkSlug(t.id, item.id, item.tr, where)
+    if (item.en && (item.kind === 'word' || item.kind === 'phrase')) checkPunct(item.kind, item.bg, item.en, where, item.f?.bg)
     if (item.f) {
       checkBg(item.f.bg, `${where} (f)`)
       checkStress(item.f.tr, `${where} (f)`)
@@ -284,6 +412,8 @@ function validateTrack(t: Track, minUnits: number, target: number) {
   for (const u of t.units) {
     checkStyle(u.title, `${t.id} unit ${u.id} title`)
     checkStyle(u.description, `${t.id} unit ${u.id} description`)
+    noFullStop(u.title, `${t.id} unit ${u.id} title`)
+    for (const l of u.lessons) noFullStop(l.title, `${t.id} lesson ${l.id} title`)
   }
   const usedIn = new Map<string, string>()
   for (const u of t.units) {
@@ -303,6 +433,7 @@ function validateTrack(t: Track, minUnits: number, target: number) {
   for (const id of items.keys()) if (!usedIn.has(id)) err(`${t.id}: item ${id} is not used in any lesson`)
   const lessonCount = t.units.reduce((n, u) => n + u.lessons.length, 0)
   const dialogues = validateDialogues(t)
+  checkDialogueVocab(t)
   return { units: t.units.length, lessons: lessonCount, items: t.items.length, dialogues }
 }
 

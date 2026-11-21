@@ -5,7 +5,7 @@ export type TrackId = 'azbuka' | 'basics' | 'kids' | 'love' | 'home' | 'family' 
 
 /** A word or phrase the learner studies. */
 export interface Item {
-  /** Globally unique and stable forever (progress is keyed on it), e.g. "kids.voda". */
+  /** Globally unique and stable forever (progress is keyed on it), e.g. "kids.vilitsa". */
   id: string
   kind: 'word' | 'phrase'
   /** Bulgarian in Cyrillic, as a man would say it (see `f` for the woman's form). */

@@ -57,26 +57,26 @@ export const love: Track = {
 
     // L3 I love you
     {
-      id: 'love.obicham-te', kind: 'phrase', bg: 'Обичам те', tr: 'obícham te', en: 'I love you', emoji: '😍',
+      id: 'love.obicham-te', kind: 'phrase', bg: 'Обичам те.', tr: 'obícham te', en: 'I love you.', emoji: '😍',
       alt: ['love you'],
       note: 'те means "you" here. It is a small word that leans on the verb.',
     },
     {
-      id: 'love.lyubov-moya', kind: 'phrase', bg: 'Любов моя', tr: 'lyubóv móya', en: 'my love', emoji: '💞',
+      id: 'love.lyubov-moya', kind: 'phrase', bg: 'любов моя', tr: 'lyubóv móya', en: 'my love', emoji: '💞',
       bgAlt: ['Моя любов'],
       note: 'Putting моя after the noun sounds tender and a little poetic.',
     },
     {
-      id: 'love.sartse-moe', kind: 'phrase', bg: 'Сърце мое', tr: 'sărtsé móe', en: 'my heart', emoji: '💓',
+      id: 'love.sartse-moe', kind: 'phrase', bg: 'сърце мое', tr: 'sărtsé móe', en: 'my heart', emoji: '💓',
       alt: ['sweetheart'],
       bgAlt: ['Мое сърце'],
     },
     {
-      id: 'love.obicham-te-skapa', kind: 'phrase', bg: 'Обичам те, скъпа', tr: 'obícham te, skắpa', en: 'I love you, darling', emoji: '💕',
+      id: 'love.obicham-te-skapa', kind: 'phrase', bg: 'Обичам те, скъпа.', tr: 'obícham te, skắpa', en: 'I love you, darling.', emoji: '💕',
       alt: ['i love you honey', 'i love you dear', 'i love you sweetheart', 'love you darling'],
     },
     {
-      id: 'love.ti-si-moyata-lyubov', kind: 'phrase', bg: 'Ти си моята любов', tr: 'ti si móyata lyubóv', en: 'You are my love', emoji: '💑',
+      id: 'love.ti-si-moyata-lyubov', kind: 'phrase', bg: 'Ти си моята любов.', tr: 'ti si móyata lyubóv', en: 'You are my love.', emoji: '💑',
       alt: ['youre my love'],
     },
 
@@ -112,32 +112,32 @@ export const love: Track = {
     { id: 'love.kosa', kind: 'word', bg: 'коса', tr: 'kosá', en: 'hair', emoji: '💇‍♀️' },
     { id: 'love.usmivka', kind: 'word', bg: 'усмивка', tr: 'usmívka', en: 'smile', emoji: '😊' },
     { id: 'love.roklya', kind: 'word', bg: 'рокля', tr: 'róklya', en: 'dress', emoji: '👗' },
-    { id: 'love.dnes', kind: 'word', bg: 'устни', tr: 'ustní', en: 'lips', emoji: '💋', alt: ['your lips', 'mouth'] },
+    { id: 'love.ustni', kind: 'word', bg: 'устни', tr: 'ustní', en: 'lips', emoji: '💋', alt: ['your lips', 'mouth'] },
 
     // L3 You're beautiful
     {
-      id: 'love.krasiva-si', kind: 'phrase', bg: 'Красива си', tr: 'krasíva si', en: "You're beautiful", emoji: '😍',
+      id: 'love.krasiva-si', kind: 'phrase', bg: 'Красива си.', tr: 'krasíva si', en: "You're beautiful.", emoji: '😍',
       alt: ['you are beautiful'],
       bgAlt: ['Ти си красива'],
     },
     {
-      id: 'love.mnogo-si-krasiva-dnes', kind: 'phrase', bg: 'Много си красива днес', tr: 'mnógo si krasíva dnes', en: 'You look very beautiful today', emoji: '🌹',
+      id: 'love.mnogo-si-krasiva-dnes', kind: 'phrase', bg: 'Много си красива днес.', tr: 'mnógo si krasíva dnes', en: 'You look very beautiful today.', emoji: '🌹',
       alt: ['you are very beautiful today', 'youre very beautiful today', 'you look beautiful today', 'you are so beautiful today', 'youre so beautiful today'],
       bgAlt: ['Днес си много красива'],
     },
     {
-      id: 'love.obicham-usmivkata-ti', kind: 'phrase', bg: 'Обичам усмивката ти', tr: 'obícham usmívkata ti', en: 'I love your smile', emoji: '😊',
+      id: 'love.obicham-usmivkata-ti', kind: 'phrase', bg: 'Обичам усмивката ти.', tr: 'obícham usmívkata ti', en: 'I love your smile.', emoji: '😊',
       note: '-та on the end means "the": усмивка → усмивката. ти after it means "your".',
     },
     {
-      id: 'love.imash-krasivi-ochi', kind: 'phrase', bg: 'Имаш красиви очи', tr: 'ímash krasívi ochí', en: 'You have beautiful eyes', emoji: '👀',
+      id: 'love.imash-krasivi-ochi', kind: 'phrase', bg: 'Имаш красиви очи.', tr: 'ímash krasívi ochí', en: 'You have beautiful eyes.', emoji: '👀',
     },
     {
-      id: 'love.roklyata-ti-e-prekrasna', kind: 'phrase', bg: 'Роклята ти е прекрасна', tr: 'róklyata ti e prekrásna', en: 'Your dress is gorgeous', emoji: '👗',
+      id: 'love.roklyata-ti-e-prekrasna', kind: 'phrase', bg: 'Роклята ти е прекрасна.', tr: 'róklyata ti e prekrásna', en: 'Your dress is gorgeous.', emoji: '👗',
       alt: ['your dress is wonderful', 'your dress is beautiful', 'your dress is lovely'],
     },
     {
-      id: 'love.mnogo-te-obicham', kind: 'phrase', bg: 'Много те обичам', tr: 'mnógo te obícham', en: 'I love you so much', emoji: '🥰',
+      id: 'love.mnogo-te-obicham', kind: 'phrase', bg: 'Много те обичам.', tr: 'mnógo te obícham', en: 'I love you so much.', emoji: '🥰',
       alt: ['i love you very much', 'i love you a lot'],
       note: 'те can never start a sentence, so it moves in front of обичам when another word comes first.',
     },
@@ -151,7 +151,7 @@ export const love: Track = {
       id: 'love.pregradka', kind: 'word', bg: 'прегръдка', tr: 'pregrắdka', en: 'hug', emoji: '🤗',
       alt: ['cuddle', 'embrace'],
     },
-    { id: 'love.kafe', kind: 'word', bg: 'будилник', tr: 'budílnik', en: 'alarm clock', emoji: '⏰', alt: ['alarm', 'the alarm', 'an alarm clock'] },
+    { id: 'love.budilnik', kind: 'word', bg: 'будилник', tr: 'budílnik', en: 'alarm clock', emoji: '⏰', alt: ['alarm', 'the alarm', 'an alarm clock'] },
 
     // L2 Sweet texts
     {
@@ -175,25 +175,25 @@ export const love: Track = {
 
     // L3 Sweet dreams
     {
-      id: 'love.dobro-utro-skapa', kind: 'phrase', bg: 'Добро утро, скъпа', tr: 'dobró útro, skắpa', en: 'Good morning, darling', emoji: '🌞',
+      id: 'love.dobro-utro-skapa', kind: 'phrase', bg: 'Добро утро, скъпа.', tr: 'dobró útro, skắpa', en: 'Good morning, darling.', emoji: '🌞',
       alt: ['good morning honey', 'good morning dear', 'good morning sweetheart'],
     },
     {
-      id: 'love.leka-nosht-lyubov-moya', kind: 'phrase', bg: 'Лека нощ, любов моя', tr: 'léka nosht, lyubóv móya', en: 'Good night, my love', emoji: '🌙',
+      id: 'love.leka-nosht-lyubov-moya', kind: 'phrase', bg: 'Лека нощ, любов моя.', tr: 'léka nosht, lyubóv móya', en: 'Good night, my love.', emoji: '🌙',
       alt: ['goodnight my love', 'good night love'],
     },
-    { id: 'love.sladki-sanishta', kind: 'phrase', bg: 'Сънувай ме.', tr: 'sănúvay me', en: 'Dream of me.', emoji: '💭', alt: ['dream of me', 'dream about me'], note: 'A sweet last text of the night.' },
+    { id: 'love.sanuvay-me', kind: 'phrase', bg: 'Сънувай ме.', tr: 'sănúvay me', en: 'Dream of me.', emoji: '💭', alt: ['dream of me', 'dream about me'], note: 'A sweet last text of the night.' },
     {
-      id: 'love.mislya-za-teb', kind: 'phrase', bg: 'Мисля за теб', tr: 'míslya za teb', en: "I'm thinking of you", emoji: '💭',
+      id: 'love.mislya-za-teb', kind: 'phrase', bg: 'Мисля за теб.', tr: 'míslya za teb', en: "I'm thinking of you.", emoji: '💭',
       alt: ['i am thinking of you', 'i am thinking about you', 'im thinking about you', 'i think of you', 'thinking of you', 'i think about you'],
     },
     {
-      id: 'love.lipsvash-mi', kind: 'phrase', bg: 'Липсваш ми', tr: 'lípsvash mi', en: 'I miss you', emoji: '🥺',
+      id: 'love.lipsvash-mi', kind: 'phrase', bg: 'Липсваш ми.', tr: 'lípsvash mi', en: 'I miss you.', emoji: '🥺',
       alt: ['miss you'],
       note: 'Literally "you are missing to me". She is the subject, you are the one who feels it.',
     },
     {
-      id: 'love.skoro-shte-sam-vkashti', kind: 'phrase', bg: 'Скоро ще съм вкъщи', tr: 'skóro shte săm vkắshti', en: "I'll be home soon", emoji: '🏠',
+      id: 'love.skoro-shte-sam-vkashti', kind: 'phrase', bg: 'Скоро ще съм вкъщи.', tr: 'skóro shte săm vkắshti', en: "I'll be home soon.", emoji: '🏠',
       alt: ['i will be home soon', 'ill be home soon'],
       bgAlt: ['Скоро ще бъда вкъщи', 'Скоро се прибирам'],
       note: 'ще makes the future: ще съм = I will be.',
@@ -220,7 +220,7 @@ export const love: Track = {
     },
 
     // L2 Going out
-    { id: 'love.vecherya', kind: 'word', bg: 'ресторант', tr: 'restoránt', en: 'restaurant', emoji: '🍽️', alt: ['a restaurant', 'the restaurant'] },
+    { id: 'love.restorant', kind: 'word', bg: 'ресторант', tr: 'restoránt', en: 'restaurant', emoji: '🍽️', alt: ['a restaurant', 'the restaurant'] },
     {
       id: 'love.sreshta', kind: 'word', bg: 'среща', tr: 'sréshta', en: 'date', emoji: '🕯️',
       alt: ['meeting'],
@@ -239,9 +239,9 @@ export const love: Track = {
 
     // L3 Let's dance
     {
-      id: 'love.shtastliv-sam-s-teb', kind: 'phrase', bg: 'Щастлив съм с теб', tr: 'shtastlív săm s teb', en: "I'm happy with you", emoji: '😊',
+      id: 'love.shtastliv-sam-s-teb', kind: 'phrase', bg: 'Щастлив съм с теб.', tr: 'shtastlív săm s teb', en: "I'm happy with you.", emoji: '😊',
       alt: ['i am happy with you', 'im happy with you'],
-      f: { bg: 'Щастлива съм с теб', tr: 'shtastlíva săm s teb' },
+      f: { bg: 'Щастлива съм с теб.', tr: 'shtastlíva săm s teb' },
     },
     {
       id: 'love.da-izlezem-li-na-vecherya', kind: 'phrase', bg: 'Да излезем ли на вечеря?', tr: 'da izlézem li na vechérya', en: 'Shall we go out for dinner?', emoji: '🍽️',
@@ -254,30 +254,30 @@ export const love: Track = {
       alt: ['shall we dance', 'would you like to dance', 'do you want to dance with me'],
     },
     {
-      id: 'love.zaedno-zavinagi', kind: 'phrase', bg: 'Заедно завинаги', tr: 'záedno zavínagi', en: 'Together forever', emoji: '♾️',
+      id: 'love.zaedno-zavinagi', kind: 'phrase', bg: 'Заедно завинаги!', tr: 'záedno zavínagi', en: 'Together forever!', emoji: '♾️',
       alt: ['forever together'],
     },
     {
-      id: 'love.ti-si-prava', kind: 'phrase', bg: 'Ти си права', tr: 'ti si práva', en: "You're right", emoji: '😅',
+      id: 'love.ti-si-prava', kind: 'phrase', bg: 'Ти си права.', tr: 'ti si práva', en: "You're right.", emoji: '😅',
       alt: ['you are right'],
       bgAlt: ['Права си'],
       note: 'права is the feminine form. Possibly the most useful sentence a husband can learn.',
     },
     {
-      id: 'love.sazhalyavam-skapa', kind: 'phrase', bg: 'Съжалявам, скъпа', tr: 'săzhalyávam, skắpa', en: "I'm sorry, darling", emoji: '💐',
+      id: 'love.sazhalyavam-skapa', kind: 'phrase', bg: 'Съжалявам, скъпа.', tr: 'săzhalyávam, skắpa', en: "I'm sorry, darling.", emoji: '💐',
       alt: ['sorry darling', 'im sorry honey', 'i am sorry darling', 'sorry honey', 'im sorry dear', 'i am sorry honey'],
     },
 
     // ---------------------------------------------------------- Unit 5: Plans and surprises
     // L1 Surprises
     { id: 'love.iznenada', kind: 'word', bg: 'изненада', tr: 'iznenáda', en: 'surprise', emoji: '🎉' },
-    { id: 'love.podarak', kind: 'word', bg: 'пръстен', tr: 'prắsten', en: 'ring', emoji: '💍', alt: ['a ring', 'the ring'] },
+    { id: 'love.prasten', kind: 'word', bg: 'пръстен', tr: 'prắsten', en: 'ring', emoji: '💍', alt: ['a ring', 'the ring'] },
     {
       id: 'love.tsvetya', kind: 'word', bg: 'цветя', tr: 'tsvetyá', en: 'flowers', emoji: '💐',
       note: 'Bring an odd number of flowers. Even numbers are for funerals in Bulgaria.',
     },
     { id: 'love.uikend', kind: 'word', bg: 'уикенд', tr: 'uikénd', en: 'weekend', emoji: '🗓️' },
-    { id: 'love.pochivka', kind: 'word', bg: 'пътуване', tr: 'pătúvane', en: 'trip', emoji: '✈️', alt: ['journey', 'a trip', 'travel', 'travelling'] },
+    { id: 'love.patuvane', kind: 'word', bg: 'пътуване', tr: 'pătúvane', en: 'trip', emoji: '✈️', alt: ['journey', 'a trip', 'travel', 'travelling'] },
 
     // L2 Going places
     { id: 'love.bileti', kind: 'word', bg: 'билети', tr: 'biléti', en: 'tickets', emoji: '🎟️' },
@@ -285,8 +285,8 @@ export const love: Track = {
       id: 'love.kino', kind: 'word', bg: 'кино', tr: 'kíno', en: 'cinema', emoji: '🎬',
       alt: ['movies', 'the movies', 'the cinema', 'movie theater', 'movie theatre'],
     },
-    { id: 'love.more', kind: 'word', bg: 'театър', tr: 'teátăr', en: 'theatre', emoji: '🎭', alt: ['theater', 'the theatre', 'the theater', 'a play'] },
-    { id: 'love.planina', kind: 'word', bg: 'концерт', tr: 'kontsért', en: 'concert', emoji: '🎵', alt: ['a concert', 'the concert', 'gig'] },
+    { id: 'love.teatar', kind: 'word', bg: 'театър', tr: 'teátăr', en: 'theatre', emoji: '🎭', alt: ['theater', 'the theatre', 'the theater', 'a play'] },
+    { id: 'love.kontsert', kind: 'word', bg: 'концерт', tr: 'kontsért', en: 'concert', emoji: '🎵', alt: ['a concert', 'the concert', 'gig'] },
     {
       id: 'love.dovechera', kind: 'word', bg: 'довечера', tr: 'dovéchera', en: 'tonight', emoji: '🌆',
       alt: ['this evening', 'later tonight'],
@@ -295,11 +295,11 @@ export const love: Track = {
 
     // L3 Let's go away
     {
-      id: 'love.imam-iznenada-za-teb', kind: 'phrase', bg: 'Имам изненада за теб', tr: 'ímam iznenáda za teb', en: 'I have a surprise for you', emoji: '🎁',
+      id: 'love.imam-iznenada-za-teb', kind: 'phrase', bg: 'Имам изненада за теб.', tr: 'ímam iznenáda za teb', en: 'I have a surprise for you.', emoji: '🎁',
       alt: ['ive got a surprise for you', 'i have got a surprise for you'],
     },
     {
-      id: 'love.tova-e-podarak-za-teb', kind: 'phrase', bg: 'Това е подарък за теб', tr: 'tová e podárăk za teb', en: 'This is a present for you', emoji: '💝',
+      id: 'love.tova-e-podarak-za-teb', kind: 'phrase', bg: 'Това е подарък за теб.', tr: 'tová e podárăk za teb', en: 'This is a present for you.', emoji: '💝',
       alt: ['this is a gift for you', 'this present is for you'],
     },
     {
@@ -313,12 +313,12 @@ export const love: Track = {
       bgAlt: ['Да отидем ли на кино довечера?'],
     },
     {
-      id: 'love.rezervirah-masa', kind: 'phrase', bg: 'Резервирах маса за двама', tr: 'rezervírah mása za dváma', en: 'I booked a table for two', emoji: '🍽️',
+      id: 'love.rezervirah-masa', kind: 'phrase', bg: 'Резервирах маса за двама.', tr: 'rezervírah mása za dváma', en: 'I booked a table for two.', emoji: '🍽️',
       alt: ['i reserved a table for two', 'ive booked a table for two', 'i have booked a table for two'],
       note: 'The -х ending means "I did it": резервирах = I booked.',
     },
     {
-      id: 'love.tova-lyato-na-more', kind: 'phrase', bg: 'Това лято ще отидем на море', tr: 'tová lyáto shte otídem na moré', en: "This summer we'll go to the seaside", emoji: '🏖️',
+      id: 'love.tova-lyato-na-more', kind: 'phrase', bg: 'Това лято ще отидем на море.', tr: 'tová lyáto shte otídem na moré', en: "This summer we'll go to the seaside.", emoji: '🏖️',
       alt: ['this summer we will go to the seaside', 'we will go to the seaside this summer', 'well go to the seaside this summer', 'this summer we will go to the sea', 'this summer well go to the sea'],
     },
 
@@ -333,7 +333,7 @@ export const love: Track = {
       id: 'love.vina', kind: 'word', bg: 'вина', tr: 'viná', en: 'fault', emoji: '🙇',
       alt: ['guilt', 'blame'],
     },
-    { id: 'love.spokoyno', kind: 'word', bg: 'търпение', tr: 'tărpénie', en: 'patience', emoji: '🧘', alt: ['be patient'], note: 'Имай търпение с мен: be patient with me.' },
+    { id: 'love.tarpenie', kind: 'word', bg: 'търпение', tr: 'tărpénie', en: 'patience', emoji: '🧘', alt: ['be patient'], note: 'Имай търпение с мен: be patient with me.' },
     {
       id: 'love.slusham', kind: 'word', bg: 'слушам', tr: 'slúsham', en: "I'm listening", emoji: '👂',
       alt: ['i am listening', 'i listen'],
@@ -346,7 +346,7 @@ export const love: Track = {
       alt: ['next to you', 'beside you', 'with you'],
     },
     { id: 'love.pomosht', kind: 'word', bg: 'помощ', tr: 'pómosht', en: 'help', emoji: '🤲' },
-    { id: 'love.umorena', kind: 'word', bg: 'силна', tr: 'sílna', en: 'strong', emoji: '💪', alt: ['you are strong'], note: 'Ти си много силна: you are very strong.' },
+    { id: 'love.silna', kind: 'word', bg: 'силна', tr: 'sílna', en: 'strong', emoji: '💪', alt: ['you are strong'], note: 'Ти си много силна: you are very strong.' },
     {
       id: 'love.tazhna', kind: 'word', bg: 'тъжна', tr: 'tắzhna', en: 'sad', emoji: '😢',
       note: 'The feminine form. About a man: тъжен.',
@@ -354,25 +354,25 @@ export const love: Track = {
 
     // L3 Forgive me
     {
-      id: 'love.prosti-mi', kind: 'phrase', bg: 'Прости ми', tr: 'prostí mi', en: 'Forgive me', emoji: '😔',
+      id: 'love.prosti-mi', kind: 'phrase', bg: 'Прости ми.', tr: 'prostí mi', en: 'Forgive me.', emoji: '😔',
       alt: ['please forgive me'],
     },
     {
-      id: 'love.vinata-e-moya', kind: 'phrase', bg: 'Вината е моя', tr: 'vináta e móya', en: "It's my fault", emoji: '😞',
+      id: 'love.vinata-e-moya', kind: 'phrase', bg: 'Вината е моя.', tr: 'vináta e móya', en: "It's my fault.", emoji: '😞',
       alt: ['it is my fault', 'my fault', 'the fault is mine'],
       bgAlt: ['Моя е вината'],
     },
     {
-      id: 'love.da-ne-se-karame', kind: 'phrase', bg: 'Да не се караме', tr: 'da ne se kárame', en: "Let's not fight", emoji: '🕊️',
+      id: 'love.da-ne-se-karame', kind: 'phrase', bg: 'Да не се караме.', tr: 'da ne se kárame', en: "Let's not fight.", emoji: '🕊️',
       alt: ['let us not fight', 'lets not argue', 'let us not argue', 'lets not quarrel'],
       note: 'Карам се = to quarrel. Да не + verb is a gentle "let\'s not".',
     },
     {
-      id: 'love.slusham-te', kind: 'phrase', bg: 'Слушам те', tr: 'slúsham te', en: "I'm listening to you", emoji: '👂',
+      id: 'love.slusham-te', kind: 'phrase', bg: 'Слушам те.', tr: 'slúsham te', en: "I'm listening to you.", emoji: '👂',
       alt: ['i am listening to you', 'im listening', 'i am listening', 'i hear you'],
     },
     {
-      id: 'love.vinagi-sam-do-teb', kind: 'phrase', bg: 'Винаги съм до теб', tr: 'vínagi săm do teb', en: "I'm always here for you", emoji: '💪',
+      id: 'love.vinagi-sam-do-teb', kind: 'phrase', bg: 'Винаги съм до теб.', tr: 'vínagi săm do teb', en: "I'm always here for you.", emoji: '💪',
       alt: ['i am always here for you', 'i am always by your side', 'im always by your side', 'i am always with you', 'im always with you'],
     },
     {
@@ -389,7 +389,7 @@ export const love: Track = {
     { id: 'love.svatba', kind: 'word', bg: 'сватба', tr: 'svátba', en: 'wedding', emoji: '💒' },
     { id: 'love.semeystvo', kind: 'word', bg: 'семейство', tr: 'seméystvo', en: 'family', emoji: '👨‍👩‍👧‍👦' },
     { id: 'love.badeshte', kind: 'word', bg: 'бъдеще', tr: 'bắdeshte', en: 'future', emoji: '🔮' },
-    { id: 'love.detsa', kind: 'word', bg: 'дом', tr: 'dom', en: 'home', emoji: '🏡', alt: ['house', 'our home'] },
+    { id: 'love.dom', kind: 'word', bg: 'дом', tr: 'dom', en: 'home', emoji: '🏡', alt: ['house', 'our home'] },
 
     // L2 Thank you
     {
@@ -418,26 +418,26 @@ export const love: Track = {
       alt: ['remember how we met', 'do you remember how we first met'],
     },
     {
-      id: 'love.gord-sam-s-teb', kind: 'phrase', bg: 'Горд съм с теб', tr: 'gord săm s teb', en: "I'm proud of you", emoji: '🏅',
+      id: 'love.gord-sam-s-teb', kind: 'phrase', bg: 'Горд съм с теб.', tr: 'gord săm s teb', en: "I'm proud of you.", emoji: '🏅',
       alt: ['i am proud of you'],
       bgAlt: ['Гордея се с теб'],
-      f: { bg: 'Горда съм с теб', tr: 'górda săm s teb' },
+      f: { bg: 'Горда съм с теб.', tr: 'górda săm s teb' },
     },
     {
-      id: 'love.blagodarya-ti-za-vsichko', kind: 'phrase', bg: 'Благодаря ти за всичко', tr: 'blagodaryá ti za vsíchko', en: 'Thank you for everything', emoji: '💖',
+      id: 'love.blagodarya-ti-za-vsichko', kind: 'phrase', bg: 'Благодаря ти за всичко.', tr: 'blagodaryá ti za vsíchko', en: 'Thank you for everything.', emoji: '💖',
       alt: ['thanks for everything'],
     },
     {
-      id: 'love.nay-hubavoto-neshto', kind: 'phrase', bg: 'Ти си най-хубавото нещо в живота ми', tr: 'ti si nay-húbavoto néshto v zhivóta mi', en: "You're the best thing in my life", emoji: '👑',
+      id: 'love.nay-hubavoto-neshto', kind: 'phrase', bg: 'Ти си най-хубавото нещо в живота ми.', tr: 'ti si nay-húbavoto néshto v zhivóta mi', en: "You're the best thing in my life.", emoji: '👑',
       alt: ['you are the best thing in my life', 'youre the best thing that ever happened to me'],
       note: 'най- in front of an adjective makes "the most": най-хубаво = the best, the most beautiful.',
     },
     {
-      id: 'love.iskam-da-ostareya-s-teb', kind: 'phrase', bg: 'Искам да остарея с теб', tr: 'ískam da ostaréya s teb', en: 'I want to grow old with you', emoji: '🧓',
+      id: 'love.iskam-da-ostareya-s-teb', kind: 'phrase', bg: 'Искам да остарея с теб.', tr: 'ískam da ostaréya s teb', en: 'I want to grow old with you.', emoji: '🧓',
       alt: ['i want to grow old together with you', 'i want to get old with you'],
     },
     {
-      id: 'love.nay-dobrata-mayka', kind: 'phrase', bg: 'Ти си най-добрата майка', tr: 'ti si nay-dobráta máyka', en: "You're the best mother", emoji: '👩‍👧',
+      id: 'love.nay-dobrata-mayka', kind: 'phrase', bg: 'Ти си най-добрата майка.', tr: 'ti si nay-dobráta máyka', en: "You're the best mother.", emoji: '👩‍👧',
       alt: ['you are the best mother', 'youre the best mom', 'you are the best mom', 'youre the best mum', 'you are the best mum'],
     },
   ],
@@ -462,7 +462,7 @@ export const love: Track = {
       emoji: '🌹',
       lessons: [
         { id: 'love.u2.l1', title: 'Beautiful and smart', titleBg: 'Красива и умна', items: ['love.krasiva', 'love.hubava', 'love.umna', 'love.prekrasna', 'love.mnogo'] },
-        { id: 'love.u2.l2', title: 'Eyes, hair, smile', titleBg: 'Очи, коса, усмивка', items: ['love.ochi', 'love.kosa', 'love.usmivka', 'love.roklya', 'love.dnes'] },
+        { id: 'love.u2.l2', title: 'Eyes, hair, smile', titleBg: 'Очи, коса, усмивка', items: ['love.ochi', 'love.kosa', 'love.usmivka', 'love.roklya', 'love.ustni'] },
         { id: 'love.u2.l3', title: "You're beautiful", titleBg: 'Красива си', items: ['love.krasiva-si', 'love.mnogo-si-krasiva-dnes', 'love.obicham-usmivkata-ti', 'love.imash-krasivi-ochi', 'love.roklyata-ti-e-prekrasna', 'love.mnogo-te-obicham'] },
       ],
     },
@@ -473,9 +473,9 @@ export const love: Track = {
       description: 'Good morning, good night and sweet texts.',
       emoji: '🌙',
       lessons: [
-        { id: 'love.u3.l1', title: 'Morning to night', titleBg: 'От утро до нощ', items: ['love.utro', 'love.nosht', 'love.sanishta', 'love.pregradka', 'love.kafe'] },
+        { id: 'love.u3.l1', title: 'Morning to night', titleBg: 'От утро до нощ', items: ['love.utro', 'love.nosht', 'love.sanishta', 'love.pregradka', 'love.budilnik'] },
         { id: 'love.u3.l2', title: 'Sweet texts', titleBg: 'Мили съобщения', items: ['love.mislya', 'love.za-teb', 'love.skoro', 'love.vkashti', 'love.tseluvki'] },
-        { id: 'love.u3.l3', title: 'Sweet dreams', titleBg: 'Сладки сънища', items: ['love.dobro-utro-skapa', 'love.leka-nosht-lyubov-moya', 'love.sladki-sanishta', 'love.mislya-za-teb', 'love.lipsvash-mi', 'love.skoro-shte-sam-vkashti'] },
+        { id: 'love.u3.l3', title: 'Sweet dreams', titleBg: 'Сладки сънища', items: ['love.dobro-utro-skapa', 'love.leka-nosht-lyubov-moya', 'love.sanuvay-me', 'love.mislya-za-teb', 'love.lipsvash-mi', 'love.skoro-shte-sam-vkashti'] },
       ],
     },
     {
@@ -486,7 +486,7 @@ export const love: Track = {
       emoji: '🍷',
       lessons: [
         { id: 'love.u4.l1', title: 'Feelings', titleBg: 'Чувства', items: ['love.shtastliv', 'love.vlyuben', 'love.zaedno', 'love.zavinagi', 'love.sazhalyavam'] },
-        { id: 'love.u4.l2', title: 'Going out', titleBg: 'Излизане', items: ['love.vecherya', 'love.sreshta', 'love.vino', 'love.tantsuvame', 'love.zhena'] },
+        { id: 'love.u4.l2', title: 'Going out', titleBg: 'Излизане', items: ['love.restorant', 'love.sreshta', 'love.vino', 'love.tantsuvame', 'love.zhena'] },
         { id: 'love.u4.l3', title: "Let's dance", titleBg: 'Да танцуваме', items: ['love.shtastliv-sam-s-teb', 'love.da-izlezem-li-na-vecherya', 'love.iskash-li-da-tantsuvame', 'love.zaedno-zavinagi', 'love.ti-si-prava', 'love.sazhalyavam-skapa'] },
       ],
     },
@@ -497,8 +497,8 @@ export const love: Track = {
       description: 'Make plans together and surprise her.',
       emoji: '🎁',
       lessons: [
-        { id: 'love.u5.l1', title: 'Surprises', titleBg: 'Изненади', items: ['love.iznenada', 'love.podarak', 'love.tsvetya', 'love.uikend', 'love.pochivka'] },
-        { id: 'love.u5.l2', title: 'Going places', titleBg: 'Накъде?', items: ['love.bileti', 'love.kino', 'love.more', 'love.planina', 'love.dovechera'] },
+        { id: 'love.u5.l1', title: 'Surprises', titleBg: 'Изненади', items: ['love.iznenada', 'love.prasten', 'love.tsvetya', 'love.uikend', 'love.patuvane'] },
+        { id: 'love.u5.l2', title: 'Going places', titleBg: 'Накъде?', items: ['love.bileti', 'love.kino', 'love.teatar', 'love.kontsert', 'love.dovechera'] },
         { id: 'love.u5.l3', title: "Let's go away", titleBg: 'Да заминем', items: ['love.imam-iznenada-za-teb', 'love.tova-e-podarak-za-teb', 'love.kakvo-shte-pravim-uikenda', 'love.da-otidem-na-kino', 'love.rezervirah-masa', 'love.tova-lyato-na-more'] },
       ],
     },
@@ -509,8 +509,8 @@ export const love: Track = {
       description: 'Say sorry, listen and be there for her.',
       emoji: '🕊️',
       lessons: [
-        { id: 'love.u6.l1', title: 'After a fight', titleBg: 'След кавга', items: ['love.kavga', 'love.proshka', 'love.vina', 'love.spokoyno', 'love.slusham'] },
-        { id: 'love.u6.l2', title: "I'm here for you", titleBg: 'Тук съм', items: ['love.vinagi', 'love.do-teb', 'love.pomosht', 'love.umorena', 'love.tazhna'] },
+        { id: 'love.u6.l1', title: 'After a fight', titleBg: 'След кавга', items: ['love.kavga', 'love.proshka', 'love.vina', 'love.tarpenie', 'love.slusham'] },
+        { id: 'love.u6.l2', title: "I'm here for you", titleBg: 'Тук съм', items: ['love.vinagi', 'love.do-teb', 'love.pomosht', 'love.silna', 'love.tazhna'] },
         { id: 'love.u6.l3', title: 'Forgive me', titleBg: 'Прости ми', items: ['love.prosti-mi', 'love.vinata-e-moya', 'love.da-ne-se-karame', 'love.slusham-te', 'love.vinagi-sam-do-teb', 'love.zashto-si-tazhna'] },
       ],
     },
@@ -521,7 +521,7 @@ export const love: Track = {
       description: 'How you met, your family and the years ahead.',
       emoji: '💍',
       lessons: [
-        { id: 'love.u7.l1', title: 'Our family', titleBg: 'Нашето семейство', items: ['love.spomen', 'love.svatba', 'love.semeystvo', 'love.badeshte', 'love.detsa'] },
+        { id: 'love.u7.l1', title: 'Our family', titleBg: 'Нашето семейство', items: ['love.spomen', 'love.svatba', 'love.semeystvo', 'love.badeshte', 'love.dom'] },
         { id: 'love.u7.l2', title: 'Thank you', titleBg: 'Благодаря ти', items: ['love.gord', 'love.blagodaren', 'love.za-parvi-pat', 'love.vsichko', 'love.godini'] },
         { id: 'love.u7.l3', title: 'Our story', titleBg: 'Нашата история', items: ['love.pomnish-li-kak-se-zapoznahme', 'love.gord-sam-s-teb', 'love.blagodarya-ti-za-vsichko', 'love.nay-hubavoto-neshto', 'love.iskam-da-ostareya-s-teb', 'love.nay-dobrata-mayka'] },
       ],

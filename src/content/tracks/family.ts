@@ -18,11 +18,11 @@ export const family: Track = {
     { id: 'family.tashta', kind: 'word', bg: 'тъща', tr: 'tắshta', en: 'mother-in-law', emoji: '👩‍🦳', alt: ['mother in law', 'my wifes mother', 'wifes mother'], note: "Only a husband's mother-in-law (his wife's mother) is тъща; a wife's is свекърва. Bulgaria has a whole genre of тъща jokes." },
     { id: 'family.tast', kind: 'word', bg: 'тъст', tr: 'tăst', en: 'father-in-law', emoji: '👨‍🦳', alt: ['father in law', 'my wifes father', 'wifes father'], note: "Your wife's father. A wife calls her husband's father свекър." },
     { id: 'family.sapruga', kind: 'word', bg: 'съпруга', tr: 'săprúga', en: 'wife', emoji: '💍', alt: ['spouse'], note: 'Formal. In everyday speech people say жена ми, "my wife".' },
-    { id: 'family.detsa', kind: 'word', bg: 'зет', tr: 'zet', en: 'son-in-law', emoji: '🤵', alt: ['brother-in-law', 'brother in law', 'son in law'], note: 'That is you: to her parents you are their зет.' },
+    { id: 'family.zet', kind: 'word', bg: 'зет', tr: 'zet', en: 'son-in-law', emoji: '🤵', alt: ['brother-in-law', 'brother in law', 'son in law'], note: 'That is you: to her parents you are their зет.' },
     { id: 'family.vnutsi', kind: 'word', bg: 'внуци', tr: 'vnútsi', en: 'grandchildren', emoji: '👶', alt: ['grandkids', 'grandsons'] },
     { id: 'family.lelya', kind: 'word', bg: 'леля', tr: 'lélya', en: 'aunt', emoji: '👩‍🦰', alt: ['auntie', 'aunty'], note: 'Kids also call any friendly older woman леля.' },
 
-    { id: 'family.tova-e-zhena-mi', kind: 'phrase', bg: 'Запознайте се с жена ми.', tr: 'zapoznáyte se s zhená mi', en: 'Meet my wife.', emoji: '💑', alt: ['meet my wife', 'this is my wife', 'let me introduce my wife'], note: 'Жена means both "woman" and "wife"; жена ми is "my wife". Запознайте се is the polite "meet".' },
+    { id: 'family.zapoznayte-se-s-zhena-mi', kind: 'phrase', bg: 'Запознайте се с жена ми.', tr: 'zapoznáyte se s zhená mi', en: 'Meet my wife.', emoji: '💑', alt: ['meet my wife', 'this is my wife', 'let me introduce my wife'], note: 'Жена means both "woman" and "wife"; жена ми is "my wife". Запознайте се is the polite "meet".' },
     { id: 'family.tova-sa-nashite-detsa', kind: 'phrase', bg: 'Това са нашите деца.', tr: 'tová sa náshite detsá', en: 'These are our children.', emoji: '👨‍👩‍👧‍👦', alt: ['these are our kids', 'this is our children', 'this is our kids'], bgAlt: ['Това са децата ни.'] },
     { id: 'family.mnogo-pozdravi-na-mayka-ti', kind: 'phrase', bg: 'Много поздрави на майка ти.', tr: 'mnógo pózdravi na máyka ti', en: 'Say hello to your mum.', emoji: '💐', alt: ['say hello to your mom', 'say hello to your mother', 'say hi to your mum', 'say hi to your mom', 'give my regards to your mother', 'give my regards to your mum', 'give my love to your mum', 'give my love to your mom', 'many greetings to your mother', 'lots of greetings to your mother'] },
     { id: 'family.obicham-semeystvoto-ti', kind: 'phrase', bg: 'Обичам семейството ти.', tr: 'obícham seméystvoto ti', en: 'I love your family.', emoji: '❤️' },
@@ -30,11 +30,11 @@ export const family: Track = {
 
     // ---------------------------------------------------------------- Unit 2: at the table
     { id: 'family.masa', kind: 'word', bg: 'маса', tr: 'mása', en: 'table', emoji: '🍽️', alt: ['the table'], note: 'Сядаме на масата = we sit down to eat.' },
-    { id: 'family.vecherya', kind: 'word', bg: 'чиния', tr: 'chiníya', en: 'plate', emoji: '🍽️', alt: ['a plate', 'dish'] },
+    { id: 'family.chiniya', kind: 'word', bg: 'чиния', tr: 'chiníya', en: 'plate', emoji: '🍽️', alt: ['a plate', 'dish'] },
     { id: 'family.rakiya', kind: 'word', bg: 'ракия', tr: 'rakíya', en: 'rakia', emoji: '🥃', alt: ['brandy', 'fruit brandy', 'rakiya'], note: 'Strong fruit brandy, sipped slowly with a salad before the meal. Often homemade, and the тъст will want your opinion.' },
-    { id: 'family.vino', kind: 'word', bg: 'наздравица', tr: 'nazdrávitsa', en: 'toast', emoji: '🥂', alt: ['a toast', 'the toast'], note: 'At the table the тъст usually makes the first наздравица.' },
+    { id: 'family.nazdravitsa', kind: 'word', bg: 'наздравица', tr: 'nazdrávitsa', en: 'toast', emoji: '🥂', alt: ['a toast', 'the toast'], note: 'At the table the тъст usually makes the first наздравица.' },
     { id: 'family.salata', kind: 'word', bg: 'салата', tr: 'saláta', en: 'salad', emoji: '🥗', note: 'Шопска салата: tomatoes, cucumbers, peppers and grated сирене, in the white, green and red of the flag.' },
-    { id: 'family.banitsa', kind: 'word', bg: 'сарми', tr: 'sarmí', en: 'stuffed vine leaves', emoji: '🥬', alt: ['sarmi', 'stuffed cabbage leaves', 'stuffed leaves', 'sarma'], note: 'Rice and meat rolled in vine or cabbage leaves, a holiday classic.' },
+    { id: 'family.sarmi', kind: 'word', bg: 'сарми', tr: 'sarmí', en: 'stuffed vine leaves', emoji: '🥬', alt: ['sarmi', 'stuffed cabbage leaves', 'stuffed leaves', 'sarma'], note: 'Rice and meat rolled in vine or cabbage leaves, a holiday classic.' },
 
     { id: 'family.nazdrave', kind: 'word', bg: 'Наздраве!', tr: 'nazdráve', en: 'Cheers!', emoji: '🥂', alt: ['to your health'], note: 'Look each person in the eye as you clink glasses. People notice.' },
     { id: 'family.dobar-apetit', kind: 'phrase', bg: 'Добър апетит!', tr: 'dóbăr apetít', en: 'Enjoy your meal!', emoji: '🍴', alt: ['bon appetit', 'enjoy', 'enjoy your food', 'good appetite'], note: 'Said before everyone starts eating.' },
@@ -54,7 +54,7 @@ export const family: Track = {
     { id: 'family.zapovyadayte', kind: 'word', bg: 'Заповядайте', tr: 'zapovyádayte', en: 'Here you are', emoji: '🤲', alt: ['please', 'go ahead', 'help yourself', 'come in', 'please come in', 'after you', 'here you go'], note: 'The polite all-purpose "please, go ahead": offering food, inviting someone in, handing something over. Informal: заповядай.' },
     { id: 'family.izvinete', kind: 'word', bg: 'Извинете', tr: 'izvinéte', en: 'Excuse me', emoji: '🙇', alt: ['sorry', 'pardon', 'i am sorry', 'pardon me'], note: 'Polite. To a friend, извинявай.' },
     { id: 'family.blagodarya-vi', kind: 'phrase', bg: 'Благодаря Ви.', tr: 'blagodaryá vi', en: 'Thank you.', emoji: '🙏', alt: ['thanks', 'thank you very much'], note: 'Ви, often written with a capital letter, is the polite "you".' },
-    { id: 'family.dovizhdane', kind: 'word', bg: 'Всичко хубаво!', tr: 'vsíchko húbavo', en: 'All the best!', emoji: '👋', alt: ['all the best', 'take care', 'all the best to you'], note: 'A warm, polite goodbye, perfect when leaving the in-laws.' },
+    { id: 'family.vsichko-hubavo', kind: 'word', bg: 'Всичко хубаво!', tr: 'vsíchko húbavo', en: 'All the best!', emoji: '👋', alt: ['all the best', 'take care', 'all the best to you'], note: 'A warm, polite goodbye, perfect when leaving the in-laws.' },
 
     { id: 'family.chestita-koleda', kind: 'phrase', bg: 'Честита Коледа!', tr: 'chestíta kóleda', en: 'Merry Christmas!', emoji: '🎄', alt: ['happy christmas'], note: 'On Christmas Eve (Бъдни вечер) the table has an odd number of meatless dishes.' },
     { id: 'family.chestita-nova-godina', kind: 'phrase', bg: 'Честита Нова година!', tr: 'chestíta nóva godína', en: 'Happy New Year!', emoji: '🎆' },
@@ -69,7 +69,7 @@ export const family: Track = {
     { id: 'family.veseli-praznitsi', kind: 'phrase', bg: 'Весели празници!', tr: 'véseli práznitsi', en: 'Happy holidays!', emoji: '✨', alt: ['merry holidays', 'happy holiday'] },
 
     // ---------------------------------------------------------------- Unit 4: calling the in-laws
-    { id: 'family.telefon', kind: 'word', bg: 'обаждам се', tr: 'obázhdam se', en: 'I call', emoji: '📞', alt: ['call', "i'm calling", 'i am calling', 'i phone', 'i ring'], note: 'Ще ти се обадя: I will call you.' },
+    { id: 'family.obazhdam-se', kind: 'word', bg: 'обаждам се', tr: 'obázhdam se', en: 'I call', emoji: '📞', alt: ['call', "i'm calling", 'i am calling', 'i phone', 'i ring'], note: 'Ще ти се обадя: I will call you.' },
     { id: 'family.alo', kind: 'word', bg: 'Ало?', tr: 'aló', en: 'Hello? (on the phone)', emoji: '📞', alt: ['hello', 'hallo', 'hello on the phone'], note: 'What Bulgarians say when they pick up the phone. Family often just answer Да?' },
     { id: 'family.kamera', kind: 'word', bg: 'камера', tr: 'kámera', en: 'camera', emoji: '📷', alt: ['webcam', 'the camera'] },
     { id: 'family.chuvam', kind: 'word', bg: 'чувам', tr: 'chúvam', en: 'I hear', emoji: '👂', alt: ['i can hear', 'hear', 'to hear'] },
@@ -90,11 +90,11 @@ export const family: Track = {
 
     // ---------------------------------------------------------------- Unit 5: guests
     { id: 'family.gosti', kind: 'word', bg: 'гости', tr: 'gósti', en: 'guests', emoji: '🧑‍🤝‍🧑', alt: ['visitors', 'company'], note: 'На гости = visiting someone. Bulgarians rarely arrive empty-handed.' },
-    { id: 'family.podarak', kind: 'word', bg: 'бонбони', tr: 'bonbóni', en: 'chocolates', emoji: '🍬', alt: ['sweets', 'candy', 'a box of chocolates'] },
-    { id: 'family.tsvetya', kind: 'word', bg: 'букет', tr: 'bukét', en: 'bouquet', emoji: '💐', alt: ['a bouquet', 'flowers', 'a bunch of flowers'], note: 'Give an odd number of flowers: even numbers are for funerals.' },
-    { id: 'family.torta', kind: 'word', bg: 'домакиня', tr: 'domakínya', en: 'hostess', emoji: '👩‍🍳', alt: ['the hostess', 'housewife', 'host'], note: 'Вие сте чудесна домакиня: you are a wonderful hostess.' },
+    { id: 'family.bonboni', kind: 'word', bg: 'бонбони', tr: 'bonbóni', en: 'chocolates', emoji: '🍬', alt: ['sweets', 'candy', 'a box of chocolates'] },
+    { id: 'family.buket', kind: 'word', bg: 'букет', tr: 'bukét', en: 'bouquet', emoji: '💐', alt: ['a bouquet', 'flowers', 'a bunch of flowers'], note: 'Give an odd number of flowers: even numbers are for funerals.' },
+    { id: 'family.domakinya', kind: 'word', bg: 'домакиня', tr: 'domakínya', en: 'hostess', emoji: '👩‍🍳', alt: ['the hostess', 'housewife', 'host'], note: 'Вие сте чудесна домакиня: you are a wonderful hostess.' },
     { id: 'family.kashta', kind: 'word', bg: 'къща', tr: 'kắshta', en: 'house', emoji: '🏠', alt: ['a house', 'home'] },
-    { id: 'family.gradina', kind: 'word', bg: 'балкон', tr: 'balkón', en: 'balcony', emoji: '🪴', alt: ['the balcony', 'terrace'] },
+    { id: 'family.balkon', kind: 'word', bg: 'балкон', tr: 'balkón', en: 'balcony', emoji: '🪴', alt: ['the balcony', 'terrace'] },
 
     { id: 'family.zapovyadayte-vlezte', kind: 'phrase', bg: 'Заповядайте, влезте!', tr: 'zapovyádayte, vlézte', en: 'Please, come in!', emoji: '🚪', alt: ['please come in', 'come in please', 'come in', 'welcome come in'] },
     { id: 'family.da-se-sabuya-li', kind: 'phrase', bg: 'Да се събуя ли?', tr: 'da se săbúya li', en: 'Should I take off my shoes?', emoji: '👟', alt: ['should i take my shoes off', 'shall i take off my shoes', 'shall i take my shoes off', 'do i take off my shoes'], note: 'Most Bulgarian homes are shoes-off, and the host will hand you slippers (пантофи).' },
@@ -109,7 +109,7 @@ export const family: Track = {
     { id: 'family.sledvashtiya-pat-u-nas', kind: 'phrase', bg: 'Следващия път у нас!', tr: 'slédvashtiya păt u nas', en: 'Next time at our place!', emoji: '🏘️', alt: ['next time at our house', 'next time at ours', 'next time come to ours', 'next time at our home'], note: 'У нас = at our place. У вас = at your place.' },
 
     // ---------------------------------------------------------------- Unit 6: about me
-    { id: 'family.rabota', kind: 'word', bg: 'фирма', tr: 'fírma', en: 'company', emoji: '🏢', alt: ['firm', 'business', 'the company'], note: 'Работя във фирма: I work at a company.' },
+    { id: 'family.firma', kind: 'word', bg: 'фирма', tr: 'fírma', en: 'company', emoji: '🏢', alt: ['firm', 'business', 'the company'], note: 'Работя във фирма: I work at a company.' },
     { id: 'family.ofis', kind: 'word', bg: 'офис', tr: 'ófis', en: 'office', emoji: '🏢', alt: ['the office', 'an office'] },
     { id: 'family.grad', kind: 'word', bg: 'град', tr: 'grad', en: 'city', emoji: '🏙️', alt: ['town', 'a city', 'a town', 'the city'] },
     { id: 'family.hobi', kind: 'word', bg: 'хоби', tr: 'hóbi', en: 'hobby', emoji: '🎨', alt: ['a hobby', 'hobbies', 'pastime'] },
@@ -118,7 +118,7 @@ export const family: Track = {
 
     { id: 'family.kakvo-rabotite', kind: 'phrase', bg: 'Какво работите?', tr: 'kakvó rabótite', en: 'What do you do for work?', emoji: '🤔', alt: ['what do you do', 'what is your job', 'what work do you do', 'what do you work as'], bgAlt: ['Какво работиш?'], note: 'Polite. To a friend: Какво работиш?' },
     { id: 'family.rabotya-mnogo', kind: 'phrase', bg: 'Работя много.', tr: 'rabótya mnógo', en: 'I work a lot.', emoji: '😅', alt: ['i work hard', 'i work very much', 'i am working a lot'], note: 'Careful with stress: работя (I work) is rabótya, работа (work) is rábota.' },
-    { id: 'family.otkade-ste', kind: 'phrase', bg: 'А Вие?', tr: 'a víe', en: 'And you?', emoji: '🙂', alt: ['and you', 'what about you', 'how about you'], note: 'Polite Вие for elders; with friends say А ти?' },
+    { id: 'family.a-vie', kind: 'phrase', bg: 'А Вие?', tr: 'a víe', en: 'And you?', emoji: '🙂', alt: ['and you', 'what about you', 'how about you'], note: 'Polite Вие for elders; with friends say А ти?' },
     { id: 'family.ne-sam-ottuk', kind: 'phrase', bg: 'Не съм оттук.', tr: 'ne săm ottúk', en: "I'm not from here.", emoji: '🧳', alt: ['i am not from here', 'im not from here', 'i am not local', 'im not local'] },
     { id: 'family.obicham-da-gotvya', kind: 'phrase', bg: 'Обичам да готвя.', tr: 'obícham da gótvya', en: 'I love to cook.', emoji: '👨‍🍳', alt: ['i love cooking', 'i like to cook', 'i like cooking', 'i enjoy cooking'] },
 
@@ -137,8 +137,8 @@ export const family: Track = {
       emoji: '👪',
       lessons: [
         { id: 'family.u1.l1', title: 'Close family', titleBg: 'Най-близките', items: ['family.mayka', 'family.bashta', 'family.baba', 'family.dyado', 'family.sestra', 'family.brat'] },
-        { id: 'family.u1.l2', title: 'In-laws', titleBg: 'Тъща и тъст', items: ['family.tashta', 'family.tast', 'family.sapruga', 'family.detsa', 'family.vnutsi', 'family.lelya'] },
-        { id: 'family.u1.l3', title: 'Introductions', titleBg: 'Запознанства', items: ['family.tova-e-zhena-mi', 'family.tova-sa-nashite-detsa', 'family.mnogo-pozdravi-na-mayka-ti', 'family.obicham-semeystvoto-ti', 'family.tashta-mi-e-mila'] },
+        { id: 'family.u1.l2', title: 'In-laws', titleBg: 'Тъща и тъст', items: ['family.tashta', 'family.tast', 'family.sapruga', 'family.zet', 'family.vnutsi', 'family.lelya'] },
+        { id: 'family.u1.l3', title: 'Introductions', titleBg: 'Запознанства', items: ['family.zapoznayte-se-s-zhena-mi', 'family.tova-sa-nashite-detsa', 'family.mnogo-pozdravi-na-mayka-ti', 'family.obicham-semeystvoto-ti', 'family.tashta-mi-e-mila'] },
       ],
     },
     {
@@ -148,7 +148,7 @@ export const family: Track = {
       description: 'Toasts, compliments to the cook, and how to (try to) say no to seconds.',
       emoji: '🥂',
       lessons: [
-        { id: 'family.u2.l1', title: 'On the table', titleBg: 'На масата', items: ['family.masa', 'family.vecherya', 'family.rakiya', 'family.vino', 'family.salata', 'family.banitsa'] },
+        { id: 'family.u2.l1', title: 'On the table', titleBg: 'На масата', items: ['family.masa', 'family.chiniya', 'family.rakiya', 'family.nazdravitsa', 'family.salata', 'family.sarmi'] },
         { id: 'family.u2.l2', title: 'Table talk', titleBg: 'Наздраве!', items: ['family.nazdrave', 'family.dobar-apetit', 'family.vkusno', 'family.oshte', 'family.sit-sam'] },
         { id: 'family.u2.l3', title: 'Compliments to the cook', titleBg: 'Много е вкусно', items: ['family.mnogo-e-vkusno', 'family.blagodarya-za-vecheryata', 'family.mozhe-li-oshte-malko', 'family.za-vashe-zdrave', 'family.vie-gotvite-prekrasno'] },
       ],
@@ -160,7 +160,7 @@ export const family: Track = {
       description: 'Polite Вие forms for elders, and the wishes for every celebration.',
       emoji: '🎄',
       lessons: [
-        { id: 'family.u3.l1', title: 'Polite words', titleBg: 'Учтиво', items: ['family.kak-ste', 'family.dobre-doshli', 'family.zapovyadayte', 'family.izvinete', 'family.blagodarya-vi', 'family.dovizhdane'] },
+        { id: 'family.u3.l1', title: 'Polite words', titleBg: 'Учтиво', items: ['family.kak-ste', 'family.dobre-doshli', 'family.zapovyadayte', 'family.izvinete', 'family.blagodarya-vi', 'family.vsichko-hubavo'] },
         { id: 'family.u3.l2', title: 'Holidays', titleBg: 'Празници', items: ['family.chestita-koleda', 'family.chestita-nova-godina', 'family.chestit-rozhden-den', 'family.hristos-voskrese', 'family.chestita-baba-marta'] },
         { id: 'family.u3.l3', title: 'Toasts and wishes', titleBg: 'Пожелания', items: ['family.chestit-imen-den', 'family.voistina-voskrese', 'family.za-mnogo-godini', 'family.mnogo-zdrave-i-shtastie', 'family.veseli-praznitsi'] },
       ],
@@ -172,7 +172,7 @@ export const family: Track = {
       description: 'Phone and video calls with Baba and Dyado, even when the connection drops.',
       emoji: '📱',
       lessons: [
-        { id: 'family.u4.l1', title: 'Phone words', titleBg: 'Ало?', items: ['family.telefon', 'family.alo', 'family.kamera', 'family.chuvam', 'family.vizhdam', 'family.vrazka'] },
+        { id: 'family.u4.l1', title: 'Phone words', titleBg: 'Ало?', items: ['family.obazhdam-se', 'family.alo', 'family.kamera', 'family.chuvam', 'family.vizhdam', 'family.vrazka'] },
         { id: 'family.u4.l2', title: 'Can you hear me?', titleBg: 'Чувате ли ме?', items: ['family.chuvate-li-me', 'family.ne-vi-chuvam', 'family.vizhdam-vi', 'family.vrazkata-e-losha', 'family.shte-vi-se-obadya'] },
         { id: 'family.u4.l3', title: 'We miss you', titleBg: 'Липсвате ни', items: ['family.lipsvate-ni-mnogo', 'family.detsata-iskat-da-vi-vidyat', 'family.koga-shte-doydete-pri-nas', 'family.shte-vi-zvannem-v-nedelya', 'family.pozdravi-na-vsichki'] },
       ],
@@ -184,7 +184,7 @@ export const family: Track = {
       description: 'Arriving with flowers, praising the home, and surviving the third helping.',
       emoji: '💐',
       lessons: [
-        { id: 'family.u5.l1', title: 'Visiting', titleBg: 'На гости', items: ['family.gosti', 'family.podarak', 'family.tsvetya', 'family.torta', 'family.kashta', 'family.gradina'] },
+        { id: 'family.u5.l1', title: 'Visiting', titleBg: 'На гости', items: ['family.gosti', 'family.bonboni', 'family.buket', 'family.domakinya', 'family.kashta', 'family.balkon'] },
         { id: 'family.u5.l2', title: 'Come in!', titleBg: 'Заповядайте!', items: ['family.zapovyadayte-vlezte', 'family.da-se-sabuya-li', 'family.tova-e-za-vas', 'family.imate-mnogo-hubav-dom', 'family.chuvstvayte-se-kato-u-doma-si'] },
         { id: 'family.u5.l3', title: 'A lovely evening', titleBg: 'Прекрасна вечер', items: ['family.koy-e-napravil-tazi-torta', 'family.tryabva-da-mi-dadete-retseptata', 'family.ne-moga-poveche-blagodarya', 'family.beshe-prekrasna-vecher', 'family.sledvashtiya-pat-u-nas'] },
       ],
@@ -196,8 +196,8 @@ export const family: Track = {
       description: 'Work, where you are from and what you love, told politely to the older generation.',
       emoji: '🗣️',
       lessons: [
-        { id: 'family.u6.l1', title: 'Work and play', titleBg: 'Работа и хоби', items: ['family.rabota', 'family.ofis', 'family.grad', 'family.hobi', 'family.futbol', 'family.gotvene'] },
-        { id: 'family.u6.l2', title: 'Small talk', titleBg: 'Разговор', items: ['family.kakvo-rabotite', 'family.rabotya-mnogo', 'family.otkade-ste', 'family.ne-sam-ottuk', 'family.obicham-da-gotvya'] },
+        { id: 'family.u6.l1', title: 'Work and play', titleBg: 'Работа и хоби', items: ['family.firma', 'family.ofis', 'family.grad', 'family.hobi', 'family.futbol', 'family.gotvene'] },
+        { id: 'family.u6.l2', title: 'Small talk', titleBg: 'Разговор', items: ['family.kakvo-rabotite', 'family.rabotya-mnogo', 'family.a-vie', 'family.ne-sam-ottuk', 'family.obicham-da-gotvya'] },
         { id: 'family.u6.l3', title: 'My story', titleBg: 'За себе си', items: ['family.v-svobodnoto-si-vreme-igraya-futbol', 'family.ucha-balgarski-zaradi-zhena-si', 'family.rabotata-mi-e-interesna-no-trudna', 'family.a-vie-kakvo-obichate-da-pravite', 'family.razkazhete-mi-za-sebe-si'] },
       ],
     },
