@@ -1,0 +1,13 @@
+{
+ "v": 1,
+ "generatedAt": "2026-11-21T16:19:22.145Z",
+ "provider": "elevenlabs",
+ "voices": {
+  "f": "Milena",
+  "m": "Georgi",
+  "kid": "Mimi",
+  "elder-f": "Milena",
+  "elder-m": "Georgi"
+ },
+ "clips": {}
+}
