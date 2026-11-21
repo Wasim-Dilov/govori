@@ -141,7 +141,9 @@ export function elevenlabs(env = process.env) {
     if (res.ok) return true
     if (res.status === 401 || res.status === 403) {
       const e = await errorOf(res)
-      throw new FatalError(`ElevenLabs refused to read voices (HTTP ${res.status}: ${e.status || e.message}). The key needs the Voices permission.`)
+      if (`${e.status} ${e.message}`.includes('invalid_api_key'))
+        throw new FatalError('ElevenLabs did not recognise the API key (invalid_api_key). Copy the full key again (it starts with sk_) and update the GitHub secret ELEVENLABS_API_KEY.')
+      throw new FatalError(`ElevenLabs refused to read voices (HTTP ${res.status}: ${e.status || e.message}). The key needs the Voices permission (read and write).`)
     }
     return false
   }
