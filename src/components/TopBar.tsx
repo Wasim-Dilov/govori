@@ -35,7 +35,7 @@ export function GoalRing({ value, goal, size = 30, stroke = 4, children, label }
 
 export function TopBar({ onOpenFocus }: { onOpenFocus?: () => void }) {
   const summary = useApp((s) => s.summary)
-  const learned = useApp((s) => s.learned)
+  const learned = useApp((s) => s.learned + s.lettersLearned)
   const viewTrack = useApp((s) => s.viewTrack)
   const goal = useApp((s) => s.profile.dailyGoal)
   const [open, setOpen] = useState(false)

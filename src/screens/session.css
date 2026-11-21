@@ -7,7 +7,7 @@
 .session__combo { display: inline-flex; align-items: center; gap: 2px; color: var(--gold-ink); min-width: 48px; }
 .session__combo svg { width: 22px; height: 22px; }
 .session__timer { color: var(--ink); min-width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
-.session__body { overflow-x: hidden; }
+.session__body { overflow-x: hidden; padding-bottom: var(--space-8); }
 .session__retry { color: var(--rose-ink); background: var(--rose-soft); border-radius: var(--radius-full); padding: 4px 12px; display: inline-block; margin-top: var(--space-2); }
 
 .session__foot { position: sticky; bottom: 0; z-index: 6; }

@@ -116,6 +116,12 @@ export async function learnedCount(): Promise<number> {
   return ids.filter(isWord).length
 }
 
+/** Cyrillic letters met so far. */
+export async function lettersLearnedCount(): Promise<number> {
+  const ids = (await db.memory.toCollection().primaryKeys()) as string[]
+  return ids.filter((id) => study(id)?.kind === 'letter').length
+}
+
 /** Items answered wrongly in the last 14 days that have not been answered right since. */
 export async function recentMistakes(limit = 12): Promise<string[]> {
   const since = Date.now() - 14 * dayMs

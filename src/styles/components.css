@@ -23,7 +23,7 @@
 }
 .gv-btn:active:not(:disabled) { transform: translateY(var(--ledge-md)); box-shadow: 0 0 0 var(--tone-deep); }
 .gv-btn:focus-visible { outline: none; box-shadow: 0 var(--ledge-md) 0 var(--tone-deep), var(--focus-ring); }
-.gv-btn:disabled { background: var(--linen-sunk); color: var(--ink-muted); box-shadow: 0 var(--ledge-md) 0 var(--line); cursor: default; }
+.gv-btn:disabled { background: var(--linen-sunk); color: var(--ink-muted); box-shadow: 0 var(--ledge-md) 0 var(--line); outline: 2px solid var(--line-strong); outline-offset: -2px; cursor: default; }
 .gv-btn--block { width: 100%; }
 .gv-btn--quiet { --tone: var(--linen-raised); --tone-deep: var(--line-strong); --on-tone: var(--ink); outline: 2px solid var(--line-strong); outline-offset: -2px; }
 .gv-btn--ghost { background: transparent; box-shadow: none; color: var(--rose); }

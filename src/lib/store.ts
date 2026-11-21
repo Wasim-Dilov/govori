@@ -13,6 +13,7 @@ import {
   finishSession as persistFinish,
   getSummary,
   learnedCount,
+  lettersLearnedCount,
   learnedWordIds,
   newSessionId,
   recentMistakes,
@@ -80,6 +81,8 @@ interface State {
   focus: Focus
   progress: Record<string, LessonProgress>
   learned: number
+  /** Cyrillic letters met so far. */
+  lettersLearned: number
   dueCount: number
   mistakesCount: number
   screen: Screen
@@ -131,6 +134,7 @@ export const useApp = create<State>((set, get) => ({
   focus: DEFAULT_FOCUS,
   progress: {},
   learned: 0,
+  lettersLearned: 0,
   dueCount: 0,
   mistakesCount: 0,
   screen: { name: 'home' },
@@ -157,8 +161,8 @@ export const useApp = create<State>((set, get) => ({
   },
 
   async refresh() {
-    const [summary, progress, learned, due, mistakes] = await Promise.all([getSummary(), allLessonProgress(), learnedCount(), dueItems(50), recentMistakes(50)])
-    set({ summary, progress, learned, dueCount: due.length, mistakesCount: mistakes.length })
+    const [summary, progress, learned, letters, due, mistakes] = await Promise.all([getSummary(), allLessonProgress(), learnedCount(), lettersLearnedCount(), dueItems(50), recentMistakes(50)])
+    set({ summary, progress, learned, lettersLearned: letters, dueCount: due.length, mistakesCount: mistakes.length })
   },
 
   go(screen) {
@@ -177,7 +181,7 @@ export const useApp = create<State>((set, get) => ({
     setSfx(profile.sfx)
     await setKV('profile', profile)
     if (p.name !== undefined || p.dailyGoal !== undefined) {
-      const s = { ...get().summary, name: profile.name, dailyGoal: profile.dailyGoal }
+      const s = { ...(await getSummary()), name: profile.name, dailyGoal: profile.dailyGoal }
       set({ summary: s })
       await saveSummary(s)
     }
