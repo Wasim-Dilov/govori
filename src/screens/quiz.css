@@ -1,0 +1,60 @@
+/* "Quiz me": calm, big targets she can use without explanation. */
+.quiz { background: var(--linen); }
+.quiz__head { display: flex; align-items: center; gap: var(--space-3); min-height: 52px; position: sticky; top: 0; z-index: 5; background: var(--linen); }
+.quiz__close {
+  appearance: none; border: 0; flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--fill-secondary); color: var(--ink-muted); cursor: pointer;
+}
+.quiz__close svg { width: 16px; height: 16px; }
+.quiz__close:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.quiz__title { flex: 1; margin: 0; text-align: center; padding-right: 32px; }
+.quiz__progress { flex: 1; }
+.quiz__count { color: var(--ink-muted); font-variant-numeric: tabular-nums; min-width: 52px; text-align: right; }
+
+.quiz__body { display: grid; align-content: start; padding-block: var(--space-4) var(--space-6); }
+.quiz__center { display: grid; justify-items: center; text-align: center; gap: var(--space-4); padding-top: var(--space-6); }
+.quiz__badge { width: 72px; height: 72px; border-radius: 22px; display: grid; place-items: center; background: var(--rose-soft); color: var(--rose); }
+.quiz__badge svg { width: 36px; height: 36px; }
+.quiz__headline { margin: 0; }
+.quiz__lead { margin: 0; max-width: 34ch; }
+.quiz__steps { width: 100%; margin: 0; padding: 0; list-style: none; text-align: left; }
+.quiz__num {
+  flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--rose-soft); color: var(--rose-ink); font: 600 15px/1 var(--font-text);
+}
+.quiz__go { margin-top: var(--space-2); }
+
+.quiz__card-wrap { display: grid; gap: var(--space-3); }
+.quiz__ask { margin: 0; color: var(--ink-muted); text-align: center; }
+.quiz__card { display: grid; justify-items: center; text-align: center; gap: var(--space-3); padding: var(--space-6) var(--space-4); }
+.quiz__emoji { font-size: 48px; line-height: 1; }
+.quiz__en { margin: 0; overflow-wrap: anywhere; }
+.quiz__answer {
+  width: 100%; display: grid; justify-items: center; gap: var(--space-2);
+  padding-top: var(--space-4); border-top: var(--hairline, 1px) solid var(--separator);
+}
+.quiz__bg { margin: 0; font: 600 28px/34px var(--font-text); color: var(--rose); overflow-wrap: anywhere; }
+.quiz__tr { margin: 0; font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+.quiz__play svg { width: 18px; height: 18px; }
+.quiz__hint { margin: 0; text-align: center; }
+
+.quiz__foot {
+  position: sticky; bottom: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);
+  padding-block: var(--space-3) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  background: var(--material, var(--linen));
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+}
+.quiz__judge {
+  appearance: none; border: 0; min-height: 96px; border-radius: var(--radius-lg);
+  display: grid; justify-items: center; align-content: center; gap: 6px;
+  font: 600 17px/22px var(--font-text); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms var(--ease-out), filter 120ms;
+}
+.quiz__judge:active { transform: scale(0.97); filter: brightness(0.95); }
+.quiz__judge:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.quiz__judge-icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+.quiz__judge-icon svg { width: 22px; height: 22px; }
+.quiz__judge--no { background: var(--warn-soft); color: var(--warn-ink); }
+.quiz__judge--no .quiz__judge-icon { background: var(--warn); color: var(--on-warn); }
+.quiz__judge--yes { background: var(--pine-soft); color: var(--pine-ink); }
+.quiz__judge--yes .quiz__judge-icon { background: var(--pine); color: var(--on-pine); }

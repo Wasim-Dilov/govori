@@ -7,6 +7,7 @@ import { logAnswer, updateMemory } from '../lib/progress.ts'
 import { useApp } from '../lib/store.ts'
 import { BuildExercise } from '../exercises/Build.tsx'
 import { ChoiceExercise } from '../exercises/Choice.tsx'
+import { ClozeExercise } from '../exercises/Cloze.tsx'
 import { DialogueExercise } from '../exercises/Dialogue.tsx'
 import { IntroExercise } from '../exercises/Intro.tsx'
 import { MatchExercise } from '../exercises/Match.tsx'
@@ -357,6 +358,8 @@ function ExerciseView({ ex, common, skip }: { ex: Exercise; common: Common; skip
       return common.speaking ? <SpeakExercise ex={ex} {...common} /> : <SkipSpeak complete={common.complete} />
     case 'dialogue':
       return <DialogueExercise ex={ex} {...common} />
+    case 'cloze':
+      return <ClozeExercise ex={ex} {...common} />
     default:
       return <ChoiceExercise ex={ex} {...common} />
   }

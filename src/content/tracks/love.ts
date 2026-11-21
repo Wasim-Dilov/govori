@@ -444,6 +444,7 @@ export const love: Track = {
   units: [
     {
       id: 'love.u1',
+      canDo: 'You can tell her you love her and call her by a sweet pet name',
       title: 'Sweet words',
       titleBg: 'Мили думи',
       description: 'Pet names and the first words of love.',
@@ -456,6 +457,7 @@ export const love: Track = {
     },
     {
       id: 'love.u2',
+      canDo: 'You can tell her she is beautiful and compliment her eyes and smile',
       title: 'Compliments',
       titleBg: 'Комплименти',
       description: 'Tell her how beautiful she is.',
@@ -468,6 +470,7 @@ export const love: Track = {
     },
     {
       id: 'love.u3',
+      canDo: 'You can say good morning and good night to her and send a sweet text',
       title: 'Morning and night',
       titleBg: 'Сутрин и вечер',
       description: 'Good morning, good night and sweet texts.',
@@ -480,6 +483,7 @@ export const love: Track = {
     },
     {
       id: 'love.u4',
+      canDo: 'You can ask her out to dinner and tell her how you feel',
       title: 'Date night',
       titleBg: 'Вечер за двама',
       description: 'Feelings, dinner dates and making up.',
@@ -492,6 +496,7 @@ export const love: Track = {
     },
     {
       id: 'love.u5',
+      canDo: 'You can plan a surprise and suggest a trip away together',
       title: 'Plans and surprises',
       titleBg: 'Планове и изненади',
       description: 'Make plans together and surprise her.',
@@ -504,6 +509,7 @@ export const love: Track = {
     },
     {
       id: 'love.u6',
+      canDo: 'You can say sorry, really listen and tell her you are there for her',
       title: 'Making up',
       titleBg: 'Сдобряване',
       description: 'Say sorry, listen and be there for her.',
@@ -516,6 +522,7 @@ export const love: Track = {
     },
     {
       id: 'love.u7',
+      canDo: 'You can tell your story: how you met and the life you are building',
       title: 'Our story',
       titleBg: 'Нашата история',
       description: 'How you met, your family and the years ahead.',

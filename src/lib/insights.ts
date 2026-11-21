@@ -63,8 +63,9 @@ export type SkillId = 'recognise' | 'listen' | 'build' | 'type' | 'speak' | 'let
 export const SKILLS: { id: SkillId; label: string; gerund: string; types: ExerciseType[] }[] = [
   { id: 'recognise', label: 'Recognise', gerund: 'Recognising words', types: ['mc_bg_en', 'mc_en_bg', 'match'] },
   { id: 'listen', label: 'Listen', gerund: 'Listening', types: ['listen_mc', 'listen_type'] },
-  { id: 'build', label: 'Build sentences', gerund: 'Building sentences', types: ['build'] },
+  { id: 'build', label: 'Build sentences', gerund: 'Building sentences', types: ['build', 'cloze'] },
   { id: 'type', label: 'Type', gerund: 'Typing in Bulgarian', types: ['type_bg'] },
+  // Missions ("Say it to her today") and "Quiz me" answers are logged as 'speak', so they count here too.
   { id: 'speak', label: 'Speak', gerund: 'Speaking', types: ['speak'] },
   { id: 'letters', label: 'Letters', gerund: 'Reading letters', types: ['letter_sound', 'sound_letter', 'read_word'] },
   { id: 'dialogue', label: 'Conversations', gerund: 'Conversations', types: ['dialogue'] },

@@ -171,6 +171,7 @@ export const kids: Track = {
   units: [
     {
       id: 'kids.u1',
+      canDo: 'You can get the kids to the table and ask if they are hungry or thirsty',
       title: 'Hungry & thirsty',
       titleBg: 'Гладни и жадни',
       description: 'Food and drink the kids ask for every day.',
@@ -183,6 +184,7 @@ export const kids: Track = {
     },
     {
       id: 'kids.u2',
+      canDo: 'You can run bath time and bedtime and wish them sweet dreams',
       title: 'Bath & bedtime',
       titleBg: 'Баня и лягане',
       description: 'From bath time to sweet dreams.',
@@ -195,6 +197,7 @@ export const kids: Track = {
     },
     {
       id: 'kids.u3',
+      canDo: 'You can get the kids dressed and take them out to the park',
       title: 'Play & outside',
       titleBg: 'Игра и навън',
       description: 'Toys, the park, and getting dressed to go out.',
@@ -207,6 +210,7 @@ export const kids: Track = {
     },
     {
       id: 'kids.u4',
+      canDo: 'You can comfort a scraped knee, set house rules and tell them well done',
       title: 'Ouch, rules & praise',
       titleBg: 'Боли, правила и браво',
       description: 'Comfort, house rules, and telling them they did great.',
@@ -219,6 +223,7 @@ export const kids: Track = {
     },
     {
       id: 'kids.u5',
+      canDo: 'You can get everyone up, out of the door and off to school',
       title: 'School mornings',
       titleBg: 'Сутрин преди училище',
       description: 'Getting everyone up, out of the door and picked up again.',
@@ -231,6 +236,7 @@ export const kids: Track = {
     },
     {
       id: 'kids.u6',
+      canDo: 'You can name their feelings, calm a tantrum and make up afterwards',
       title: 'Big feelings',
       titleBg: 'Големи чувства',
       description: 'Naming feelings, calming tantrums and making up.',
@@ -243,6 +249,7 @@ export const kids: Track = {
     },
     {
       id: 'kids.u7',
+      canDo: 'You can play hide-and-seek, draw together and read one more story',
       title: 'Games, stories & songs',
       titleBg: 'Игри, приказки и песни',
       description: 'Hide-and-seek, drawing, and one more story at bedtime.',
@@ -255,6 +262,7 @@ export const kids: Track = {
     },
     {
       id: 'kids.u8',
+      canDo: 'You can handle car trips, birthday parties and a visit to the doctor',
       title: 'Out & about',
       titleBg: 'Навън и на път',
       description: 'Car trips, birthday parties and a visit to the doctor.',

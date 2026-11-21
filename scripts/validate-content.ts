@@ -56,6 +56,15 @@ function checkBg(bg: string, where: string) {
   if (/[ыэё]/i.test(bg)) err(`${where}: Russian-only letter in "${bg}"`)
 }
 
+/** Can-do statements: one per unit, "You can ...", plain English, no final punctuation. */
+function checkCanDo(canDo: string | undefined, where: string) {
+  if (!canDo || !canDo.trim()) return err(`${where}: needs a canDo statement ("You can ...")`)
+  if (!canDo.startsWith('You can ')) err(`${where}: canDo must start with "You can ": "${canDo}"`)
+  if (/[.!?…;:,]$/.test(canDo.trim())) err(`${where}: canDo must not end with punctuation: "${canDo}"`)
+  if (/[—–§]/.test(canDo)) err(`${where}: canDo contains a dash or § sign: "${canDo}"`)
+  if (canDo.length > 100) warn(`${where}: canDo is long (${canDo.length} characters)`)
+}
+
 /** House style: no em dashes or section signs in any text the learner reads. */
 function checkStyle(text: string | undefined, where: string) {
   if (text && /[—§]/.test(text)) err(`${where}: contains an em dash or § sign: "${text}"`)
@@ -266,6 +275,7 @@ function validateAlphabet(a: Alphabet) {
   const usedLetter = new Map<string, string>()
   for (const u of a.units) {
     claimId(u.id, `azbuka unit ${u.id}`)
+    checkCanDo(u.canDo, `azbuka unit ${u.id}`)
     for (const lesson of u.lessons) {
       const where = `azbuka lesson ${lesson.id}`
       claimId(lesson.id, where)
@@ -411,6 +421,7 @@ function validateTrack(t: Track, minUnits: number, target: number) {
   else if (t.units.length < target) warn(`${t.id}: has ${t.units.length} units (planned ${target})`)
   for (const u of t.units) {
     checkStyle(u.title, `${t.id} unit ${u.id} title`)
+    checkCanDo(u.canDo, `${t.id} unit ${u.id}`)
     checkStyle(u.description, `${t.id} unit ${u.id} description`)
     noFullStop(u.title, `${t.id} unit ${u.id} title`)
     for (const l of u.lessons) noFullStop(l.title, `${t.id} lesson ${l.id} title`)

@@ -145,3 +145,15 @@
 @media (prefers-reduced-motion: reduce) {
   .dlg-bubble--typing i, .spk-rec__wrap.is-live .spk-rec__btn svg, .spk-play.is-playing .gv-row__icon svg, .dlg-opt.is-wrong { animation: none; }
 }
+
+/* "Say it out loud first" step before his options */
+.dlg-say__en { margin: 0; font: 600 20px/25px var(--font-text); color: var(--ink); }
+.dlg-say__help { margin: 0; font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+.dlg-say__actions { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2); align-items: center; }
+.dlg-say__actions svg { flex: none; }
+.dlg-model {
+  appearance: none; border: 0; background: var(--rose-soft); color: var(--rose-ink);
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--radius-full);
+  font: 600 13px/18px var(--font-text); cursor: pointer; margin-left: auto;
+}
+.dlg-model:focus-visible { outline: none; box-shadow: var(--focus-ring); }

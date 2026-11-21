@@ -42,6 +42,8 @@ export interface Unit {
   titleBg: string
   description: string
   emoji: string
+  /** What the learner can do after this unit, e.g. "You can greet your тъща and ask how she is". Starts with "You can", no final full stop. */
+  canDo?: string
   lessons: Lesson[]
 }
 
@@ -150,6 +152,8 @@ export interface AlphabetUnit {
   titleBg: string
   description: string
   emoji: string
+  /** What the learner can do after this unit, e.g. "You can greet your тъща and ask how she is". Starts with "You can", no final full stop. */
+  canDo?: string
   lessons: AlphabetLesson[]
 }
 

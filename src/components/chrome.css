@@ -83,3 +83,37 @@
 /* A row icon slot that holds its own tile (track badge, week number): no tinted backing. */
 .gv-row__icon.badge-slot { background: transparent; color: inherit; border-radius: 0; }
 .focus-plan-track { flex: none; display: inline-flex; }
+
+/* ---------- streak: freezes in the navbar, the status line and the repair notice */
+.nav-streak.is-off { color: var(--label-tertiary); }
+.nav-streak__freezes { display: inline-flex; gap: 1px; margin-left: 2px; color: var(--trk-basics); }
+.nav-streak__freezes svg { width: 14px; height: 14px; }
+
+.streak-line {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--space-2);
+  margin: calc(-1 * var(--space-3)) 0 var(--space-5); padding: 0 var(--space-1);
+  font: 400 15px/20px var(--font-text); color: var(--ink-muted);
+}
+.streak-line__icon { flex: none; width: 18px; height: 18px; color: var(--ink-muted); }
+.streak-line.is-done .streak-line__icon { color: var(--rose); }
+.streak-line__icon.is-frost { color: var(--trk-basics); }
+.streak-line__text { min-width: 0; }
+.streak-line__freeze {
+  display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: var(--radius-full);
+  background: var(--fill-secondary); font: 500 13px/18px var(--font-text); color: var(--ink-muted); white-space: nowrap;
+}
+.streak-line__freeze.has-freeze { background: var(--trk-basics-soft); color: var(--trk-basics-ink, var(--ink)); }
+.streak-line__chip { width: 14px; height: 14px; color: var(--trk-basics); }
+
+.streak-repair {
+  display: grid; gap: var(--space-3); padding: var(--space-4); margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+  background: var(--linen-raised); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+}
+.streak-repair__head { display: flex; align-items: flex-start; gap: var(--space-3); }
+.streak-repair__icon { color: var(--rose); }
+.streak-repair__text { display: grid; gap: 2px; min-width: 0; }
+.streak-repair__title { font: 600 17px/22px var(--font-text); color: var(--ink); }
+.streak-repair__body { font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+.streak-repair__dots { display: flex; gap: 6px; padding-left: calc(32px + var(--space-3)); }
+.streak-repair__dots i { width: 28px; height: 6px; border-radius: var(--radius-full); background: var(--fill-secondary); }
+.streak-repair__dots i.on { background: var(--rose); }

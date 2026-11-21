@@ -19,7 +19,9 @@ import {
   type DayActivity,
   type Rate,
 } from '../lib/insights.ts'
-import { IconChart, IconShare, IconSpeaker, IconStar, IconTarget } from '../components/Icons.tsx'
+import { IconChart, IconCheck, IconHeart, IconShare, IconSpeaker, IconStar, IconTarget } from '../components/Icons.tsx'
+import { earnedCanDos } from '../lib/milestones.ts'
+import { missionsDone } from '../lib/missions.ts'
 import './stats.css'
 
 interface Data {
@@ -185,6 +187,10 @@ function Filled(props: {
         </p>
       </motion.section>
 
+      <CanDoSection />
+
+      <TogetherSection sessions={data.sessions} />
+
       <motion.section variants={enter} className="gv-section" aria-labelledby="st-hl-t">
         <h2 id="st-hl-t" className="gv-section-header">
           Highlights
@@ -285,6 +291,103 @@ function Filled(props: {
         <ExportSection />
       </motion.div>
     </>
+  )
+}
+
+/** "I can…": the capability lines of every unit he has finished. */
+function CanDoSection() {
+  const [items, setItems] = useState<Awaited<ReturnType<typeof earnedCanDos>> | null>(null)
+  useEffect(() => {
+    let alive = true
+    earnedCanDos()
+      .then((r) => alive && setItems(r))
+      .catch(() => alive && setItems([]))
+    return () => {
+      alive = false
+    }
+  }, [])
+  if (items === null) return null
+  return (
+    <motion.section variants={enter} className="gv-section" aria-labelledby="st-cando-t">
+      <h2 id="st-cando-t" className="gv-section-header">
+        I can…
+      </h2>
+      <ul className="gv-list st-plain">
+        {items.length ? (
+          items.map((c) => (
+            <li key={c.unitId} className="gv-row st-cando">
+              <span className="st-cando__check" aria-hidden="true">
+                <IconCheck />
+              </span>
+              <span className="gv-row__body">
+                <span className="gv-row__title st-wrap">{c.canDo.replace(/^You can /, '')}</span>
+                <span className="gv-row__subtitle">{c.title}</span>
+              </span>
+            </li>
+          ))
+        ) : (
+          <li className="gv-row">
+            <span className="st-cando__check is-empty" aria-hidden="true">
+              <IconCheck />
+            </span>
+            <span className="gv-row__body">
+              <span className="gv-row__title st-wrap muted">Finish a unit to unlock your first I can</span>
+            </span>
+          </li>
+        )}
+      </ul>
+      {items.length > 0 && (
+        <p className="gv-section-footer">
+          {items.length} of the things you can now do in Bulgarian.
+        </p>
+      )}
+    </motion.section>
+  )
+}
+
+/** Using it for real: "Say it to her today" missions and "Quiz me" rounds this week. */
+function TogetherSection({ sessions }: { sessions: SessionRecord[] }) {
+  const [missions, setMissions] = useState<number | null>(null)
+  useEffect(() => {
+    let alive = true
+    missionsDone(7)
+      .then((n) => alive && setMissions(n))
+      .catch(() => alive && setMissions(0))
+    return () => {
+      alive = false
+    }
+  }, [])
+  const weekAgo = Date.now() - 7 * 86_400_000
+  const quizzes = sessions.filter((s) => s.kind === 'quiz' && s.start >= weekAgo).length
+  if (missions === null) return null
+  return (
+    <motion.section variants={enter} className="gv-section" aria-labelledby="st-together-t">
+      <h2 id="st-together-t" className="gv-section-header">
+        With her this week
+      </h2>
+      <div className="gv-list">
+        <div className="gv-row">
+          <span className="gv-row__icon st-together__icon" aria-hidden="true">
+            <IconHeart />
+          </span>
+          <span className="gv-row__body">
+            <span className="gv-row__title">Said it to her</span>
+            <span className="gv-row__subtitle">{missions ? 'Phrases from "Say it to her today"' : 'Try today\'s phrase on Home'}</span>
+          </span>
+          <span className="gv-row__accessory st-together__n">{missions}</span>
+        </div>
+        <div className="gv-row">
+          <span className="gv-row__icon st-together__icon" aria-hidden="true">
+            <IconCheck />
+          </span>
+          <span className="gv-row__body">
+            <span className="gv-row__title">Quiz me rounds</span>
+            <span className="gv-row__subtitle">{quizzes ? 'She checked your speaking' : 'Start one from Me, Practise together'}</span>
+          </span>
+          <span className="gv-row__accessory st-together__n">{quizzes}</span>
+        </div>
+      </div>
+    </motion.section>
   )
 }
 

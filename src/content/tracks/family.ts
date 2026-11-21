@@ -131,6 +131,7 @@ export const family: Track = {
   units: [
     {
       id: 'family.u1',
+      canDo: 'You can introduce your family and greet your тъща and тъст',
       title: 'The family',
       titleBg: 'Семейството',
       description: 'Who is who, including the two people who matter most at Sunday lunch.',
@@ -143,6 +144,7 @@ export const family: Track = {
     },
     {
       id: 'family.u2',
+      canDo: 'You can raise a toast, praise the cook and politely refuse seconds',
       title: 'At the table',
       titleBg: 'На масата',
       description: 'Toasts, compliments to the cook, and how to (try to) say no to seconds.',
@@ -155,6 +157,7 @@ export const family: Track = {
     },
     {
       id: 'family.u3',
+      canDo: 'You can speak politely to elders with Вие and wish everyone well on holidays',
       title: 'Holidays and respect',
       titleBg: 'Празници и уважение',
       description: 'Polite Вие forms for elders, and the wishes for every celebration.',
@@ -167,6 +170,7 @@ export const family: Track = {
     },
     {
       id: 'family.u4',
+      canDo: 'You can call your in-laws, check they can hear you and say you miss them',
       title: 'Calling the in-laws',
       titleBg: 'По телефона',
       description: 'Phone and video calls with Baba and Dyado, even when the connection drops.',
@@ -179,6 +183,7 @@ export const family: Track = {
     },
     {
       id: 'family.u5',
+      canDo: 'You can arrive as a guest with flowers and compliment the home and the food',
       title: 'Guests',
       titleBg: 'На гости',
       description: 'Arriving with flowers, praising the home, and surviving the third helping.',
@@ -191,6 +196,7 @@ export const family: Track = {
     },
     {
       id: 'family.u6',
+      canDo: 'You can tell the family about your work, where you are from and what you love',
       title: 'About me',
       titleBg: 'За мен',
       description: 'Work, where you are from and what you love, told politely to the older generation.',

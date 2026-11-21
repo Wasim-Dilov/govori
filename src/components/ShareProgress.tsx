@@ -3,13 +3,27 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { IconShare } from './Icons.tsx'
 import { useApp } from '../lib/store.ts'
 import type { SessionResult } from '../lib/progress.ts'
-import { buildSessionCard, cardText, copyText, getPartner, renderCard, savePartner, shareCard, suggestedMessage, type CardData, type Partner } from '../lib/shareCard.ts'
+import type { Milestone } from '../lib/milestones.ts'
+import type { Speaker } from '../content/index.ts'
+import { buildSessionCard, buildWeekCard, cardText, copyText, getPartner, renderCard, savePartner, shareCard, suggestedMessage, type CardData, type Partner } from '../lib/shareCard.ts'
 import './share.css'
 
 type Step = 'setup' | 'preview'
+type Build = (opts: { partner: string; from: string; message: string; speaker: Speaker }) => Promise<CardData>
 
 /** "Share with her": a tinted button that opens a sheet with a progress card to send to his wife. */
-export function ShareProgress({ result }: { result: SessionResult }) {
+export function ShareProgress({ result, milestone, className }: { result: SessionResult; milestone?: Milestone; className?: string }) {
+  const build = useCallback<Build>((o) => buildSessionCard(result, { ...o, milestone }), [result, milestone])
+  return <ShareFlow build={build} sheetTitle="Share today’s progress" className={className} />
+}
+
+/** "Share my week": the same sheet with the last 7 days on the card (used by the Sunday week card). */
+export function ShareWeek({ className, label = 'Share my week' }: { className?: string; label?: string }) {
+  const build = useCallback<Build>((o) => buildWeekCard(o), [])
+  return <ShareFlow build={build} sheetTitle="Share your week" className={className} triggerLabel={label} />
+}
+
+function ShareFlow({ build, sheetTitle, className, triggerLabel }: { build: Build; sheetTitle: string; className?: string; triggerLabel?: string }) {
   const profileName = useApp((s) => s.profile.name)
   const speaker = useApp((s) => s.profile.speaker)
   const reduce = useReducedMotion()
@@ -42,7 +56,7 @@ export function ShareProgress({ result }: { result: SessionResult }) {
     if (!open || step !== 'preview') return
     let cancelled = false
     const t = setTimeout(async () => {
-      const data = await buildSessionCard(result, { partner: partner?.name ?? '', from: partner?.from || profileName || '', message, speaker })
+      const data = await build({ partner: partner?.name ?? '', from: partner?.from || profileName || '', message, speaker })
       const png = await renderCard(data)
       if (cancelled) return
       setCard({ data, png, url: URL.createObjectURL(png) })
@@ -52,7 +66,7 @@ export function ShareProgress({ result }: { result: SessionResult }) {
       clearTimeout(t)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, step, message, partner, profileName, speaker, result])
+  }, [open, step, message, partner, profileName, speaker, build])
 
   // Free the previous preview image whenever a new one replaces it, and on unmount.
   useEffect(() => {
@@ -93,11 +107,11 @@ export function ShareProgress({ result }: { result: SessionResult }) {
     setStatus(ok ? 'Message copied.' : 'Could not copy. Long-press the text to copy it.')
   }
 
-  const label = partner?.name ? `Share with ${partner.name}` : 'Share with her'
+  const label = triggerLabel ?? (partner?.name ? `Share with ${partner.name}` : 'Share with her')
 
   return (
     <>
-      <button type="button" className="gv-btn gv-btn--tinted gv-btn--block gv-tone-rose share-trigger" onClick={openSheet} disabled={partner === undefined}>
+      <button type="button" className={className ?? 'gv-btn gv-btn--tinted gv-btn--block gv-tone-rose share-trigger'} onClick={openSheet} disabled={partner === undefined}>
         <IconShare width={20} height={20} />
         {label}
       </button>
@@ -121,9 +135,9 @@ export function ShareProgress({ result }: { result: SessionResult }) {
               <div className="gv-sheet__grip" />
               <div className="share-head">
                 <h2 id="share-title" className="t-headline">
-                  {step === 'setup' ? 'Who is it for?' : 'Share today’s progress'}
+                  {step === 'setup' ? 'Who is it for?' : sheetTitle}
                 </h2>
-                <button type="button" className="gv-btn gv-btn--plain gv-btn--sm share-head__done" onClick={close}>
+                <button type="button" className="gv-btn gv-btn--plain gv-btn--sm gv-tone-rose share-head__done" onClick={close}>
                   {step === 'setup' ? 'Cancel' : 'Done'}
                 </button>
               </div>
@@ -181,7 +195,7 @@ export function ShareProgress({ result }: { result: SessionResult }) {
                       <IconShare width={20} height={20} />
                       {busy ? 'Sharing…' : 'Share'}
                     </button>
-                    <button type="button" className="gv-btn gv-btn--plain gv-btn--block" onClick={() => void copy()} disabled={!card}>
+                    <button type="button" className="gv-btn gv-btn--plain gv-btn--block gv-tone-rose" onClick={() => void copy()} disabled={!card}>
                       Copy text
                     </button>
                   </div>

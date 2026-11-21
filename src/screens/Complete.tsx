@@ -1,12 +1,15 @@
 // The calm summary after every session: what you did, what it earned, what you met.
-import { useEffect, useRef } from 'react'
-import { motion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useApp } from '../lib/store.ts'
 import { LEVEL_NAMES } from '../lib/progress.ts'
 import { sfx, speak } from '../lib/audio.ts'
 import type { StudyItem } from '../content/index.ts'
 import { IconChat, IconCheck, IconFlame, IconSpeaker, IconStar, IconTarget } from '../components/Icons.tsx'
 import { ShareProgress } from '../components/ShareProgress.tsx'
+import { IconSnowflake } from '../components/TopBar.tsx'
+import type { Milestone } from '../lib/milestones.ts'
+import type { SessionResult } from '../lib/progress.ts'
 import './complete.css'
 
 const TITLES: Record<string, { en: string; bg: string }> = {
@@ -16,6 +19,10 @@ const TITLES: Record<string, { en: string; bg: string }> = {
   practice: { en: 'Review done', bg: 'Добре!' },
   mistakes: { en: 'Mistakes fixed', bg: 'Готово!' },
   speed: { en: 'Speed round done', bg: 'Бързо!' },
+  warmup: { en: 'Warm-up done', bg: 'Загрявката е готова.' },
+  quick: { en: 'One minute, done', bg: 'Една минута. Браво!' },
+  welcome: { en: 'Welcome back', bg: 'Радвам се, че се върна.' },
+  quiz: { en: 'Quiz done', bg: 'Благодаря, че ме изпита!' },
 }
 
 const fmtTime = (ms: number) => {
@@ -36,6 +43,8 @@ export function CompleteScreen() {
   const go = useApp((s) => s.go)
   const result = screen.name === 'complete' ? screen.result : null
   const played = useRef(false)
+  // Milestones come first, one sheet each, then the summary.
+  const [shown, setShown] = useState(0)
 
   // A short chime once per result.
   useEffect(() => {
@@ -53,7 +62,10 @@ export function CompleteScreen() {
   const words = result.newItems.slice(0, 8)
   const showStory = result.lessonLevelUp && result.kind === 'story'
   const showLesson = result.lessonLevelUp && isLessonKind
-  const hasNews = result.goalReached || !!levelName || showStory || showLesson
+  const milestones = result.milestones ?? []
+  const unitDone = milestones.find((m) => m.kind === 'unit' && m.canDo)
+  const hasNews = result.goalReached || !!levelName || showStory || showLesson || !!unitDone || !!result.usedFreeze || !!result.repaired || !!result.earnedFreeze
+  const milestone = shown < milestones.length ? milestones[shown] : null
 
   return (
     <div className={`done gv-tone-${result.trackId}`}>
@@ -105,6 +117,18 @@ export function CompleteScreen() {
 
         {hasNews && (
           <motion.div className="gv-list done__news" {...fade(3)}>
+            {unitDone && (
+              <div className="gv-row done__cando">
+                <span className="gv-row__icon">
+                  <IconStar />
+                </span>
+                <span className="gv-row__body">
+                  <span className="gv-row__title">{unitDone.canDo}</span>
+                  <span className="gv-row__subtitle">{unitDone.title}</span>
+                </span>
+              </div>
+            )}
+            {(result.usedFreeze || result.repaired || result.earnedFreeze) && <StreakNews result={result} />}
             {result.goalReached && (
               <div className="gv-row gv-tone-gold">
                 <span className="gv-row__icon">
@@ -188,6 +212,100 @@ export function CompleteScreen() {
           Continue
         </button>
       </div>
+
+      <AnimatePresence>{milestone && <MilestoneSheet key={milestone.id} milestone={milestone} result={result} onContinue={() => setShown((n) => n + 1)} />}</AnimatePresence>
     </div>
+  )
+}
+
+/** Freeze and repair news, as quiet rows in the summary list. */
+function StreakNews({ result }: { result: SessionResult }) {
+  const rows = [
+    result.repaired && { title: 'Streak repaired', sub: `Your ${result.streak}-day streak is back.`, frost: false },
+    result.usedFreeze && { title: 'A freeze kept your streak', sub: 'Yesterday is covered. Keep going today.', frost: true },
+    result.earnedFreeze && { title: 'You earned a streak freeze', sub: 'Seven goal days. It covers one missed day.', frost: true },
+  ].filter(Boolean) as { title: string; sub: string; frost: boolean }[]
+  return (
+    <>
+      {rows.map((r) => (
+        <div key={r.title} className="gv-row">
+          <span className={`gv-row__icon${r.frost ? ' done__frost' : ''}`}>{r.frost ? <IconSnowflake /> : <IconFlame />}</span>
+          <span className="gv-row__body">
+            <span className="gv-row__title">{r.title}</span>
+            <span className="gv-row__subtitle">{r.sub}</span>
+          </span>
+        </div>
+      ))}
+    </>
+  )
+}
+
+/** A milestone, marked calmly: the stitch band, the moment, a Bulgarian proverb, and what he can now do. */
+function MilestoneSheet({ milestone: m, result, onContinue }: { milestone: Milestone; result: SessionResult; onContinue: () => void }) {
+  const reduce = useReducedMotion()
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    ref.current?.focus()
+  }, [])
+  const big = m.kind === 'unit' ? null : `${m.value}`
+  const unit = m.kind === 'streak' ? (m.value === 1 ? 'day' : 'days') : m.kind === 'words' ? 'words' : ''
+  return (
+    <motion.div className="milestone" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.25 }}>
+      <motion.div
+        ref={ref}
+        className="milestone__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="milestone-title"
+        tabIndex={-1}
+        initial={reduce ? false : { y: 24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+      >
+        <div className="milestone__body flow__pad">
+          <div className="gv-shevitsa milestone__band" aria-hidden="true" />
+          <p className="milestone__eyebrow">{m.kind === 'unit' ? 'Unit complete' : m.kind === 'streak' ? 'Streak milestone' : 'Words milestone'}</p>
+          {big ? (
+            <p className="milestone__big" aria-hidden="true">
+              {big}
+              <span>{unit}</span>
+            </p>
+          ) : (
+            <span className="gv-ring-wrap milestone__mark" aria-hidden="true">
+              <svg className="gv-ring gv-ring--lg gv-tone-pine" viewBox="0 0 36 36" style={{ ['--value' as string]: 100 }}>
+                <circle className="gv-ring__track" cx="18" cy="18" r="16" />
+                <circle className="gv-ring__value" cx="18" cy="18" r="16" pathLength={100} />
+              </svg>
+              <span className="gv-ring__label done__check">
+                <IconCheck />
+              </span>
+            </span>
+          )}
+          <h2 id="milestone-title" className="t-title1 milestone__title">
+            {m.title}
+          </h2>
+          {m.kind !== 'unit' && <p className="milestone__subtitle">{m.subtitle}</p>}
+          {m.canDo && (
+            <p className="milestone__cando">
+              <IconStar />
+              <span>{m.canDo}</span>
+            </p>
+          )}
+          <figure className="milestone__proverb">
+            <blockquote lang="bg">{m.proverb.bg}</blockquote>
+            <figcaption>
+              <span>{m.proverb.tr}</span>
+              <span>{m.proverb.en}</span>
+            </figcaption>
+          </figure>
+        </div>
+        <div className="done__foot flow__pad">
+          <ShareProgress result={result} milestone={m} />
+          <button type="button" className="gv-btn gv-btn--block" onClick={onContinue}>
+            Continue
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
   )
 }

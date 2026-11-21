@@ -3,7 +3,7 @@
 // onto the new version, but never in the middle of a lesson or onboarding.
 import { useApp } from './store.ts'
 
-const UNSAFE = new Set(['session', 'complete', 'onboarding'])
+const UNSAFE = new Set(['session', 'complete', 'onboarding', 'quiz'])
 const HOUR = 60 * 60 * 1000
 
 export function watchForUpdates() {

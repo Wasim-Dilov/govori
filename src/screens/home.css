@@ -13,6 +13,13 @@
 .home-today__text { flex: 1; min-width: 0; display: grid; gap: 2px; }
 .home-today__eyebrow { font: 400 13px/18px var(--font-text); color: var(--ink-muted); }
 .home-today__title { font: 600 20px/25px var(--font-display); letter-spacing: -0.01em; color: var(--ink); overflow-wrap: anywhere; }
+.home-today--compact { padding: 0; gap: 0; }
+.home-today__row { appearance: none; border: 0; background: none; color: inherit; font: inherit; text-align: left; width: 100%; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.home-today__row .home-today__text { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.home-today__row:active { background: var(--fill-secondary, var(--linen-sunk)); }
+.home-today__row:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.home-today__title--sm { font: 600 17px/22px var(--font-text); letter-spacing: 0; }
+.home-today__chev { width: 18px; height: 18px; color: var(--label-tertiary, var(--ink-muted)); flex: none; }
 .home-today__bg { font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
 .home-today__goal { flex: none; display: grid; justify-items: center; gap: 4px; }
 .home-today__xp { font: 600 17px/1 var(--font-text); font-variant-numeric: tabular-nums; color: var(--ink); }
@@ -135,3 +142,44 @@
 .node-sheet__locked { display: flex; align-items: flex-start; gap: var(--space-2); font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
 .node-sheet__locked svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
 .node-sheet .gv-btn--block { margin-top: var(--space-2); }
+
+/* ---------- today: warm-up action */
+.home-today__action { display: grid; gap: 6px; }
+.home-today__then { text-align: center; font: 400 13px/18px var(--font-text); color: var(--ink-muted); }
+
+/* ---------- welcome back (after 3+ days away): warm, no guilt */
+.home-welcome { display: grid; gap: var(--space-2); padding: var(--space-4); margin-bottom: var(--space-5); box-shadow: var(--shadow-card); }
+.home-welcome__bg { font: 400 15px/20px var(--font-text); color: var(--rose); }
+.home-welcome__title { font: 700 22px/28px var(--font-display); letter-spacing: -0.01em; color: var(--ink); margin-top: -2px; }
+.home-welcome__body { font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+.home-welcome__actions { display: grid; justify-items: center; gap: var(--space-1); margin-top: var(--space-2); }
+
+/* ---------- say it to her today */
+.home-mission { display: grid; gap: var(--space-3); padding: var(--space-4); margin-bottom: var(--space-5); box-shadow: var(--shadow-card); }
+.home-mission__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin: -4px -8px -6px 0; }
+.home-mission__eyebrow { font: 600 13px/18px var(--font-text); color: var(--rose); letter-spacing: 0.01em; }
+.home-mission__quiz { font-weight: 400; }
+.home-mission__phrase { display: flex; align-items: center; gap: var(--space-3); }
+.home-mission__text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.home-mission__bg { font: 600 26px/32px var(--font-text); letter-spacing: -0.01em; color: var(--ink); overflow-wrap: anywhere; }
+.home-mission__tr { font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
+.home-mission__en { font: 400 15px/20px var(--font-text); color: var(--ink); }
+.home-mission__play { flex: none; }
+.home-mission__done {
+  display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px;
+  border-radius: var(--radius-md); background: var(--pine-soft); color: var(--pine-ink);
+  font: 600 15px/20px var(--font-text);
+}
+.home-mission__done svg { width: 18px; height: 18px; }
+.home-mission__xp { font-weight: 400; opacity: 0.85; }
+
+/* ---------- practice: review done */
+.home-pcell__done { width: 20px; height: 20px; color: var(--pine); }
+
+/* ---------- your week (Sunday) */
+.home-week { margin-bottom: var(--space-5); }
+.home-week__card { display: grid; gap: var(--space-3); padding: var(--space-3); box-shadow: var(--shadow-card); }
+.home-week__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+.home-week__cell { background: var(--linen); box-shadow: none; }
+.home-week__note { font: 400 15px/20px var(--font-text); color: var(--ink-muted); padding: 0 var(--space-1); }
+.home-pcell { align-content: space-between; }

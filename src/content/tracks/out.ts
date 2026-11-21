@@ -130,6 +130,7 @@ export const out: Track = {
   units: [
     {
       id: 'out.u1',
+      canDo: 'You can order coffee, tea and juice at a café like a local',
       title: 'At the café',
       titleBg: 'В кафенето',
       description: 'Order coffee, tea and juice like a local.',
@@ -142,6 +143,7 @@ export const out: Track = {
     },
     {
       id: 'out.u2',
+      canDo: 'You can order Bulgarian classics at a restaurant and ask for the bill',
       title: 'At the restaurant',
       titleBg: 'В ресторанта',
       description: 'Shopska salad, kebapcheta and asking for the bill.',
@@ -154,6 +156,7 @@ export const out: Track = {
     },
     {
       id: 'out.u3',
+      canDo: 'You can buy fruit and vegetables by the kilo and ask the price',
       title: 'At the market',
       titleBg: 'На пазара',
       description: 'Fruit, vegetables, kilos and prices.',
@@ -166,6 +169,7 @@ export const out: Track = {
     },
     {
       id: 'out.u4',
+      canDo: 'You can ask the way and follow left, right and straight on',
       title: 'Getting around',
       titleBg: 'Из града',
       description: 'Left, right, straight on, and how far it is.',
@@ -178,6 +182,7 @@ export const out: Track = {
     },
     {
       id: 'out.u5',
+      canDo: 'You can talk about the weather and the seasons',
       title: 'Weather and seasons',
       titleBg: 'Времето',
       description: 'Sun, rain, snow and how you feel about it.',
@@ -190,6 +195,7 @@ export const out: Track = {
     },
     {
       id: 'out.u6',
+      canDo: "You can talk about a holiday at the sea or a visit to grandma's village",
       title: 'Holiday and the village',
       titleBg: 'На почивка',
       description: "The seaside, the mountains and grandma's village.",

@@ -117,3 +117,22 @@
   .ex-lettercard, .ex-soundcard { padding-block: var(--space-4); }
   .ex-lettercard .t-letter { font-size: 80px; line-height: 84px; }
 }
+
+/* ---------- Fill the gap (cloze) */
+.ex-cloze__sentence { margin: 0; font: 600 26px/40px var(--font-text); color: var(--ink); overflow-wrap: anywhere; }
+.ex-cloze__gap {
+  display: inline-block; min-width: 4.5em; margin-inline: 2px; padding: 0 6px;
+  border-bottom: 2px solid var(--line-strong); text-align: center; color: var(--pick);
+  transition: border-color 150ms, color 150ms, background-color 150ms; border-radius: 6px 6px 0 0;
+}
+.ex-cloze__gap.is-filled { border-bottom-color: var(--pick); background: var(--pick-soft); }
+.ex-cloze__gap.is-correct { border-bottom-color: var(--pine); background: var(--pine-soft); color: var(--pine-ink); }
+.ex-cloze__gap.is-wrong { border-bottom-color: var(--warn); background: var(--warn-soft); color: var(--warn-ink); }
+.ex-cloze__tr { margin: calc(-1 * var(--space-3)) 0 0; }
+.ex-cloze__options { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.ex-cloze__chip { min-height: 50px; padding-inline: 18px; font-weight: 600; }
+.ex-cloze__chip.is-selected { border-color: var(--pick); background: var(--pick-soft); color: var(--pick); }
+.ex-cloze__chip.is-correct { border-color: var(--pine); background: var(--pine-soft); color: var(--pine-ink); }
+.ex-cloze__chip.is-wrong { border-color: var(--warn); background: var(--warn-soft); color: var(--warn-ink); }
+.ex-cloze__chip.is-dim { opacity: 0.45; }
+.ex-cloze__chip:disabled { cursor: default; }

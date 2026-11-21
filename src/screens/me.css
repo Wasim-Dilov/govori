@@ -97,3 +97,42 @@
 @media (max-width: 370px) {
   .me-stats { grid-template-columns: 1fr 1fr; }
 }
+
+/* ---------- Streak */
+.me-value { font: 400 17px/22px var(--font-text); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.me-freeze-bar { display: block; height: 4px; margin-top: var(--space-2); max-width: 220px; }
+.me-repair .gv-row__title { color: var(--warn-ink); }
+
+/* ---------- Practise together */
+.me-nav-row { appearance: none; border: 0; width: 100%; text-align: left; font: inherit; color: inherit; background: transparent; cursor: pointer; }
+.me-row-icon {
+  flex: none; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--rose); color: var(--on-rose);
+}
+.me-row-icon svg { width: 18px; height: 18px; }
+
+/* ---------- Our phrases */
+.me-phrase__emoji { flex: none; width: 30px; text-align: center; font-size: 22px; line-height: 1; }
+.me-phrase__del {
+  appearance: none; border: 0; flex: none; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--fill-secondary); color: var(--ink-muted); cursor: pointer;
+}
+.me-phrase__confirm {
+  appearance: none; border: 0; flex: none; padding: 6px 12px; border-radius: var(--radius-full);
+  background: var(--warn); color: var(--on-warn); font: 600 15px/20px var(--font-text); cursor: pointer;
+}
+.me-phrase__del:focus-visible, .me-phrase__confirm:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* ---------- Add a phrase sheet */
+.me-add { display: grid; gap: var(--space-4); }
+.me-field { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: var(--space-3); cursor: text; }
+.me-field__label { font: 400 17px/22px var(--font-text); color: var(--ink); }
+.me-field input {
+  min-width: 0; border: 0; outline: none; background: transparent; color: var(--ink);
+  font: 400 17px/22px var(--font-text); padding: 4px 0;
+}
+.me-field input::placeholder { color: var(--label-tertiary); }
+.me-field:focus-within .me-field__label { color: var(--pick); }
+.me-add__by { display: grid; gap: var(--space-2); }
+.me-add__by .gv-section-header { margin: 0; }
+.me-add__error { margin: 0; color: var(--warn-ink); font: 400 15px/20px var(--font-text); }

@@ -20,6 +20,8 @@ export interface TodayMeta {
   sessionsToday: number
   /** Whether the latest of those taught new material (level 1 or a conversation). */
   lastWasNew: boolean
+  /** A review of any kind (warm-up, quick, welcome back, Review) was done today. Optional for older callers. */
+  warmupDone?: boolean
 }
 
 const LEVEL_UP_GAP_MS = 20 * 3_600_000
@@ -27,7 +29,8 @@ const LEVEL_UP_GAP_MS = 20 * 3_600_000
 export function todayMeta(sessionsToday: SessionRecord[]): TodayMeta {
   const lessons = sessionsToday.filter((s) => s.completed && (s.kind === 'lesson' || s.kind === 'letters' || s.kind === 'story')).sort((a, b) => a.start - b.start)
   const last = lessons[lessons.length - 1]
-  return { sessionsToday: lessons.length, lastWasNew: !!last && (last.kind === 'story' || last.level <= 1) }
+  const reviewed = sessionsToday.some((s) => s.completed && (s.kind === 'warmup' || s.kind === 'quick' || s.kind === 'welcome' || s.kind === 'practice'))
+  return { sessionsToday: lessons.length, lastWasNew: !!last && (last.kind === 'story' || last.level <= 1), warmupDone: reviewed }
 }
 
 /**
@@ -73,4 +76,30 @@ export function suggestNext(track: TrackView, progress: Record<string, LessonPro
     if (c) return { lesson: c, level: progress[c.id].level + 1, reason: 'levelup' }
   }
   return { ...base, reason: base.lesson.kind === 'story' ? 'story' : 'new' }
+}
+
+// ------------------------------------------------------------- the day's plan
+
+/** A warm-up is offered when at least this many items are due. */
+export const WARMUP_MIN_DUE = 8
+/** A warm-up reviews at most this many items (about two minutes). */
+export const WARMUP_MAX = 10
+
+export interface TodayPlan {
+  /** Review first, then continue into `next`. Null when nothing much is due or a review was done today. */
+  warmup: { count: number; minutes: number } | null
+  /** The lesson to do (after the warm-up, if any). Null when the track is finished. */
+  next: Suggestion | null
+}
+
+/**
+ * What the Today button should do: a short warm-up review when 8+ items are due (retrieval
+ * before new input), chained into the next lesson; otherwise the next lesson straight away.
+ * `review.count` is today's bounded review (todayReview() in progress.ts), never the raw backlog.
+ */
+export function todayPlan(track: TrackView, progress: Record<string, LessonProgress>, today: TodayMeta, review: { count: number }, now = Date.now()): TodayPlan {
+  const next = suggestNext(track, progress, today, now)
+  const count = Math.min(WARMUP_MAX, review.count)
+  const warmup = !today.warmupDone && review.count >= WARMUP_MIN_DUE ? { count, minutes: Math.max(1, Math.round((count * 12) / 60)) } : null
+  return { warmup, next }
 }

@@ -46,6 +46,7 @@ export const alphabet: Alphabet = {
   units: [
     {
       id: 'azbuka.u1',
+      canDo: 'You can read А, М, О, Т, Е and К and sound out мама',
       title: 'Familiar faces',
       titleBg: 'Познати букви',
       description: 'Six letters that look and sound just like English.',
@@ -81,6 +82,7 @@ export const alphabet: Alphabet = {
     },
     {
       id: 'azbuka.u2',
+      canDo: 'You can tell В from B and Н from H, and read words like нос and сок',
       title: 'False friends',
       titleBg: 'Фалшиви приятели',
       description: 'They look English but sound different. Don\'t trust them!',
@@ -116,6 +118,7 @@ export const alphabet: Alphabet = {
     },
     {
       id: 'azbuka.u3',
+      canDo: 'You can read your first family words, like баба and дете',
       title: 'New shapes',
       titleBg: 'Нови форми',
       description: 'Letters you have never seen before, and your first real family words.',
@@ -165,6 +168,7 @@ export const alphabet: Alphabet = {
     },
     {
       id: 'azbuka.u4',
+      canDo: 'You can read the buzzing sounds and words like жена and шапка',
       title: 'Buzzing letters',
       titleBg: 'Жужащи букви',
       description: 'Ж, Ш, Ч, Щ, Ц and Ф: the sounds that make Bulgarian sound Bulgarian.',
@@ -214,6 +218,7 @@ export const alphabet: Alphabet = {
     },
     {
       id: 'azbuka.u5',
+      canDo: 'You can read the whole alphabet, from Ъ to Я, and sound out любов',
       title: 'The tricky ones',
       titleBg: 'Трудните',
       description: 'Ъ, Й, Я, Ю and Ь. Master these and you can read anything.',

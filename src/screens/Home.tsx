@@ -1,20 +1,24 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type Ref } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { useApp, trackMeta } from '../lib/store.ts'
+import { useApp, trackMeta, type Screen } from '../lib/store.ts'
 import { learnedWordIds, lessonStates, practicedToday, trackCompletion, xpToday, type NodeState } from '../lib/progress.ts'
-import { suggestNext, todayMeta, type TodayMeta } from '../lib/suggest.ts'
+import { todayMeta, todayPlan, type TodayMeta } from '../lib/suggest.ts'
+import { MISSION_XP } from '../lib/missions.ts'
+import { markWeekShown, weekCardDue, weekSummary, type WeekSummary } from '../lib/milestones.ts'
 import { db, getKV, localDay, setKV } from '../lib/db.ts'
 import { dialogueById, maxLevel, study, tracks, unitById, type LessonView, type TrackView } from '../content/index.ts'
-import { planWeek } from '../content/plan.ts'
-import { TopBar, GoalRing, LargeTitle } from '../components/TopBar.tsx'
+import { planStatus } from '../content/plan.ts'
+import { TopBar, GoalRing, LargeTitle, StreakStatusBlock } from '../components/TopBar.tsx'
+import { ShareWeek } from '../components/ShareProgress.tsx'
 import { BottomSheet, FocusSheet, TrackBadge, lessonsDone } from '../components/FocusSheet.tsx'
-import { IconChat, IconCheck, IconLock, IconSpeaker } from '../components/Icons.tsx'
+import { IconChat, IconCheck, IconChevron, IconLock, IconSpeaker } from '../components/Icons.tsx'
 import { clipCount, manifestReady, sfx, speak } from '../lib/audio.ts'
 import { speedRounds } from '../lib/engine.ts'
 import './home.css'
 
 export function HomeScreen() {
   const viewTrack = useApp((s) => s.viewTrack)
+  const welcome = useApp((s) => s.welcome)
   const [focusOpen, setFocusOpen] = useState(false)
   const [sheetLesson, setSheetLesson] = useState<LessonView | null>(null)
   const track = trackMeta(viewTrack)
@@ -27,9 +31,15 @@ export function HomeScreen() {
     <div className="screen has-navbar home">
       <TopBar />
       <LargeTitle>Learn</LargeTitle>
-      <TodayCard onChangeFocus={() => setFocusOpen(true)} />
+      <StreakStatusBlock />
+      <WelcomeBackCard />
+      {/* One primary button on screen: the welcome back leads when it is showing. */}
+      <TodayCard onChangeFocus={() => setFocusOpen(true)} primary={!welcome} />
+      {/* The mission waits until the welcome-back warm-up is done or dismissed. */}
+      {!welcome && <MissionCard />}
       <VoiceCard />
       <PracticeRow />
+      <WeekCard />
       <TrackChips onAll={() => setFocusOpen(true)} />
       <Path track={track} onOpen={setSheetLesson} />
       <FocusSheet open={focusOpen} onClose={() => setFocusOpen(false)} />
@@ -156,15 +166,17 @@ function VoiceCard() {
 
 // ------------------------------------------------------------- Today
 
-function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
+function TodayCard({ onChangeFocus, primary = true }: { onChangeFocus: () => void; primary?: boolean }) {
   const profile = useApp((s) => s.profile)
   const focus = useApp((s) => s.focus)
   const summary = useApp((s) => s.summary)
   const progress = useApp((s) => s.progress)
   const dueCount = useApp((s) => s.dueCount)
+  const reviewToday = useApp((s) => s.reviewToday)
   const mistakesCount = useApp((s) => s.mistakesCount)
   const learned = useApp((s) => s.learned)
   const startLesson = useApp((s) => s.startLesson)
+  const startWarmup = useApp((s) => s.startWarmup)
   const startPractice = useApp((s) => s.startPractice)
   const startMistakes = useApp((s) => s.startMistakes)
   const startSpeedRound = useApp((s) => s.startSpeedRound)
@@ -188,11 +200,15 @@ function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
     }
   }, [progress, learned])
 
-  const week = planWeek(profile.startedAt)
+  const { week, held } = planStatus(profile.startedAt)
   const plan = focus.track === 'plan'
   const trackId = focus.track === 'plan' ? week.focus : focus.track
   const track = trackMeta(trackId)
-  const next = suggestNext(track, progress, today)
+  // Retrieval before new input: a short warm-up of due words leads into the lesson.
+  const plan0 = todayPlan(track, progress, today, { count: reviewToday })
+  const { next } = plan0
+  // The welcome back is already a warm-up: don't offer two.
+  const warmup = primary ? plan0.warmup : null
   const xp = xpToday(summary)
   const goal = profile.dailyGoal
   const eyebrow = plan ? `Week ${week.week} · ${week.title}` : `${focus.scope === 'day' ? 'Focus today' : 'Focus this week'} · ${track.title}`
@@ -200,7 +216,9 @@ function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
 
   // When the track is finished: review what's due, else a speed round, else fix mistakes.
   const review = !next ? (dueCount > 0 ? 'practice' : words >= 5 ? 'speed' : mistakesCount > 0 ? 'mistakes' : null) : null
-  const label = next
+  const label = warmup
+    ? `Warm up · ${warmup.count} words · ${warmup.minutes} min`
+    : next
     ? next.reason === 'levelup'
       ? `Start level ${next.level}`
       : next.reason === 'story'
@@ -232,7 +250,9 @@ function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
       : next.reason === 'story'
         ? (dialogueById.get(next.lesson.dialogueId ?? '')?.scene ?? 'Put this unit to work in a short conversation.')
         : plan
-          ? week.goal
+          ? held
+            ? `Finish a ${track.title} unit to move on to week ${week.week + 1}. ${week.goal}`
+            : week.goal
           : track.tagline
     : review
       ? 'Keep it fresh with a quick review.'
@@ -240,11 +260,28 @@ function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
 
   const go = () => {
     sfx.tap()
+    if (warmup) return void startWarmup(next ? { lessonId: next.lesson.id, level: next.level } : null)
     if (next) return void startLesson(next.lesson.id, next.level)
     if (review === 'practice') return void startPractice()
     if (review === 'speed') return void startSpeedRound()
     if (review === 'mistakes') return void startMistakes()
   }
+
+  // While the welcome back leads, the Today card shrinks to one quiet row: one primary button on screen.
+  if (!primary)
+    return (
+      <section className="gv-card home-today home-today--compact" aria-labelledby="today-title">
+        <button type="button" className="home-today__row" onClick={next || review ? go : onChangeFocus}>
+          <span className="home-today__text">
+            <span className="home-today__eyebrow">Afterwards · {eyebrow}</span>
+            <span id="today-title" className="home-today__title home-today__title--sm">
+              {headline}
+            </span>
+          </span>
+          <IconChevron className="home-today__chev" aria-hidden="true" />
+        </button>
+      </section>
+    )
 
   return (
     <motion.section
@@ -279,9 +316,12 @@ function TodayCard({ onChangeFocus }: { onChangeFocus: () => void }) {
       ) : (
         <p className="home-today__detail">{detail}</p>
       )}
-      <button type="button" className="gv-btn gv-btn--block" onClick={next || review ? go : onChangeFocus}>
-        {label}
-      </button>
+      <div className="home-today__action">
+        <button type="button" className={`gv-btn gv-btn--block${primary ? '' : ' gv-btn--tinted gv-tone-rose'}`} onClick={warmup || next || review ? go : onChangeFocus}>
+          {label}
+        </button>
+        {warmup && <p className="home-today__then">{next ? `then: ${next.lesson.title}` : 'then: back to your path'}</p>}
+      </div>
       <div className="home-today__foot">
         {also ? (
           <button type="button" className="gv-btn gv-btn--plain gv-btn--sm gv-tone-rose" onClick={() => setViewTrack(also.id)}>
@@ -308,10 +348,179 @@ function LevelDots({ level }: { level: number }) {
   )
 }
 
+// ------------------------------------------------------------- welcome back
+
+/** After 3+ days away: warm, no guilt, and an easy way back in. */
+function WelcomeBackCard() {
+  const welcome = useApp((s) => s.welcome)
+  const speaker = useApp((s) => s.profile.speaker)
+  const startWelcomeBack = useApp((s) => s.startWelcomeBack)
+  const dismissWelcome = useApp((s) => s.dismissWelcome)
+  const reduce = useReducedMotion()
+  if (!welcome) return null
+  const track = welcome.lastTrackId ? trackMeta(welcome.lastTrackId) : null
+  return (
+    <motion.section
+      className="gv-card home-welcome"
+      aria-labelledby="welcome-title"
+      initial={reduce ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+    >
+      <p className="home-welcome__bg" lang="bg">
+        {speaker === 'f' ? 'Добре дошла обратно.' : 'Добре дошъл обратно.'}
+      </p>
+      <h2 id="welcome-title" className="home-welcome__title">
+        Welcome back
+      </h2>
+      <p className="home-welcome__body">
+        {welcome.bestStreak >= 3 ? `Your best run was ${welcome.bestStreak} days. ` : ''}Two minutes with words you know well, then {track ? `back to ${track.title}` : 'back to your path'}.
+      </p>
+      <div className="home-welcome__actions">
+        <button
+          type="button"
+          className="gv-btn gv-btn--block"
+          onClick={() => {
+            sfx.tap()
+            void startWelcomeBack()
+          }}
+        >
+          Start a 2-minute warm-up
+        </button>
+        <button type="button" className="gv-btn gv-btn--plain gv-btn--sm gv-tone-rose" onClick={() => void dismissWelcome()}>
+          Not now
+        </button>
+      </div>
+    </motion.section>
+  )
+}
+
+// ------------------------------------------------------------- say it to her
+
+const goQuiz = () => useApp.getState().go({ name: 'quiz' } as unknown as Screen)
+
+/** One learned phrase a day to say to her for real: the point of the whole app. */
+function MissionCard() {
+  const mission = useApp((s) => s.mission)
+  const translit = useApp((s) => s.profile.translit)
+  const completeMission = useApp((s) => s.completeMission)
+  const [busy, setBusy] = useState(false)
+  if (!mission) return null
+  const { item, done } = mission
+  return (
+    <section className={`gv-card home-mission${done ? ' is-done' : ''}`} aria-labelledby="mission-title">
+      <div className="home-mission__top">
+        <p id="mission-title" className="home-mission__eyebrow">
+          Say it to her today
+        </p>
+        <button type="button" className="gv-btn gv-btn--plain gv-btn--sm gv-tone-rose home-mission__quiz" onClick={goQuiz}>
+          Quiz me
+        </button>
+      </div>
+      <div className="home-mission__phrase">
+        <div className="home-mission__text">
+          <p className="home-mission__bg" lang="bg">
+            {item.bg}
+          </p>
+          {translit && item.tr && <p className="home-mission__tr">{item.tr}</p>}
+          <p className="home-mission__en">{item.en}</p>
+        </div>
+        <button type="button" className="gv-iconbtn gv-iconbtn--sm home-mission__play" onClick={() => void speak(item.bg, { itemId: item.id })} aria-label={`Play ${item.bg}`}>
+          <IconSpeaker />
+        </button>
+      </div>
+      {done ? (
+        <p className="home-mission__done" role="status">
+          <IconCheck />
+          <span>Said today</span>
+          <span className="home-mission__xp">+{MISSION_XP} XP</span>
+        </p>
+      ) : (
+        <button
+          type="button"
+          className="gv-btn gv-btn--tinted gv-btn--block gv-tone-rose"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true)
+            sfx.tap()
+            await completeMission()
+            setBusy(false)
+          }}
+        >
+          I said it
+        </button>
+      )}
+    </section>
+  )
+}
+
+// ------------------------------------------------------------- your week (Sunday)
+
+function WeekCard() {
+  const progress = useApp((s) => s.progress)
+  const [week, setWeek] = useState<WeekSummary | null>(null)
+  const [hidden, setHidden] = useState(false)
+
+  useEffect(() => {
+    let live = true
+    void weekCardDue()
+      .then(async (due) => (due ? weekSummary() : null))
+      .then((w) => live && setWeek(w && w.sessions > 0 ? w : null))
+      .catch(() => {})
+    return () => {
+      live = false
+    }
+  }, [progress])
+
+  if (!week || hidden) return null
+  const cells = [
+    { label: 'Days', value: `${week.daysPracticed}`, unit: 'of 7' },
+    { label: 'Minutes', value: `${week.minutes}`, unit: '' },
+    { label: 'New words', value: `${week.newWords}`, unit: '' },
+    { label: 'Said to her', value: `${week.missions}`, unit: week.missions === 1 ? 'time' : 'times' },
+  ]
+  return (
+    <section className="home-week" aria-labelledby="week-title">
+      <div className="gv-section-header home-sectionhead">
+        <h2 id="week-title" className="gv-section-header__title">
+          Your week
+        </h2>
+        <button
+          type="button"
+          className="gv-section-header__action"
+          onClick={() => {
+            setHidden(true)
+            void markWeekShown()
+          }}
+        >
+          Dismiss
+        </button>
+      </div>
+      <div className="gv-card home-week__card">
+        <div className="home-week__grid">
+          {cells.map((c) => (
+            <div key={c.label} className="gv-statcell home-week__cell">
+              <span className="gv-statcell__label">{c.label}</span>
+              <span className="gv-statcell__value">
+                {c.value}
+                {c.unit && <span className="gv-statcell__unit">{c.unit}</span>}
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="home-week__note">
+          <span lang="bg">Браво за седмицата.</span> {week.streak > 1 ? `${week.streak}-day streak going into next week.` : 'A fresh week starts tomorrow.'}
+        </p>
+        <ShareWeek className="gv-btn gv-btn--tinted gv-btn--block gv-tone-rose share-trigger" />
+      </div>
+    </section>
+  )
+}
+
 // ------------------------------------------------------------- practice tiles
 
 function PracticeRow() {
-  const dueCount = useApp((s) => s.dueCount)
+  const reviewToday = useApp((s) => s.reviewToday)
   const mistakesCount = useApp((s) => s.mistakesCount)
   const learned = useApp((s) => s.learned)
   const startPractice = useApp((s) => s.startPractice)
@@ -329,7 +538,7 @@ function PracticeRow() {
 
   const rounds = speedRounds(words)
   const cells = [
-    { key: 'review', label: 'Review', value: dueCount, unit: 'due', disabled: learned === 0, run: startPractice },
+    { key: 'review', label: "Today's review", value: reviewToday, unit: reviewToday === 1 ? 'word' : 'words', disabled: learned === 0, run: startPractice },
     { key: 'mistakes', label: 'Mistakes', value: mistakesCount, unit: 'to fix', disabled: mistakesCount === 0, run: startMistakes },
     { key: 'speed', label: 'Speed round', value: words >= 5 ? rounds : 0, unit: rounds === 1 ? 'round' : 'rounds', disabled: words < 5, run: startSpeedRound },
   ]
@@ -337,6 +546,7 @@ function PracticeRow() {
   // One calm line explaining whatever is switched off.
   const notes: string[] = []
   if (learned === 0) notes.push('Review opens after your first lesson.')
+  if (learned > 0 && reviewToday === 0) notes.push("Today's review is done.")
   if (learned > 0 && mistakesCount === 0) notes.push('No mistakes to fix right now.')
   if (words < 5) notes.push(`Speed round opens after ${5 - words} more ${5 - words === 1 ? 'word' : 'words'}.`)
 
@@ -360,8 +570,8 @@ function PracticeRow() {
           >
             <span className="gv-statcell__label">{label}</span>
             <span className="gv-statcell__value">
-              {disabled ? '–' : value > 99 ? '99+' : value}
-              {!disabled && <span className="gv-statcell__unit">{unit}</span>}
+              {disabled ? '–' : key === 'review' && value === 0 ? <IconCheck className="home-pcell__done" /> : value > 99 ? '99+' : value}
+              {!disabled && !(key === 'review' && value === 0) && <span className="gv-statcell__unit">{unit}</span>}
             </span>
           </button>
         ))}

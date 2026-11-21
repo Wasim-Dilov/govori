@@ -7,9 +7,14 @@ import { MeScreen } from './screens/Me.tsx'
 import { OnboardingScreen } from './screens/Onboarding.tsx'
 import { SessionScreen } from './screens/Session.tsx'
 import { CompleteScreen } from './screens/Complete.tsx'
+import { QuizScreen } from './screens/Quiz.tsx'
+import { engineFeatures } from './lib/engine.ts'
 import { TabBar } from './components/TabBar.tsx'
 import { BrandMark } from './components/BrandMark.tsx'
 import { Toast } from './components/Toast.tsx'
+
+// The fill-the-gap exercise has a screen now, so the engine may build it.
+engineFeatures.cloze = true
 
 export default function App() {
   return (
@@ -53,6 +58,12 @@ function Screens() {
       return (
         <div className="app-shell">
           <CompleteScreen />
+        </div>
+      )
+    case 'quiz':
+      return (
+        <div className="app-shell">
+          <QuizScreen />
         </div>
       )
     default:

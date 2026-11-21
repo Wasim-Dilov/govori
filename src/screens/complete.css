@@ -42,3 +42,32 @@
   -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
   box-shadow: 0 calc(-1 * var(--hairline)) 0 var(--separator);
 }
+
+/* Freeze news and the unit's can-do line */
+.done__frost { color: var(--trk-basics); }
+.done__cando .gv-row__title { font-weight: 600; }
+
+/* ---------- milestone sheet: shown before the summary, calm and proud */
+.milestone { position: fixed; inset: 0; z-index: 35; background: var(--linen); overflow-y: auto; }
+.milestone__panel {
+  min-height: 100dvh; display: grid; grid-template-rows: 1fr auto; max-width: 520px; margin: 0 auto;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.milestone__panel:focus { outline: none; }
+.milestone__body { display: grid; align-content: center; justify-items: center; gap: var(--space-3); text-align: center; padding-block: var(--space-6); }
+.milestone__band { --tone: var(--rose); width: 100%; max-width: 280px; margin-bottom: var(--space-4); }
+.milestone__eyebrow { font: 600 13px/18px var(--font-text); color: var(--rose); letter-spacing: 0.01em; }
+.milestone__big { font: 700 72px/1 var(--font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.milestone__big span { display: block; font: 400 17px/22px var(--font-text); letter-spacing: 0; color: var(--ink-muted); margin-top: 4px; }
+.milestone__mark { margin: var(--space-2) 0; }
+.milestone__title { margin: 0; max-width: 22ch; }
+.milestone__subtitle { font: 400 17px/22px var(--font-text); color: var(--ink-muted); max-width: 32ch; }
+.milestone__cando {
+  display: flex; align-items: flex-start; gap: var(--space-2); text-align: left; max-width: 36ch;
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--linen-raised); box-shadow: var(--shadow-card);
+  font: 600 17px/22px var(--font-text); color: var(--ink);
+}
+.milestone__cando svg { flex: none; width: 20px; height: 20px; color: var(--rose); margin-top: 1px; }
+.milestone__proverb { margin: var(--space-3) 0 0; display: grid; gap: 4px; max-width: 32ch; }
+.milestone__proverb blockquote { margin: 0; font: 600 20px/26px var(--font-text); color: var(--ink); }
+.milestone__proverb figcaption { display: grid; gap: 2px; font: 400 15px/20px var(--font-text); color: var(--ink-muted); }

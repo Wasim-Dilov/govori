@@ -169,6 +169,7 @@ export const basics: Track = {
   units: [
     {
       id: 'basics.u1',
+      canDo: 'You can greet anyone, say please and thank you, and wish everyone good night',
       title: 'Hello!',
       titleBg: 'Здравей!',
       description: 'Greetings, yes and no, please and thank you.',
@@ -181,6 +182,7 @@ export const basics: Track = {
     },
     {
       id: 'basics.u2',
+      canDo: 'You can ask how someone is and say if you are hungry or tired',
       title: 'How are you?',
       titleBg: 'Как си?',
       description: 'Me and you, hungry and tired, and a little small talk.',
@@ -193,6 +195,7 @@ export const basics: Track = {
     },
     {
       id: 'basics.u3',
+      canDo: 'You can ask her to slow down, say it again or explain a word',
       title: 'I understand',
       titleBg: 'Разбирам',
       description: 'Ask her to slow down, say it again, or explain a word.',
@@ -205,6 +208,7 @@ export const basics: Track = {
     },
     {
       id: 'basics.u4',
+      canDo: 'You can count to ten and ask how many or how much',
       title: 'How many?',
       titleBg: 'Колко?',
       description: 'Numbers one to ten and the questions that use them.',
@@ -217,6 +221,7 @@ export const basics: Track = {
     },
     {
       id: 'basics.u5',
+      canDo: 'You can talk about today, tomorrow and the week, and make plans',
       title: 'Days and plans',
       titleBg: 'Дни и планове',
       description: 'Today, tomorrow, the days of the week and making plans with ще.',
@@ -229,6 +234,7 @@ export const basics: Track = {
     },
     {
       id: 'basics.u6',
+      canDo: 'You can ask her how her day was and tell her how yours went',
       title: 'How was your day?',
       titleBg: 'Как мина денят?',
       description: 'Feelings, good days and hard days, and asking her how hers was.',
@@ -241,6 +247,7 @@ export const basics: Track = {
     },
     {
       id: 'basics.u7',
+      canDo: 'You can ask where something is and find your keys, phone and glasses',
       title: 'Where is it?',
       titleBg: 'Къде е?',
       description: 'Here and there, the things everyone loses, and finding them.',
@@ -253,6 +260,7 @@ export const basics: Track = {
     },
     {
       id: 'basics.u8',
+      canDo: 'You can chat with Bulgarians about the weather, family and work',
       title: 'Small talk',
       titleBg: 'Да си поговорим',
       description: 'Weather, family and work: chatting with Bulgarians.',

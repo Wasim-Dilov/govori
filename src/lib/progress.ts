@@ -2,17 +2,24 @@
 import { allItemIds, lessonById, maxLevel, study, trackById, type Speaker, type StudyItem, type TrackView } from '../content/index.ts'
 import type { TrackId } from '../content/types.ts'
 import { db, getKV, localDay, setKV, type AnswerEvent, type ExerciseType, type LessonProgress, type Memory, type SessionRecord, type Summary } from './db.ts'
+import { applyGoalDay, applySession, streakStatusOf, type StreakStatus } from './streak.ts'
+import type { Milestone } from './milestones.ts'
 
 export const DEFAULT_SUMMARY: Summary = {
   streak: 0,
   longestStreak: 0,
   lastPracticeDay: null,
-  dailyGoal: 40,
+  dailyGoal: 30,
   xpToday: 0,
   xpDay: null,
   totalXp: 0,
   name: '',
   wordOfDay: null,
+  freezes: 0,
+  goalDays: 0,
+  goalDay: null,
+  frozenDays: [],
+  repair: null,
 }
 
 export const getSummary = () => getKV<Summary>('summary', DEFAULT_SUMMARY).then((s) => ({ ...DEFAULT_SUMMARY, ...s }))
@@ -21,11 +28,53 @@ export const saveSummary = (s: Summary) => setKV('summary', s)
 const dayMs = 86_400_000
 export const yesterday = () => localDay(new Date(Date.now() - dayMs))
 
-/** The streak as it stands today: it survives until the end of the day after the last practice. */
+/** The streak as it stands today: it survives until the end of the day after the last practice, or longer with a freeze. */
 export function liveStreak(s: Summary): number {
-  if (!s.lastPracticeDay) return 0
-  if (s.lastPracticeDay === localDay() || s.lastPracticeDay === yesterday()) return s.streak
-  return 0
+  return streakStatusOf(s, localDay()).streak
+}
+
+/** Streak, freezes and repair state for the Today card and Stats. */
+export async function streakStatus(): Promise<StreakStatus> {
+  return streakStatusOf(await getSummary(), localDay())
+}
+
+// ------------------------------------------------------------- daily goal
+/** Daily goal choices: honest minutes for the XP they ask (a lesson is about 10 to 15 XP and 3 to 4 minutes). */
+export const GOAL_OPTIONS = [
+  { min: 5, xp: 15, label: 'Easy' },
+  { min: 10, xp: 30, label: 'Regular' },
+  { min: 15, xp: 45, label: 'Serious' },
+] as const
+export const DEFAULT_GOAL = 30
+
+/** Map an old goal (20/40/60 XP) or any other value to the nearest current option. */
+export function migrateGoal(xp: number | undefined): number {
+  const old: Record<number, number> = { 20: 15, 40: 30, 60: 45 }
+  if (xp == null || !Number.isFinite(xp)) return DEFAULT_GOAL
+  if (GOAL_OPTIONS.some((o) => o.xp === xp)) return xp
+  if (old[xp]) return old[xp]
+  return GOAL_OPTIONS.reduce((best, o) => (Math.abs(o.xp - xp) < Math.abs(best - xp) ? o.xp : best), DEFAULT_GOAL as number)
+}
+
+/**
+ * Add XP outside a session (e.g. the "Say it to her" mission). Counts toward the daily goal and
+ * toward freezes, but does not extend the streak: only a real session does that.
+ */
+export async function addXp(xp: number): Promise<{ summary: Summary; goalReached: boolean; earnedFreeze: boolean }> {
+  const today = localDay()
+  const s = await getSummary()
+  const prevToday = xpToday(s)
+  const next: Summary = { ...s, xpToday: prevToday + xp, xpDay: today, totalXp: s.totalXp + xp }
+  let earnedFreeze = false
+  const goalReached = prevToday < s.dailyGoal && prevToday + xp >= s.dailyGoal
+  if (goalReached) {
+    const g = applyGoalDay(next, today)
+    Object.assign(next, { goalDays: g.goalDays, goalDay: g.goalDay, freezes: g.freezes })
+    earnedFreeze = g.earnedFreeze
+  }
+  next.streakForReminder = streakStatusOf(next, today).streak
+  await saveSummary(next)
+  return { summary: next, goalReached, earnedFreeze }
 }
 export const practicedToday = (s: Summary) => s.lastPracticeDay === localDay()
 export const xpToday = (s: Summary) => (s.xpDay === localDay() ? s.xpToday : 0)
@@ -103,6 +152,54 @@ export async function dueItems(limit = 12, filter?: (id: string) => boolean): Pr
 export async function reviewPool(trackId: TrackId | null, exclude: string[], limit = 3): Promise<string[]> {
   const ids = await dueItems(40, (id) => !exclude.includes(id) && !id.startsWith('az.') && (!trackId || id.startsWith(trackId + '.')))
   return ids.slice(0, limit)
+}
+
+/**
+ * Review woven into a lesson: up to two due items from the same track plus one from another
+ * track (interleaving), topped up from either when one side has none.
+ */
+export async function lessonReview(trackId: TrackId | null, exclude: string[] = [], limit = 3): Promise<string[]> {
+  const due = await dueItems(60, (id) => !exclude.includes(id) && !id.startsWith('az.'))
+  const same = trackId ? due.filter((id) => id.startsWith(trackId + '.')) : due
+  const other = trackId ? due.filter((id) => !id.startsWith(trackId + '.')) : []
+  const pick = [...same.slice(0, limit - 1), ...other.slice(0, 1)]
+  for (const id of [...same, ...other]) if (pick.length < limit && !pick.includes(id)) pick.push(id)
+  return pick.slice(0, limit)
+}
+
+/** At most this many due items are reviewed per day, so a backlog never becomes a wall. */
+export const DAILY_REVIEW_CAP = 15
+/** Roughly how long one review item takes. */
+const SECONDS_PER_REVIEW = 12
+/** Sessions that count as review (their events carry the kind as lessonId). */
+const REVIEW_KINDS = new Set(['practice', 'warmup', 'quick', 'welcome', 'mistakes'])
+
+/** Distinct items already reviewed today in review sessions. */
+export async function reviewedTodayCount(): Promise<number> {
+  const events = await db.events.where('day').equals(localDay()).toArray()
+  return new Set(events.filter((e) => REVIEW_KINDS.has(e.lessonId) && !e.itemId.includes('+')).map((e) => e.itemId)).size
+}
+
+/** Today's review, bounded: what to show instead of the raw backlog. */
+export async function todayReview(): Promise<{ count: number; minutes: number; backlog: number }> {
+  const [due, done] = await Promise.all([dueItems(500), reviewedTodayCount()])
+  const count = Math.max(0, Math.min(due.length, DAILY_REVIEW_CAP - done))
+  return { count, minutes: Math.max(1, Math.round((count * SECONDS_PER_REVIEW) / 60)), backlog: due.length }
+}
+
+/** Ids for today's bounded review (weakest and most overdue first). */
+export async function todayReviewIds(limit = DAILY_REVIEW_CAP): Promise<string[]> {
+  const { count } = await todayReview()
+  return dueItems(Math.min(limit, count))
+}
+
+/** Words he knows best (highest box, most often right), for a confidence-building review. */
+export async function strongestItemIds(limit = 8): Promise<string[]> {
+  const mem = (await db.memory.toArray()).filter((m) => isWord(m.itemId))
+  return mem
+    .sort((a, b) => b.box - a.box || b.correct / Math.max(1, b.seen) - a.correct / Math.max(1, a.seen) || b.lastSeen - a.lastSeen)
+    .slice(0, limit)
+    .map((m) => m.itemId)
 }
 
 const isWord = (id: string) => {
@@ -209,6 +306,14 @@ export interface SessionResult {
   goalReached: boolean
   levelUp: { from: number; to: number } | null
   lessonLevelUp: boolean
+  /** A freeze covered yesterday and kept the streak. */
+  usedFreeze?: boolean
+  /** Two sessions after a break brought the old streak back. */
+  repaired?: boolean
+  /** Meeting today's goal earned a new freeze. */
+  earnedFreeze?: boolean
+  /** Milestones reached by this session (filled in by the store). */
+  milestones?: Milestone[]
 }
 
 export async function finishSession(input: {
@@ -226,26 +331,31 @@ export async function finishSession(input: {
   const today = localDay()
   const accuracy = input.total ? input.correct / input.total : 1
   const perfect = input.correct === input.total
-  const base = input.kind === 'lesson' || input.kind === 'letters' ? 10 + (input.level - 1) * 2 : input.kind === 'story' ? 15 : 10
+  const base = input.kind === 'lesson' || input.kind === 'letters' ? 10 + (input.level - 1) * 2 : input.kind === 'story' ? 15 : input.kind === 'quick' ? 5 : 10
   const xp = base + (perfect ? 5 : 0)
 
   const s = await getSummary()
   const before = learnerLevel(s.totalXp).level
-  const live = liveStreak(s)
-  const already = s.lastPracticeDay === today
-  const streak = already ? live : live + 1
+  const st = applySession(s, today, Date.now(), input.kind)
   const prevToday = xpToday(s)
   const next: Summary = {
     ...s,
-    streak,
-    longestStreak: Math.max(s.longestStreak, streak),
-    lastPracticeDay: today,
+    ...st.fields,
     xpToday: prevToday + xp,
     xpDay: today,
     totalXp: s.totalXp + xp,
   }
+  const goalReached = prevToday < s.dailyGoal && prevToday + xp >= s.dailyGoal
+  let earnedFreeze = false
+  if (goalReached) {
+    const g = applyGoalDay(next, today)
+    Object.assign(next, { goalDays: g.goalDays, goalDay: g.goalDay, freezes: g.freezes })
+    earnedFreeze = g.earnedFreeze
+  }
+  next.streakForReminder = streakStatusOf(next, today).streak
   next.wordOfDay = await pickWordOfDay(input.speaker)
   await saveSummary(next)
+  const streak = st.streak
   const after = learnerLevel(next.totalXp).level
 
   let lessonLevelUp = false
@@ -287,10 +397,13 @@ export async function finishSession(input: {
     perfect,
     newItems: input.newItems,
     streak,
-    streakIncreased: !already,
-    goalReached: prevToday < s.dailyGoal && prevToday + xp >= s.dailyGoal,
+    streakIncreased: st.increased,
+    goalReached,
     levelUp: after > before ? { from: before, to: after } : null,
     lessonLevelUp,
+    usedFreeze: st.usedFreeze,
+    repaired: st.repaired,
+    earnedFreeze,
   }
 }
 
@@ -304,5 +417,15 @@ async function pickWordOfDay(speaker: Speaker) {
 }
 
 export const trackOfLesson = (lessonId: string) => trackById.get(lessonById.get(lessonId)?.trackId ?? 'basics')
+
+/** True when at least one unit of the track has every lesson done at level 1 or more (conversations aside). */
+export function hasUnitDone(track: TrackId, progress: Record<string, LessonProgress>): boolean {
+  const t = trackById.get(track)
+  if (!t) return false
+  return t.units.some((u) => {
+    const lessons = u.lessons.filter((l) => l.kind !== 'story')
+    return lessons.length > 0 && lessons.every((l) => (progress[l.id]?.level ?? 0) >= 1)
+  })
+}
 
 export type { ExerciseType }

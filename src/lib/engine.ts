@@ -1,7 +1,7 @@
 // Builds lessons out of exercises and grades answers.
 import { allItemIds, allLetterIds, dialogueById, lessonById, study, trackById, type LessonView, type Speaker, type StudyItem } from '../content/index.ts'
 import type { Dialogue } from '../content/types.ts'
-import type { ExerciseType } from './db.ts'
+import type { ExerciseType, SessionKind } from './db.ts'
 
 export type Exercise =
   | { type: 'intro'; item: StudyItem }
@@ -17,6 +17,11 @@ export type Exercise =
   | { type: 'sound_letter'; item: StudyItem; options: StudyItem[] }
   | { type: 'read_word'; item: StudyItem; options: StudyItem[] }
   | { type: 'dialogue'; dialogue: Dialogue }
+  /**
+   * Fill the gap in a phrase he knows. Render `before + [gap] + after` exactly as given (spacing and
+   * punctuation are included); the right option equals `answer`.
+   */
+  | { type: 'cloze'; item: StudyItem; before: string; after: string; answer: string; options: string[] }
 
 /** The item an exercise is "about", for logging. */
 export const exItemId = (ex: Exercise) => (ex.type === 'match' ? ex.items.map((i) => i.id).join('+') : ex.type === 'dialogue' ? ex.dialogue.id : ex.item.id)
@@ -24,7 +29,7 @@ export const exType = (ex: Exercise): ExerciseType => ex.type
 
 export interface LessonPlan {
   lesson: LessonView | null
-  kind: 'lesson' | 'practice' | 'letters' | 'story' | 'speed' | 'mistakes'
+  kind: SessionKind
   level: number
   exercises: Exercise[]
   newItems: StudyItem[]
@@ -51,7 +56,19 @@ export interface BuildEnv {
   recorded?: Set<string>
   /** True when a Microsoft voice clip exists for this Bulgarian text. */
   hasClip?: (text: string) => boolean
+  /** False when he turned speaking exercises off. */
+  speaking?: boolean
 }
+
+/**
+ * Exercise types the UI can render beyond the original set. The screen that renders an
+ * exercise flips its flag on (e.g. `engineFeatures.cloze = true` next to the Cloze component),
+ * so the engine never produces something the app cannot show.
+ */
+export const engineFeatures = { cloze: false }
+
+/** The most exercises in one lesson; level-1 lessons may go one or two over to keep every item's final check. */
+export const LESSON_CAP = 16
 
 // Set at the start of each public builder; the helpers below read it.
 let env: BuildEnv & { inPlay: Set<string> } = { inPlay: new Set() }
@@ -143,12 +160,99 @@ function poolAround(ids: string[], speaker: Speaker, kind: 'words' | 'letters'):
 /** Exercise mix per lesson level. Level 1 recognises, level 2 recalls, level 3 produces. */
 const WORD_MIX: Record<number, ExerciseType[]> = {
   1: ['mc_bg_en', 'mc_en_bg', 'listen_mc', 'mc_en_bg'],
-  2: ['mc_en_bg', 'listen_mc', 'type_bg', 'build'],
-  3: ['type_bg', 'listen_type', 'build', 'speak'],
+  2: ['mc_en_bg', 'listen_mc', 'type_bg', 'build', 'cloze'],
+  3: ['type_bg', 'listen_type', 'build', 'speak', 'cloze'],
+}
+
+// Small words that make poor gaps in a cloze.
+const STOP = new Set(
+  'аз ти той тя то ние вие те е съм си сме сте са и а но или да не ли ще на в във с със за от до по при че се ми му ѝ го я ги им ни ви това този тази тези нещо много моля как какво кой коя кое кога къде защо там тук вече още'.split(' '),
+)
+const PUNCT = /[.,!?;:„“"«»…]/g
+
+// Rough word classes for picking fair gap distractors. Lexicon classes are strict: a time word
+// is never offered as a wrong answer for another time word, since both could make sense.
+const CLASS_LEXICON: Record<string, string[]> = {
+  time: 'днес утре вчера сега вечер сутрин довечера винаги никога после скоро рано късно вдругиден тогава сутринта вечерта обед следобед веднага'.split(' '),
+  place: 'тук там горе долу вкъщи навън вътре близо далеч наляво надясно направо отпред отзад'.split(' '),
+  manner: 'много малко добре зле бавно бързо тихо силно заедно отново пак сам сама само също'.split(' '),
+  number: 'едно една един две два три четири пет шест седем осем девет десет'.split(' '),
+  person: 'мой моя мое мои твой твоя твое твои негов нейна нейно наш наша наше наши ваш ваша мама татко тате баба дядо'.split(' '),
+}
+const STRICT_CLASSES = new Set(Object.keys(CLASS_LEXICON))
+const lexiconClass = new Map<string, string>(Object.entries(CLASS_LEXICON).flatMap(([c, ws]) => ws.map((w) => [w, c] as [string, string])))
+
+/** time / place / manner / number / person from the lexicons, else a verb-or-not guess from the ending. */
+export function wordClass(word: string): string {
+  const w = norm(word)
+  const lex = lexiconClass.get(w)
+  if (lex) return lex
+  if (/(ам|ям|им|ем|еш|иш|аш|ме|те|ят|ат|ах|ох|их|ше)$/.test(w) && w.length > 3) return 'verb'
+  return 'other'
+}
+
+let knownSentences: Set<string> | null = null
+/** Every Bulgarian line the course teaches (and its accepted alternatives), normalised. */
+function courseSentences(): Set<string> {
+  if (!knownSentences) {
+    knownSentences = new Set<string>()
+    for (const id of allItemIds) {
+      const it = study(id)
+      if (!it) continue
+      for (const t of [it.bg, ...(it.bgAlt ?? [])]) knownSentences.add(norm(t))
+    }
+  }
+  return knownSentences
+}
+
+/** Blank one content word of a known phrase, with three wrong words from things he knows. Null when it can't be made fairly. */
+function clozeEx(item: StudyItem, pool: StudyItem[]): Exercise | null {
+  if (!engineFeatures.cloze || item.kind !== 'phrase') return null
+  const words = item.bg.split(/\s+/).filter(Boolean)
+  if (words.length < 3) return null
+  const cands = words
+    .map((w, i) => ({ w, i, core: w.replace(PUNCT, '') }))
+    .filter((x) => x.core.length >= 3 && !STOP.has(norm(x.core)))
+  if (!cands.length) return null
+  const pick = rand(cands)
+  const capital = pick.core[0] !== pick.core[0].toLowerCase()
+  const fit = (w: string) => (capital ? w[0].toUpperCase() + w.slice(1) : w[0].toLowerCase() + w.slice(1))
+  const m = /^([„“"«]*)(.*?)([.,!?;:„“"«»…]*)$/.exec(pick.w)!
+  const before = words.slice(0, pick.i).join(' ') + (pick.i > 0 ? ' ' : '') + m[1]
+  const after = m[3] + (pick.i < words.length - 1 ? ' ' + words.slice(pick.i + 1).join(' ') : '')
+
+  const answerClass = wordClass(m[2])
+  const own = new Set([item.bg, ...(item.bgAlt ?? [])].map(norm))
+  const sentences = courseSentences()
+  const inSentence = new Set(words.map((w) => norm(w.replace(PUNCT, ''))))
+  const seen = new Set<string>()
+  const different: string[] = []
+  const sameClass: string[] = []
+  const known = pool.filter((p) => p.id !== item.id && isKnown(p.id) && (p.kind === 'word' || p.kind === 'phrase'))
+  for (const w of shuffle(known.flatMap((p) => tilesFor(p)))) {
+    const n = norm(w)
+    if (w.length < 3 || STOP.has(n) || inSentence.has(n) || seen.has(n)) continue
+    seen.add(n)
+    // A wrong option must not complete the gap into a correct sentence the course teaches.
+    const filled = norm(before + fit(w) + after)
+    if (own.has(filled) || sentences.has(filled)) continue
+    if (wordClass(w) === answerClass) sameClass.push(w)
+    else different.push(w)
+  }
+  // Prefer words of another kind; same-kind words only for loose classes and only to fill up.
+  const wrong = [...different, ...(STRICT_CLASSES.has(answerClass) ? [] : sameClass)].slice(0, 3)
+  if (wrong.length < 3) return null
+  return { type: 'cloze', item, before, after, answer: m[2], options: shuffle([m[2], ...wrong.map(fit)]) }
 }
 
 function wordExercise(requested: ExerciseType, item: StudyItem, pool: StudyItem[]): Exercise {
   const isPhrase = item.kind === 'phrase'
+  if (requested === 'cloze') {
+    const c = clozeEx(item, pool)
+    if (c) return c
+    requested = isPhrase ? 'build' : 'type_bg'
+  }
+  if (requested === 'speak' && env.speaking === false) requested = 'type_bg'
   let type = listenable(requested, item)
   // A single word can't be built from tiles: practise recall by typing or by ear instead.
   if (type === 'build' && tilesFor(item).length < 2) type = listenable(fallbackTurn++ % 2 === 0 ? 'type_bg' : 'listen_mc', item)
@@ -176,37 +280,54 @@ export function buildWordLesson(lesson: LessonView, level: number, speaker: Spea
   const items = lesson.itemIds.map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x)
   const pool = poolAround([...lesson.itemIds, ...reviewIds], speaker, 'words')
   const mix = WORD_MIX[Math.min(3, Math.max(1, level))]
-  const ex: Exercise[] = []
+  const review = reviewIds
+    .slice(0, 3)
+    .map((id) => study(id, speaker))
+    .filter((x): x is StudyItem => !!x)
+    .map((it) => wordExercise(rand(WORD_MIX[2]), it, pool))
 
   if (level === 1) {
-    // Teach each item, then immediately check it once, then mix.
-    for (const it of items) {
-      ex.push({ type: 'intro', item: it })
-      ex.push(wordExercise(it.kind === 'phrase' ? 'build' : 'mc_bg_en', it, pool))
-    }
-    ex.push({ type: 'match', items: shuffle(items).slice(0, 5), letters: false })
-    for (const it of shuffle(items)) ex.push(wordExercise(rand(mix.slice(1)), it, pool))
-  } else {
-    // Two different exercise types per item, after fallbacks, so recall really is mixed.
-    for (const it of shuffle(items)) {
-      const used = new Set<ExerciseType>()
-      for (const t of shuffle(mix)) {
-        if (used.size >= 2) break
-        const e = wordExercise(t, it, pool)
-        if (used.has(e.type)) continue
-        used.add(e.type)
-        ex.push(e)
-      }
-    }
-    ex.splice(Math.floor(ex.length / 2), 0, { type: 'match', items: shuffle(items).slice(0, 5), letters: false })
+    // Teach each item and check it straight away; the review sits in the middle, after half the new items.
+    const half = Math.ceil(items.length / 2)
+    const teach: Exercise[] = []
+    items.forEach((it, i) => {
+      teach.push({ type: 'intro', item: it })
+      teach.push(wordExercise(it.kind === 'phrase' ? 'build' : 'mc_bg_en', it, pool))
+      if (i === half - 1) teach.push(...review)
+    })
+    // Final retrieval: the match covers up to five items; every other item gets its own check. Never cut.
+    const matched = shuffle(items).slice(0, 5)
+    const finalChecks = items.filter((it) => !matched.includes(it)).map((it) => wordExercise(rand(mix.slice(1)), it, pool))
+    const room = Math.max(0, LESSON_CAP - teach.length - 1 - finalChecks.length)
+    const tail = shuffle(matched)
+      .slice(0, room)
+      .map((it) => wordExercise(rand(mix.slice(1)), it, pool))
+    const exercises: Exercise[] = [...teach, { type: 'match', items: matched, letters: false }, ...spread([...finalChecks, ...tail])]
+    return { lesson, kind: 'lesson', level, exercises, newItems: items }
   }
-  for (const id of reviewIds.slice(0, level === 1 ? 2 : 3)) {
-    const it = study(id, speaker)
-    if (it) ex.push(wordExercise(rand(WORD_MIX[2]), it, pool))
+
+  // Levels 2 and 3: every item gets one exercise for sure, a second if there is room; two different types after fallbacks.
+  const firsts: Exercise[] = []
+  const seconds: Exercise[] = []
+  for (const it of shuffle(items)) {
+    const used = new Set<ExerciseType>()
+    for (const t of shuffle(mix)) {
+      if (used.size >= 2) break
+      const ex = wordExercise(t, it, pool)
+      if (used.has(ex.type)) continue
+      used.add(ex.type)
+      ;(used.size === 1 ? firsts : seconds).push(ex)
+    }
   }
-  // Keep intros in order but spread the rest so the same item doesn't repeat back to back.
-  const plan = level === 1 ? ex : spread(ex)
-  return { lesson, kind: 'lesson', level, exercises: plan.slice(0, 16), newItems: level === 1 ? items : [] }
+  const extras: Exercise[] = [{ type: 'match', items: shuffle(items).slice(0, 5), letters: false }]
+  // Level 2: say one phrase aloud (shadowing). Skippable in the session; off when speaking is turned off.
+  if (level === 2 && env.speaking !== false) {
+    const sp = items.find((i) => i.kind === 'phrase') ?? items[0]
+    if (sp && !firsts.some((x) => x.type === 'speak' && x.item.id === sp.id)) extras.push({ type: 'speak', item: sp })
+  }
+  const mandatory = [...firsts, ...review, ...extras]
+  const room = Math.max(0, LESSON_CAP - mandatory.length)
+  return { lesson, kind: 'lesson', level, exercises: spread([...mandatory, ...shuffle(seconds).slice(0, room)]), newItems: [] }
 }
 
 export function buildLetterLesson(lesson: LessonView, level: number, speaker: Speaker, e?: BuildEnv): LessonPlan {
@@ -265,8 +386,24 @@ export function buildLesson(lessonId: string, level: number, speaker: Speaker, r
   return lesson.kind === 'letters' ? buildLetterLesson(lesson, level, speaker, e) : buildWordLesson(lesson, level, speaker, reviewIds, e)
 }
 
-/** A review session from spaced-repetition due items, weakest first. Weak exercise types get extra weight. */
-export function buildPractice(ids: string[], speaker: Speaker, weakTypes: ExerciseType[] = [], e?: BuildEnv): LessonPlan {
+export interface ReviewOptions {
+  kind?: SessionKind
+  /** Most exercises in the session. */
+  max?: number
+  /** Exercise types to lean on (e.g. his weakest skills). */
+  weakTypes?: ExerciseType[]
+  /** Types to use instead of the default mix (e.g. easy recognition for a welcome back). */
+  prefer?: ExerciseType[]
+  /** Add a matching round when there are enough words. */
+  match?: boolean
+}
+
+/**
+ * A review session from the given ids (weakest and most overdue first). Used for Review, the
+ * warm-up before a lesson, the one-minute quick session, the welcome back and mistakes.
+ */
+export function buildReview(ids: string[], speaker: Speaker, opts: ReviewOptions = {}, e?: BuildEnv): LessonPlan {
+  const { kind = 'practice', max = 14, weakTypes = [], match = true } = opts
   useEnv(e, ids)
   const items = ids.map((id) => study(id, speaker)).filter((x): x is StudyItem => !!x)
   const words = items.filter((i) => i.kind === 'word' || i.kind === 'phrase')
@@ -276,13 +413,18 @@ export function buildPractice(ids: string[], speaker: Speaker, weakTypes: Exerci
   const letterPool = poolAround(letters.map((l) => l.id), speaker, 'letters')
   // Reading words are practised by reading (choose the Latin form) or by ear.
   const readPool = [...reading, ...pool.filter((p) => p.kind === 'word')]
-  const prefer: ExerciseType[] = ['mc_en_bg', 'listen_mc', 'type_bg', 'build', 'listen_type', ...weakTypes, ...weakTypes]
+  const prefer: ExerciseType[] = opts.prefer ?? ['mc_en_bg', 'listen_mc', 'type_bg', 'build', 'listen_type', 'cloze', ...weakTypes, ...weakTypes]
   const ex: Exercise[] = []
   for (const it of words.slice(0, 10)) ex.push(wordExercise(rand(prefer), it, pool))
   for (const l of letters.slice(0, 4)) ex.push({ type: rand(['letter_sound', 'sound_letter'] as const), item: l, options: options(l, letterPool) })
   for (const r of reading.slice(0, 4)) ex.push(readingExercise(rand(['read_word', 'listen_mc'] as const), r, readPool))
-  if (words.length >= 4) ex.splice(3, 0, { type: 'match', items: shuffle(words).slice(0, 5), letters: false })
-  return { lesson: null, kind: 'practice', level: 0, exercises: spread(ex).slice(0, 14), newItems: [] }
+  if (match && words.length >= 6) ex.splice(3, 0, { type: 'match', items: shuffle(words).slice(0, 5), letters: false })
+  return { lesson: null, kind, level: 0, exercises: spread(ex).slice(0, max), newItems: [] }
+}
+
+/** A review session from spaced-repetition due items, weakest first. Weak exercise types get extra weight. */
+export function buildPractice(ids: string[], speaker: Speaker, weakTypes: ExerciseType[] = [], e?: BuildEnv): LessonPlan {
+  return buildReview(ids, speaker, { kind: 'practice', max: 14, weakTypes, match: ids.length >= 4 }, e)
 }
 
 /** How many speed rounds a number of learned words allows: one per 5 words, at most 3. */

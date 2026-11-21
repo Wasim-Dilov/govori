@@ -50,6 +50,8 @@ export interface UnitView {
   emoji: string
   index: number
   lessons: LessonView[]
+  /** What he can do after this unit ("You can greet your тъща and ask how she is"). */
+  canDo?: string
 }
 
 export interface TrackView {
@@ -84,6 +86,7 @@ function buildAlphabetView(): TrackView {
     description: u.description,
     emoji: u.emoji,
     index: ui,
+    canDo: u.canDo,
     lessons: u.lessons.map((l) => {
       const readingIds = l.reading.map((r, ri) => {
         const id = `${l.id}.r${ri}`
@@ -117,6 +120,7 @@ function buildTrackView(t: Track): TrackView {
     description: u.description,
     emoji: u.emoji,
     index: ui,
+    canDo: u.canDo,
     lessons: [
       ...u.lessons.map((l) => {
         const view: LessonView = { id: l.id, trackId: t.id, unitId: u.id, title: l.title, titleBg: l.titleBg, kind: 'words', itemIds: l.items, index: lessons.length }
@@ -147,8 +151,20 @@ export const TRACK_IDS = tracks.map((t) => t.id)
 /** Highest level a lesson node can reach: 3 for lessons, 1 for conversations. */
 export const maxLevel = (l: LessonView) => (l.kind === 'story' ? 1 : 3)
 
-/** Resolve any id (item, letter, reading word) to a StudyItem, using the learner's speaker form. */
+// ---- "Our phrases": items his wife (or he) added, kept on the phone and registered at startup.
+const customItems = new Map<string, StudyItem>()
+
+/** Make custom items resolvable by study(). Replaces the whole set. */
+export function registerCustomItems(list: StudyItem[]) {
+  customItems.clear()
+  for (const it of list) customItems.set(it.id, it)
+}
+export const customItemIds = () => [...customItems.keys()]
+
+/** Resolve any id (item, letter, reading word, custom phrase) to a StudyItem, using the learner's speaker form. */
 export function study(id: string, speaker: Speaker = 'm'): StudyItem | undefined {
+  const custom = customItems.get(id)
+  if (custom) return custom
   const it = items.get(id)
   if (it) {
     const useF = speaker === 'f' && it.f

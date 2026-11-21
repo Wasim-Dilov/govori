@@ -6,7 +6,7 @@ import type { DialogueLine, Who } from '../content/types.ts'
 import { shuffle, translit } from '../lib/engine.ts'
 import { sfx, speak, stopSpeaking, voiceForWho } from '../lib/audio.ts'
 import { useApp } from '../lib/store.ts'
-import { IconChat, IconCheck, IconSpeaker, IconX } from '../components/Icons.tsx'
+import { IconChat, IconCheck, IconMic, IconSpeaker, IconX } from '../components/Icons.tsx'
 import type { ExerciseProps } from './types.ts'
 import './exercises-d.css'
 
@@ -29,7 +29,7 @@ type Step = { kind: 'line'; index: number } | { kind: 'question'; index: number 
 type LogStep = { itemId: string; correct: boolean; answer: string; ms: number }
 
 
-export function DialogueExercise({ ex, complete, translit: showTr }: ExerciseProps<'dialogue'>) {
+export function DialogueExercise({ ex, complete, translit: showTr, speaking }: ExerciseProps<'dialogue'>) {
   const d = ex.dialogue
   const speaker = useApp((s) => s.profile.speaker)
   const steps = useMemo<Step[]>(
@@ -60,6 +60,9 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
   const [hint, setHint] = useState(false)
   const [english, setEnglish] = useState<number[]>([])
   const [playing, setPlaying] = useState<number | null>(null)
+  // "Say it out loud first": done (or skipped) for the current line of his.
+  const [said, setSaid] = useState(false)
+  const saidAloud = useRef(false)
 
   const log = useRef<LogStep[]>([])
   const shownAt = useRef(Date.now())
@@ -82,6 +85,8 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
     setWrongPicks([])
     setRightPick(null)
     setHint(false)
+    setSaid(false)
+    saidAloud.current = false
     firstPick.current = null
     shownAt.current = Date.now()
     if (step.kind === 'line' && d.lines[step.index].who !== 'me') {
@@ -124,7 +129,7 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
   function pickLine(i: number) {
     if (!line || rightPick !== null) return
     const opt = options[step.index][i]
-    if (firstPick.current === null) firstPick.current = (hint ? 'hint+' : '') + opt.text
+    if (firstPick.current === null) firstPick.current = (saidAloud.current ? 'said+' : '') + (hint ? 'hint+' : '') + opt.text
     if (!opt.right) {
       sfx.wrong()
       setWrongPicks((w) => [...w, i])
@@ -294,10 +299,39 @@ export function DialogueExercise({ ex, complete, translit: showTr }: ExercisePro
         </div>
 
         <AnimatePresence mode="wait">
-          {isMe && rightPick === null && line && (
+          {isMe && rightPick === null && line && speaking && !said && (
+            <motion.div key={`say-${pos}`} className="dlg-ask dlg-say" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+              <div className="dlg-ask__head">
+                <span className="dlg-ask__title">Say it out loud first</span>
+              </div>
+              <p className="dlg-say__en">“{line.en}”</p>
+              <p className="dlg-say__help">Try it in Bulgarian, out loud. Then pick the line you meant.</p>
+              <div className="dlg-say__actions">
+                <button
+                  type="button"
+                  className="gv-btn gv-btn--tinted"
+                  onClick={() => {
+                    saidAloud.current = true
+                    setSaid(true)
+                  }}
+                >
+                  <IconMic width={18} height={18} /> I said it
+                </button>
+                <button type="button" className="gv-btn gv-btn--plain" onClick={() => setSaid(true)}>
+                  Skip
+                </button>
+              </div>
+            </motion.div>
+          )}
+          {isMe && rightPick === null && line && (!speaking || said) && (
             <motion.div key={`me-${pos}`} className="dlg-ask" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
               <div className="dlg-ask__head">
                 <span className="dlg-ask__title">What do you say?</span>
+                {speaking && said && (
+                  <button type="button" className="dlg-model" onClick={() => void speak(say(line).bg, { voice: voiceForWho('me', speaker) })} aria-label="Hear how it sounds">
+                    <IconSpeaker width={16} height={16} /> Hear it
+                  </button>
+                )}
                 {!hint ? (
                   <button type="button" className="dlg-hint" onClick={() => setHint(true)}>
                     Show a hint

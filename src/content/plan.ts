@@ -25,8 +25,39 @@ export const PLAN: PlanWeek[] = [
   { week: 12, title: 'Bring it all together', titleBg: 'Всичко заедно', focus: 'basics', also: 'kids', goal: 'Finish open units, replay conversations, clear your mistakes.' },
 ]
 
-/** Which plan week the learner is in, counted from the day they started. */
+/** Answers "has he finished at least one unit of this track?". Set by the app from his progress. */
+let unitDone: ((track: TrackId) => boolean) | null = null
+export function setPlanProgressCheck(check: ((track: TrackId) => boolean) | null) {
+  unitDone = check
+}
+
+export interface PlanStatus {
+  /** The plan week to work on. */
+  week: PlanWeek
+  /** The week by the calendar alone (1-based). */
+  calendarWeek: number
+  /** The calendar has moved on, but the plan waits for a finished unit in this week's track. */
+  held: boolean
+}
+
+/**
+ * Which plan week the learner is in. The calendar sets the pace, but the plan never runs more
+ * than one week ahead of his progress: it only moves past a week once that week's track has at
+ * least one finished unit. A slow or lapsed learner keeps working on the track he is in instead
+ * of being dropped into a fresh, untouched one.
+ */
+export function planStatus(startedAt: number, now = Date.now()): PlanStatus {
+  const calendarIdx = Math.min(PLAN.length - 1, Math.max(0, Math.floor((now - startedAt) / (7 * 86_400_000))))
+  let idx = calendarIdx
+  if (unitDone) {
+    let firstOpen = 0
+    while (firstOpen < calendarIdx && unitDone(PLAN[firstOpen].focus)) firstOpen++
+    idx = Math.min(calendarIdx, firstOpen)
+  }
+  return { week: PLAN[idx], calendarWeek: calendarIdx + 1, held: idx < calendarIdx }
+}
+
+/** The plan week to work on (see planStatus). */
 export function planWeek(startedAt: number, now = Date.now()): PlanWeek {
-  const week = Math.floor((now - startedAt) / (7 * 86_400_000))
-  return PLAN[Math.min(PLAN.length - 1, Math.max(0, week))]
+  return planStatus(startedAt, now).week
 }

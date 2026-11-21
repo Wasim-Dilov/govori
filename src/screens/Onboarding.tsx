@@ -11,15 +11,18 @@ import type { TrackId } from '../content/types.ts'
 import { sfx } from '../lib/audio.ts'
 import { isStandalone } from '../lib/push.ts'
 import { useApp } from '../lib/store.ts'
+import { DEFAULT_GOAL, GOAL_OPTIONS } from '../lib/progress.ts'
 import './onboarding.css'
 
 type Step = 'welcome' | 'name' | 'address' | 'goal' | 'start' | 'install'
 
-const GOALS = [
-  { xp: 20, label: 'Easy', time: '5 minutes a day', note: 'One lesson with your coffee' },
-  { xp: 40, label: 'Regular', time: '10 minutes a day', note: 'Two or three lessons' },
-  { xp: 60, label: 'Serious', time: '15 minutes a day', note: 'For fast progress' },
-]
+// Daily goals are honest about time: a lesson is roughly 3 minutes and 10 to 15 XP.
+const NOTES: Record<number, string> = {
+  5: 'One or two short lessons with your coffee',
+  10: 'Two or three lessons, the sweet spot',
+  15: 'Four or five lessons, for fast progress',
+}
+const GOALS = GOAL_OPTIONS.map((o) => ({ xp: o.xp, label: o.label, time: `${o.min} minutes a day`, note: NOTES[o.min] ?? '' }))
 
 const FEATURES = [
   { Icon: IconHeart, title: 'Words that matter at home', text: 'Sweet words for her, what the kids need, and the in-laws at the table.' },
@@ -42,7 +45,7 @@ export function OnboardingScreen() {
   const [dir, setDir] = useState(1)
   const [name, setName] = useState('')
   const [speaker, setSpeaker] = useState<'m' | 'f' | null>(null)
-  const [goal, setGoal] = useState(40)
+  const [goal, setGoal] = useState<number>(DEFAULT_GOAL)
   const [start, setStart] = useState<TrackId | 'plan'>('plan')
   const [saving, setSaving] = useState(false)
 

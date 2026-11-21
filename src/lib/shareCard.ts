@@ -4,6 +4,8 @@
 import { lessonById, study, type Speaker, type StudyItem } from '../content/index.ts'
 import { db, getKV, localDay, setKV } from './db.ts'
 import { getSummary, learnedCount, type SessionResult } from './progress.ts'
+import { missionSaidToday } from './missions.ts'
+import type { Milestone } from './milestones.ts'
 
 // ------------------------------------------------------------- data
 
@@ -33,6 +35,8 @@ export interface CardData {
   words: CardWord[]
   stats: { value: string; label: string }[]
   closing: CardWord
+  /** The phrase he said to her today ("Say it to her" mission), if any. */
+  said?: CardWord
   signature: string
   /** Her name, used in the closing line. */
   partnerName: string
@@ -45,6 +49,10 @@ const KIND_LABEL: Record<SessionResult['kind'], string> = {
   practice: 'Review',
   mistakes: 'Fixing mistakes',
   speed: 'Speed round',
+  warmup: 'Warm-up review',
+  quick: 'One-minute practice',
+  welcome: 'Welcome-back review',
+  quiz: 'Quiz with her',
 }
 
 const DEFAULT_MESSAGES = ['Quiz me tonight?', 'Ask me something in Bulgarian at dinner.', 'One step closer to talking with your family.', 'Practised again today, for you.']
@@ -108,16 +116,16 @@ function headlineFor(partner: string, from: string, practised: string) {
   return `I ${practised}`
 }
 
-export async function buildSessionCard(result: SessionResult, opts: { partner: string; from: string; message: string; speaker?: Speaker }): Promise<CardData> {
+export async function buildSessionCard(result: SessionResult, opts: { partner: string; from: string; message: string; speaker?: Speaker; milestone?: Milestone }): Promise<CardData> {
   const speaker = opts.speaker ?? 'm'
-  const [words, closing, total] = await Promise.all([sessionWords(result, speaker), closingLine(speaker), learnedCount().catch(() => 0)])
+  const [words, closing, total, said] = await Promise.all([sessionWords(result, speaker), closingLine(speaker), learnedCount().catch(() => 0), saidToday(speaker)])
   const lesson = result.lessonId ? lessonById.get(result.lessonId) : undefined
   const parts = [KIND_LABEL[result.kind] ?? 'Practice', lesson?.title].filter(Boolean)
   if ((result.kind === 'lesson' || result.kind === 'letters') && result.level > 1) parts.push(`Level ${result.level}`)
   const minutes = Math.max(1, Math.round(result.ms / 60000))
   return {
     kind: 'session',
-    eyebrow: result.streak > 1 ? `Day ${result.streak} of my streak` : 'Practised today',
+    eyebrow: opts.milestone ? opts.milestone.title : result.streak > 1 ? `Day ${result.streak} of my streak` : 'Practised today',
     headline: headlineFor(opts.partner, opts.from, 'practised Bulgarian today'),
     subtitle: parts.join(' · '),
     date: longDate(),
@@ -130,20 +138,28 @@ export async function buildSessionCard(result: SessionResult, opts: { partner: s
       { value: `${total}`, label: 'words' },
     ],
     closing,
+    said,
     signature: opts.from,
     partnerName: opts.partner,
   }
+}
+
+/** The mission phrase he said to her today, as a card word. */
+async function saidToday(speaker: Speaker): Promise<CardWord | undefined> {
+  const it = await missionSaidToday(speaker).catch(() => null)
+  return it ? { bg: it.bg, tr: it.tr, en: it.en } : undefined
 }
 
 /** The same card for the last 7 days: sessions, minutes, new words, best streak. */
 export async function buildWeekCard(opts: { partner: string; from: string; message: string; speaker?: Speaker }): Promise<CardData> {
   const speaker = opts.speaker ?? 'm'
   const since = Date.now() - 7 * 86_400_000
-  const [sessions, memory, summary, closing] = await Promise.all([
+  const [sessions, memory, summary, closing, said] = await Promise.all([
     db.sessions.where('start').above(since).toArray().catch(() => []),
     db.memory.toArray().catch(() => []),
     getSummary(),
     closingLine(speaker),
+    saidToday(speaker),
   ])
   const done = sessions.filter((s) => s.completed)
   const minutes = Math.max(0, Math.round(done.reduce((a, s) => a + Math.max(0, (s.end ?? s.start) - s.start), 0) / 60000))
@@ -169,6 +185,7 @@ export async function buildWeekCard(opts: { partner: string; from: string; messa
       ...(summary.longestStreak > 1 ? [{ value: `${summary.longestStreak}`, label: 'best streak' }] : []),
     ].filter((s, i, all) => s.value !== '0' || all.every((x) => x.value === '0') && i === 0),
     closing,
+    said,
     signature: opts.from,
     partnerName: opts.partner,
   }
@@ -186,6 +203,7 @@ export function cardText(d: CardData): string {
     lines.push(`This week: ${d.stats.filter((s) => s.value !== '0').map((s) => `${s.value} ${s.label === 'min' ? 'minutes' : s.label}`).join(', ')}.`)
     if (words.length) lines.push(`New words: ${words.join(', ')}.`)
   }
+  if (d.said) lines.push(`Tonight I said: ${d.said.bg.replace(/[.!?]$/, '')} (${d.said.en.replace(/[.!?]$/, '')}).`)
   const streak = d.eyebrow.match(/^Day (\d+)/)?.[1]
   if (streak) lines.push(`${streak}-day streak.`)
   const closing = d.closing.bg.replace(/[.!]$/, '')
@@ -450,6 +468,22 @@ async function draw(d: CardData, img: HTMLImageElement | null): Promise<Blob> {
     ctx.fillStyle = C.roseInk
     lines.forEach((l, i) => ctx.fillText(l, left + 30, y + 46 + i * 40))
     y += h
+  }
+
+  // "Tonight I said": the phrase from today's "Say it to her" mission.
+  if (d.said) {
+    y += 52
+    ctx.fillStyle = C.rose
+    ctx.font = font(600, 24)
+    ctx.fillText('Tonight I said', left, y)
+    ctx.fillStyle = C.ink
+    ctx.font = font(600, 40)
+    y += 50
+    ctx.fillText(ellipsis(ctx, d.said.bg, width), left, y)
+    ctx.fillStyle = C.muted
+    ctx.font = font(400, 26)
+    y += 38
+    ctx.fillText(ellipsis(ctx, `${d.said.tr ? `${d.said.tr}  ·  ` : ''}${d.said.en}`, width), left, y)
   }
 
   // Bottom block from the bottom up: band, then the closing line and signature.

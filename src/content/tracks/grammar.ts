@@ -124,6 +124,7 @@ export const grammar: Track = {
   units: [
     {
       id: 'grammar.u1',
+      canDo: 'You can say who and where people are with съм, си and е',
       title: 'To be',
       titleBg: 'Аз съм',
       description: 'Am, are, is: the little words that hold sentences together.',
@@ -136,6 +137,7 @@ export const grammar: Track = {
     },
     {
       id: 'grammar.u2',
+      canDo: 'You can put "the" on the end of words, like жената and детето',
       title: 'The',
       titleBg: 'Жената, детето',
       description: 'Bulgarian glues "the" onto the end of the word.',
@@ -148,6 +150,7 @@ export const grammar: Track = {
     },
     {
       id: 'grammar.u3',
+      canDo: 'You can say no and ask yes or no questions with ли and нали',
       title: 'No and questions',
       titleBg: 'Не, ли, нали',
       description: 'Say no, ask yes/no questions and check with "right?".',
@@ -160,6 +163,7 @@ export const grammar: Track = {
     },
     {
       id: 'grammar.u4',
+      canDo: 'You can say what you want, can and must do with да',
       title: 'Want, can, must',
       titleBg: 'Искам да',
       description: 'Bulgarian has no "to" form of verbs. Use да instead.',
@@ -172,6 +176,7 @@ export const grammar: Track = {
     },
     {
       id: 'grammar.u5',
+      canDo: "You can talk about plans with ще and say what you won't do with няма да",
       title: 'Tomorrow',
       titleBg: 'Ще',
       description: 'Talk about plans with ще and няма да.',
@@ -184,6 +189,7 @@ export const grammar: Track = {
     },
     {
       id: 'grammar.u6',
+      canDo: 'You can say my wife, my mother and my son the Bulgarian way',
       title: 'Mine and yours',
       titleBg: 'Жена ми',
       description: 'My, your, our, and why it is жена ми, not моя жена.',

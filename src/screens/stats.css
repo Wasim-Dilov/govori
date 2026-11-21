@@ -133,3 +133,15 @@
 .st-tough__right { font: 400 12px/16px var(--font-text); color: var(--ink-muted); }
 .st-practise { margin-top: var(--space-3); }
 .st-practise svg { width: 20px; height: 20px; }
+
+/* ---------- I can… */
+.st-cando__check {
+  flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--pine); color: var(--on-pine);
+}
+.st-cando__check svg { width: 16px; height: 16px; }
+.st-cando__check.is-empty { background: var(--fill-secondary); color: var(--label-tertiary); }
+
+/* ---------- With her this week */
+.st-together__icon { color: var(--rose); }
+.st-together__n { font: 600 20px/24px var(--font-text); color: var(--ink); font-variant-numeric: tabular-nums; }

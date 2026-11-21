@@ -132,6 +132,7 @@ export const home: Track = {
   units: [
     {
       id: 'home.u1',
+      canDo: 'You can write the shopping list and buy milk, bread and vegetables',
       title: 'Shopping list',
       titleBg: 'Списък за пазаруване',
       description: 'The everyday food you will be sent out to buy.',
@@ -144,6 +145,7 @@ export const home: Track = {
     },
     {
       id: 'home.u2',
+      canDo: 'You can offer to help and say which chores you will do',
       title: 'Helping out',
       titleBg: 'Помагам',
       description: 'Chores, and how to volunteer for them.',
@@ -156,6 +158,7 @@ export const home: Track = {
     },
     {
       id: 'home.u3',
+      canDo: 'You can tell her to rest and show her you have everything handled',
       title: 'Taking care of her',
       titleBg: 'Грижа за нея',
       description: 'Let her put her feet up while you handle things.',
@@ -168,6 +171,7 @@ export const home: Track = {
     },
     {
       id: 'home.u4',
+      canDo: 'You can cook alongside her, then call everyone to dinner',
       title: 'Cooking together',
       titleBg: 'Готвим заедно',
       description: 'Be useful in the kitchen: chop, stir, taste.',
@@ -180,6 +184,7 @@ export const home: Track = {
     },
     {
       id: 'home.u5',
+      canDo: 'You can talk about fixing things around the house and the garden',
       title: 'Around the house',
       titleBg: 'Около къщата',
       description: 'Fix the tap, change the bulb, water the garden.',
@@ -192,6 +197,7 @@ export const home: Track = {
     },
     {
       id: 'home.u6',
+      canDo: 'You can plan evenings and weekends and agree who picks up the kids',
       title: 'Planning the week',
       titleBg: 'Планове за седмицата',
       description: 'Evenings, weekends and who picks up the kids.',

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { InstallGuide } from '../components/InstallGuide.tsx'
 import { Recorder } from '../components/Recorder.tsx'
-import { IconCheck, IconSpeaker, IconUser } from '../components/Icons.tsx'
+import { IconCheck, IconChevron, IconHeart, IconSpeaker, IconUser, IconX } from '../components/Icons.tsx'
 import { allItemIds, study, trackById, tracks } from '../content/index.ts'
 import { planWeek } from '../content/plan.ts'
 import type { TrackId } from '../content/types.ts'
@@ -11,16 +11,16 @@ import { clipCount, clipUrls, clipVoiceLabel, hasBulgarianVoice, manifestReady, 
 import { db, getKV } from '../lib/db.ts'
 import { exportAll } from '../lib/exportData.ts'
 import { readBackup, restoreBackup, type Backup, type BackupSummary } from '../lib/importData.ts'
-import { learnerLevel, liveStreak } from '../lib/progress.ts'
+import { GOAL_OPTIONS, learnerLevel, liveStreak } from '../lib/progress.ts'
+import { listOurPhrases } from '../lib/custom.ts'
+import type { CustomItem } from '../lib/db.ts'
+import { getPartner } from '../lib/shareCard.ts'
+import { BottomSheet } from '../components/FocusSheet.tsx'
 import { GITHUB_ACTION_URL, GITHUB_SECRET_URL, disableReminders, enableReminders, getReminderCode, reminderStatus, type ReminderStatus } from '../lib/push.ts'
 import { useApp, type Profile } from '../lib/store.ts'
 import './me.css'
 
-const GOALS = [
-  { xp: 20, label: '5 min' },
-  { xp: 40, label: '10 min' },
-  { xp: 60, label: '15 min' },
-]
+const GOALS = GOAL_OPTIONS.map((g) => ({ xp: g.xp, label: `${g.min} min` }))
 
 // ------------------------------------------------------------- small building blocks
 
@@ -200,6 +200,190 @@ function ProfileHeader() {
   )
 }
 
+/** Freezes protect the streak; a broken streak can sometimes be repaired. */
+function StreakSection() {
+  const st = useApp((s) => s.streak)
+  const toNext = Math.max(0, 7 - st.goalDays)
+  const deadline = st.repairDeadline ? new Date(st.repairDeadline).toLocaleString('en-GB', { weekday: 'long', hour: '2-digit', minute: '2-digit' }) : ''
+  return (
+    <Section
+      title="Streak"
+      footer={<>A freeze covers one missed day by itself. You earn one for every 7 days you reach your daily goal, and can hold up to 2.</>}
+    >
+      <Row title="Current streak" subtitle={st.frozenToday ? 'A freeze saved your streak yesterday.' : `Best: ${st.best} ${st.best === 1 ? 'day' : 'days'}`} accessory={<span className="me-value">{st.streak} {st.streak === 1 ? 'day' : 'days'}</span>} />
+      <Row
+        title="Streak freezes"
+        subtitle={st.freezes >= 2 ? 'You hold the maximum.' : `Next one in ${toNext} goal ${toNext === 1 ? 'day' : 'days'}.`}
+        accessory={<span className="me-value">{st.freezes} of 2</span>}
+      >
+        <span className="gv-progress me-freeze-bar" aria-hidden="true">
+          <span className="gv-progress__fill" style={{ width: `${Math.max(4, Math.round((Math.min(7, st.goalDays) / 7) * 100))}%`, display: 'block' }} />
+        </span>
+      </Row>
+      {st.repairable && (
+        <Row
+          className="me-repair"
+          title="Repair your streak"
+          subtitle={`Finish ${st.repairSessionsLeft} more ${st.repairSessionsLeft === 1 ? 'session' : 'sessions'}${deadline ? ` by ${deadline}` : ''} to bring back your ${st.best}-day streak.`}
+        />
+      )}
+    </Section>
+  )
+}
+
+/** Practise together: "Quiz me" and the phrases the two of you add. */
+function TogetherSection() {
+  const go = useApp((s) => s.go)
+  const addOurPhrase = useApp((s) => s.addOurPhrase)
+  const removeOurPhrase = useApp((s) => s.removeOurPhrase)
+  const showToast = useApp((s) => s.showToast)
+  const [phrases, setPhrases] = useState<CustomItem[]>([])
+  const [partner, setPartner] = useState('')
+  const [adding, setAdding] = useState(false)
+  const [confirm, setConfirm] = useState<string | null>(null)
+
+  const reload = () => void listOurPhrases().then(setPhrases)
+  useEffect(() => {
+    reload()
+    void getPartner().then((p) => setPartner(p?.name?.trim() ?? ''))
+  }, [])
+
+  const her = partner || 'her'
+  async function remove(id: string) {
+    await removeOurPhrase(id)
+    setConfirm(null)
+    reload()
+    showToast('Phrase removed')
+  }
+
+  return (
+    <>
+      <Section title="Practise together" footer={<>She reads the English, you say it in Bulgarian, and she taps whether you got it. Counts as speaking practice.</>}>
+        <button type="button" className="gv-row me-nav-row" onClick={() => go({ name: 'quiz' })}>
+          <span className="me-row-icon" aria-hidden="true">
+            <IconHeart />
+          </span>
+          <span className="gv-row__body">
+            <span className="gv-row__title">Quiz me</span>
+            <span className="gv-row__subtitle">Hand the phone to {her} for a 2-minute quiz</span>
+          </span>
+          <span className="gv-row__chevron" aria-hidden="true">
+            <IconChevron />
+          </span>
+        </button>
+      </Section>
+
+      <Section title="Our phrases" footer={<>Phrases you add are practised like any other word.</>}>
+        {phrases.map((p) => (
+          <div key={p.id} className="gv-row me-phrase">
+            {p.emoji && (
+              <span className="me-phrase__emoji" aria-hidden="true">
+                {p.emoji}
+              </span>
+            )}
+            <span className="gv-row__body">
+              <span className="gv-row__title" lang="bg">
+                {p.bg}
+              </span>
+              <span className="gv-row__subtitle">
+                {p.en}
+                {p.tr ? ` · ${p.tr}` : ''} · added by {p.addedBy === 'her' ? her : 'you'}
+              </span>
+            </span>
+            {confirm === p.id ? (
+              <button type="button" className="me-phrase__confirm" onClick={() => void remove(p.id)}>
+                Delete
+              </button>
+            ) : (
+              <button type="button" className="me-phrase__del" onClick={() => setConfirm(p.id)} aria-label={`Delete ${p.bg}`}>
+                <IconX width={16} height={16} />
+              </button>
+            )}
+          </div>
+        ))}
+        {phrases.length === 0 && <Row title="No phrases yet" subtitle={`Add the things you and ${her} really say at home.`} />}
+        <ActionRow label="Add a phrase" onClick={() => setAdding(true)} />
+      </Section>
+
+      <AddPhraseSheet
+        open={adding}
+        her={her}
+        onClose={() => setAdding(false)}
+        onSave={async (p) => {
+          const it = await addOurPhrase(p)
+          if (!it) return false
+          setAdding(false)
+          reload()
+          showToast('Added to Our phrases')
+          return true
+        }}
+      />
+    </>
+  )
+}
+
+function AddPhraseSheet({ open, her, onClose, onSave }: { open: boolean; her: string; onClose: () => void; onSave: (p: { bg: string; en: string; tr?: string; emoji?: string; addedBy: 'her' | 'me' }) => Promise<boolean> }) {
+  const [bg, setBg] = useState('')
+  const [en, setEn] = useState('')
+  const [tr, setTr] = useState('')
+  const [emoji, setEmoji] = useState('')
+  const [by, setBy] = useState<'her' | 'me'>('her')
+  const [error, setError] = useState('')
+  useEffect(() => {
+    if (!open) return
+    setBg('')
+    setEn('')
+    setTr('')
+    setEmoji('')
+    setError('')
+  }, [open])
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!/[\u0400-\u04FF]/.test(bg)) return setError('Write the Bulgarian in Cyrillic letters.')
+    if (!en.trim()) return setError('Add what it means in English.')
+    const ok = await onSave({ bg: bg.trim(), en: en.trim(), tr: tr.trim() || undefined, emoji: emoji.trim() || undefined, addedBy: by })
+    if (!ok) setError('That phrase is already in the list.')
+  }
+
+  return (
+    <BottomSheet open={open} onClose={onClose} title="Add a phrase">
+      <form className="me-add" onSubmit={(e) => void submit(e)}>
+        <div className="gv-list">
+          <label className="gv-row me-field">
+            <span className="me-field__label">Bulgarian</span>
+            <input lang="bg" value={bg} onChange={(e) => setBg(e.target.value)} placeholder="Обичам те, слънчице." autoComplete="off" autoCorrect="off" spellCheck={false} />
+          </label>
+          <label className="gv-row me-field">
+            <span className="me-field__label">English</span>
+            <input value={en} onChange={(e) => setEn(e.target.value)} placeholder="I love you, sunshine." autoComplete="off" />
+          </label>
+          <label className="gv-row me-field">
+            <span className="me-field__label">Sounds like</span>
+            <input value={tr} onChange={(e) => setTr(e.target.value)} placeholder="Optional, e.g. obícham te" autoComplete="off" autoCorrect="off" spellCheck={false} />
+          </label>
+          <label className="gv-row me-field">
+            <span className="me-field__label">Emoji</span>
+            <input value={emoji} onChange={(e) => setEmoji(e.target.value.slice(0, 4))} placeholder="Optional" autoComplete="off" />
+          </label>
+        </div>
+        <div className="me-add__by">
+          <span className="gv-section-header">Added by</span>
+          <Segmented block label="Added by" value={by} options={[{ v: 'her' as const, label: her === 'her' ? 'Her' : her }, { v: 'me' as const, label: 'Me' }]} onPick={setBy} />
+        </div>
+        {error && (
+          <p className="me-add__error" role="alert">
+            {error}
+          </p>
+        )}
+        <button type="submit" className="gv-btn gv-btn--block">
+          Add phrase
+        </button>
+      </form>
+    </BottomSheet>
+  )
+}
+
 function LearningSection() {
   const profile = useApp((s) => s.profile)
   const focus = useApp((s) => s.focus)
@@ -287,7 +471,7 @@ function LearningSection() {
           ))}
         </>
       )}
-      <Row title="Daily goal" subtitle={`${profile.dailyGoal} XP a day`} accessory={<Segmented label="Daily goal" value={profile.dailyGoal} options={GOALS.map((g) => ({ v: g.xp, label: g.label }))} onPick={(v) => void setProfile({ dailyGoal: v })} />} />
+      <Row title="Daily goal" subtitle={`${profile.dailyGoal} XP a day · a lesson is 10 to 15 XP`} accessory={<Segmented label="Daily goal" value={profile.dailyGoal} options={GOALS.map((g) => ({ v: g.xp, label: g.label }))} onPick={(v) => void setProfile({ dailyGoal: v })} />} />
       <Row
         title="Address me as"
         subtitle={
@@ -880,7 +1064,7 @@ function About() {
 export function MeScreen() {
   const reduce = useReducedMotion()
   const scrolled = useScrolled()
-  const sections = [ProfileHeader, LearningSection, SoundSection, RemindersSection, HerVoiceSection, AppearanceSection, DataSection, About]
+  const sections = [ProfileHeader, StreakSection, LearningSection, TogetherSection, SoundSection, RemindersSection, HerVoiceSection, AppearanceSection, DataSection, About]
   return (
     <main className="screen me">
       <header className={`gv-navbar ${scrolled ? 'is-scrolled' : ''}`}>
