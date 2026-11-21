@@ -225,6 +225,8 @@ function azureProvider() {
 
 /** Display names for the voices chosen with the user (library names can be long). */
 const KNOWN_VOICES = {
+  khRze4xJ0JVaT8fQ0I4u: 'Mila',
+  Pr1kCf1HQmpsGI9wAR5a: 'Boris',
   M1ydWt7KnBCiuv4CnEDC: 'Milena',
   '31jwlwrRwpOA5yGuVAby': 'Georgi',
   CBDgRB8OyxYGowoi5iXR: 'Mimi',

@@ -52,9 +52,9 @@ env:
   # Milena for words, phrases and the women; Georgi for the men and his own lines; Mimi for the kids.
   # The free plan has 3 voice slots, so тъща, баба and тъст use Milena and Georgi unless
   # ELEVENLABS_VOICE_ELDER_F / _ELDER_M are set and a slot is free.
-  ELEVENLABS_VOICE_F: ${{ vars.ELEVENLABS_VOICE_F || 'M1ydWt7KnBCiuv4CnEDC' }}
-  ELEVENLABS_VOICE_M: ${{ vars.ELEVENLABS_VOICE_M || '31jwlwrRwpOA5yGuVAby' }}
-  ELEVENLABS_VOICE_KID: ${{ vars.ELEVENLABS_VOICE_KID || 'CBDgRB8OyxYGowoi5iXR' }}
+  ELEVENLABS_VOICE_F: ${{ vars.ELEVENLABS_VOICE_F || 'khRze4xJ0JVaT8fQ0I4u' }}
+  ELEVENLABS_VOICE_M: ${{ vars.ELEVENLABS_VOICE_M || 'Pr1kCf1HQmpsGI9wAR5a' }}
+  ELEVENLABS_VOICE_KID: ${{ vars.ELEVENLABS_VOICE_KID || '' }}
   ELEVENLABS_VOICE_ELDER_F: ${{ vars.ELEVENLABS_VOICE_ELDER_F || '' }}
   ELEVENLABS_VOICE_ELDER_M: ${{ vars.ELEVENLABS_VOICE_ELDER_M || '' }}
   AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
