@@ -15,6 +15,7 @@ It installs on an iPhone like a normal app (from Safari), works offline, keeps a
 - **Many ways to learn:** picture cards, listening, matching pairs, building sentences from tiles, typing on a built-in Bulgarian keyboard, speaking with playback, and reading practice for the letters.
 - **Spaced repetition:** Review brings back what is due, Fix mistakes retries what you got wrong, and Speed round is a timed matching game.
 - **Streaks, XP, learner levels and a daily goal,** plus an evening reminder on your iPhone.
+- **Its own sound:** a tambura pluck that climbs with every right answer in a row, a soft tapan drum for "not quite", a shepherd's bell for a run of five, and a bar of 7/8 ръченица when a lesson is done. All synthesised on the phone, no audio files.
 - **Her voice:** your wife can record words on your phone, and Govori plays her recordings instead of the synthetic voice.
 - **Statistics:** every answer is logged on the phone, so you can see when and how you learn best. Export it as JSON for deeper analysis.
 
@@ -37,6 +38,7 @@ npm install
 npm run dev        # http://localhost:5173/govori/
 npm run validate   # checks all lesson content
 npm run build      # tokens, validation, typecheck, production build
+npm run sfx        # writes every sound effect to sfx-preview/ and checks its levels
 ```
 
 Every push to `main` builds and deploys to GitHub Pages (`.github/workflows/deploy.yml`).
@@ -49,4 +51,5 @@ Every push to `main` builds and deploys to GitHub Pages (`.github/workflows/depl
 - `src/lib/progress.ts`: streaks, XP, levels, spaced repetition and the answer log.
 - `src/lib/db.ts`: on-device storage (IndexedDB).
 - `src/sw.ts`: offline support and reminder notifications.
-- `design/tokens.json`: the design tokens, shared with the Govori design system. `npm run tokens` regenerates `src/styles/tokens.css`.
+- `src/lib/sfx-dsp.ts`: the sound effects, synthesised sample by sample (tambura, tapan, bell, kaval).
+- `design/tokens.json`: the design tokens, shared with the Govori design system. `npm run tokens` regenerates `src/styles/tokens.css`. The look and the sound are described in `design/README.md`.

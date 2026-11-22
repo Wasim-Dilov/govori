@@ -65,7 +65,7 @@ export function OnboardingScreen() {
   async function finish() {
     if (saving) return
     setSaving(true)
-    sfx.complete()
+    sfx.welcome()
     await setProfile({ name: name.trim(), speaker: speaker ?? 'm', dailyGoal: goal, onboarded: true, startedAt: Date.now() })
     await setFocus(start, 'week')
     go({ name: 'home' })

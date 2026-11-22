@@ -1,4 +1,4 @@
-/* Shared exercise layout, native iOS. Components come from components.css; colours from tokens only. */
+/* Shared exercise layout. Components come from components.css; colours from tokens only. */
 /* Composition: prompt at the top, the stimulus centred in the space above the answers, and the
    answer group pinned low, 24pt above the Check bar. On short screens it all simply stacks. */
 .ex { flex: 1; display: flex; flex-direction: column; gap: var(--space-5); padding-block: var(--space-3) var(--space-6); }
@@ -15,9 +15,16 @@
 .ex-tr { font: 400 15px/20px var(--font-text); color: var(--ink-muted); letter-spacing: 0; }
 .ex-opt-strong { font-weight: 600; }
 
-/* The Bulgarian being taught, with its play button */
-.ex-hero { display: flex; align-items: center; gap: var(--space-4); min-height: 64px; }
-.ex-hero .t-bg-word { overflow-wrap: anywhere; }
+/* The Bulgarian being taught: a specimen card, the word centred with its play button beneath. */
+.ex-hero {
+  display: grid; justify-items: center; gap: var(--space-4); text-align: center;
+  padding: var(--space-8) var(--space-4) var(--space-5); border-radius: var(--radius-lg);
+  background: var(--linen-raised); box-shadow: var(--shadow-card);
+}
+.ex-hero .gv-iconbtn { order: 2; }
+.ex-hero .ex-bg { align-items: center; gap: var(--space-1); }
+.ex-hero .t-bg-word { overflow-wrap: anywhere; text-wrap: balance; }
+.ex-hero .ex-tr { font-size: 16px; line-height: 21px; }
 
 /* English cue for production: a framed emoji tile and the meaning */
 .ex-cue {
@@ -25,7 +32,7 @@
   padding: var(--space-3); padding-right: var(--space-4); border-radius: var(--radius-lg);
   background: var(--linen-raised); box-shadow: var(--shadow-card);
 }
-.ex-cue__text { font: 600 20px/25px var(--font-display); color: var(--ink); min-width: 0; overflow-wrap: anywhere; text-wrap: balance; }
+.ex-cue__text { font: 600 22px/28px var(--font-display); letter-spacing: -0.005em; color: var(--ink); min-width: 0; overflow-wrap: anywhere; text-wrap: balance; }
 
 /* Listening: one large play button and a quiet slow one */
 .ex-listen { display: flex; align-items: center; justify-content: center; gap: var(--space-5); padding-block: var(--space-2); }
@@ -82,10 +89,10 @@
 .ex-section .gv-section-header { margin: 0; }
 .ex-row-text { margin: 0; font: 400 15px/21px var(--font-text); }
 
-/* ---------- match: the grid sits low, like the other answer groups */
-.ex-stage--top { flex: 0 0 auto; margin-top: auto; padding-block: 0; }
+/* ---------- match: the grid is the whole exercise, so it sits in the middle of the screen */
+.ex-stage--top { flex: 0 0 auto; margin-block: auto; padding-block: 0 min(6vh, 48px); }
 .ex-match {
-  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(var(--rows, 5), minmax(56px, auto));
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(var(--rows, 5), minmax(60px, auto));
   grid-auto-flow: column; gap: var(--space-2) var(--space-3);
 }
 /* Columns stay in the DOM for structure, but their cells join the shared grid so rows line up. */
@@ -154,7 +161,9 @@
   .ex-cue__text { font-size: 18px; line-height: 23px; }
   .ex-list { gap: var(--space-2); }
   .ex-list .gv-choice { min-height: 48px; padding-block: 6px; }
-  .ex-hero { min-height: 52px; }
+  .ex-hero { padding-block: var(--space-4) var(--space-3); gap: var(--space-2); }
+  .ex-hero .t-bg-word { font-size: 30px; line-height: 36px; }
+  .ex-hero .gv-iconbtn { width: 40px; height: 40px; }
   .ex-grid .gv-choice--card { min-height: 112px; gap: var(--space-2); padding-block: var(--space-3); }
   .ex-grid .gv-choice--card .emoji-tile { --tile: 52px !important; }
   .ex-match { grid-template-rows: repeat(var(--rows, 5), minmax(48px, auto)); }

@@ -498,8 +498,11 @@ function LearningSection() {
           ))}
         </>
       )}
-      <Row icon={<IconTarget />} title="Daily goal" subtitle={`${profile.dailyGoal} XP a day · a lesson is 10 to 15 XP`} accessory={<Segmented label="Daily goal" value={profile.dailyGoal} options={GOALS.map((g) => ({ v: g.xp, label: g.label }))} onPick={(v) => void setProfile({ dailyGoal: v })} />} />
+      <Row className="me-row--control" icon={<IconTarget />} title="Daily goal" subtitle={`${profile.dailyGoal} XP a day · a lesson is 10 to 15 XP`}>
+        <Segmented block label="Daily goal" value={profile.dailyGoal} options={GOALS.map((g) => ({ v: g.xp, label: g.label }))} onPick={(v) => void setProfile({ dailyGoal: v })} />
+      </Row>
       <Row
+        className="me-row--control"
         icon={<IconUser />}
         title="Address me as"
         subtitle={
@@ -507,18 +510,18 @@ function LearningSection() {
             Forms like <span lang="bg">{profile.speaker === 'f' ? 'уморена' : 'уморен'}</span>
           </>
         }
-        accessory={
-          <Segmented
-            label="Address me as"
-            value={profile.speaker}
-            options={[
-              { v: 'm', label: 'A man' },
-              { v: 'f', label: 'A woman' },
-            ]}
-            onPick={(v) => void setProfile({ speaker: v })}
-          />
-        }
-      />
+      >
+        <Segmented
+          block
+          label="Address me as"
+          value={profile.speaker}
+          options={[
+            { v: 'm', label: 'A man' },
+            { v: 'f', label: 'A woman' },
+          ]}
+          onPick={(v) => void setProfile({ speaker: v })}
+        />
+      </Row>
       <ToggleRow id="me-translit" icon={<IconLetters />} label="Show transliteration" hint="Latin letters under the Bulgarian" on={profile.translit} onChange={(v) => void setProfile({ translit: v })} />
       <ToggleRow id="me-speaking" icon={<IconMic />} label="Speaking exercises" hint="Say words out loud and hear yourself" on={profile.speaking} onChange={(v) => void setProfile({ speaking: v })} />
     </Section>
@@ -672,7 +675,7 @@ function SoundSection() {
         )
       }
     >
-      <ToggleRow id="me-sfx" icon={<IconBell />} label="Sound effects" hint="Chimes for right and wrong answers" on={profile.sfx} onChange={(v) => void setProfile({ sfx: v })} />
+      <ToggleRow id="me-sfx" icon={<IconBell />} label="Sound effects" hint="Tambura, drum and bell, in place of the usual chimes" on={profile.sfx} onChange={(v) => void setProfile({ sfx: v })} />
       {clips && label ? (
         <VoiceClips count={clips} label={label} />
       ) : (

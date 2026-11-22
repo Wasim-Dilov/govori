@@ -16,7 +16,7 @@ export default defineConfig({
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // Only the Latin and Cyrillic font files are needed offline.
-        globIgnores: ['**/*-arabic-*', '**/*-hebrew-*', '**/*-greek-*', '**/*-vietnamese-*', '**/splash/**'],
+        globIgnores: ['**/*-arabic-*', '**/*-hebrew-*', '**/*-greek-*', '**/*-vietnamese-*', '**/literata-*-ext-*', '**/splash/**'],
         maximumFileSizeToCacheInBytes: 3_000_000,
       },
       devOptions: { enabled: false },
@@ -29,8 +29,8 @@ export default defineConfig({
         scope: '/govori/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#f2f2f7',
-        theme_color: '#f2f2f7',
+        background_color: '#f5f0e6',
+        theme_color: '#f5f0e6',
         icons: [
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },

@@ -15,8 +15,11 @@ body {
 button { font: inherit; color: inherit; }
 img, svg { max-width: 100%; }
 [hidden] { display: none !important; }
-/* Bulgarian uses the system font (standard Cyrillic forms); only the deliberate alternate glyph uses the Bulgarian style. */
-:lang(bg):not(.bgstyle-note__glyph) { font-family: var(--font-text) !important; }
+/* Bulgarian is always set in the display serif (standard Cyrillic forms), so the language being learned has its
+   own voice on every screen. Two exceptions: the deliberate Bulgarian-print glyph, and the keyboard, which
+   should look like the phone's own. */
+:lang(bg):not(.bgstyle-note__glyph, .gv-key) { font-family: var(--font-display) !important; }
+:root { font-optical-sizing: auto; }
 /* Sentence case everywhere: older styles that uppercased labels are switched off. */
 .t-label { text-transform: none !important; letter-spacing: 0 !important; }
 /* Small heading above a card title: quiet, never rose. */

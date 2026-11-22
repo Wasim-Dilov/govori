@@ -146,3 +146,7 @@
 .me-add__by { display: grid; gap: var(--space-2); }
 .me-add__by .gv-section-header { margin: 0; }
 .me-add__error { margin: 0; color: var(--warn-ink); font: 400 15px/20px var(--font-text); }
+
+/* A row whose control is too wide to sit beside its label: the control goes underneath, full width. */
+.me-row--control .gv-row__body > .gv-segmented { margin-top: var(--space-2); }
+.me-row--control .gv-segmented > button { min-height: 32px; }

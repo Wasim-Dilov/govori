@@ -1,6 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-// The system font (SF Pro) is used on Apple devices; Inter is the fallback elsewhere.
+// Literata sets titles, numbers and every Bulgarian word; the optical-size cut keeps it crisp small and fine large.
+import '@fontsource-variable/literata/opsz.css'
+// English text uses the system font (SF Pro) on Apple devices; Inter is the fallback elsewhere.
 import '@fontsource-variable/inter'
 // Only for the 'Bulgarian style' alternate letter on letter cards.
 import '@fontsource-variable/sofia-sans'

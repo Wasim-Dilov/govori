@@ -44,26 +44,6 @@ function useCountUp(target: number, ms: number, delay = 0) {
   return n
 }
 
-/** A ring that draws itself closed (CSS transition on stroke-dashoffset), with a check inside. */
-function DrawnCheck({ className = '', ms = 500 }: { className?: string; ms?: number }) {
-  const [value, setValue] = useState(0)
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setValue(100))
-    return () => cancelAnimationFrame(id)
-  }, [])
-  return (
-    <span className={`gv-ring-wrap ${className}`}>
-      <svg className="gv-ring gv-ring--lg gv-tone-pine done__ring" viewBox="0 0 36 36" style={{ ['--value' as string]: value, ['--draw-ms' as string]: `${ms}ms` }} aria-hidden="true">
-        <circle className="gv-ring__track" cx="18" cy="18" r="16" />
-        <circle className="gv-ring__value" cx="18" cy="18" r="16" pathLength={100} />
-      </svg>
-      <span className={`gv-ring__label done__check${value ? ' is-on' : ''}`}>
-        <IconCheck />
-      </span>
-    </span>
-  )
-}
-
 /** Points of an eight-pointed star (the шевица осмолъчка) around (c, c). */
 function starPath(c: number, outer: number, rot = 0) {
   const inner = outer * (Math.cos(Math.PI / 4) / Math.cos(Math.PI / 8))
@@ -74,6 +54,21 @@ function starPath(c: number, outer: number, rot = 0) {
     pts.push(`${(c + r * Math.cos(a)).toFixed(2)},${(c + r * Math.sin(a)).toFixed(2)}`)
   }
   return `M${pts.join('L')}Z`
+}
+
+/** The completion mark: the шевица star stitches itself on, then the check lands in its centre. */
+function DoneMark({ className = '' }: { className?: string }) {
+  return (
+    <span className={`milestone__star done__star ${className}`} aria-hidden="true">
+      <svg viewBox="0 0 200 200">
+        <path className="milestone__star-back" d={starPath(100, 78, Math.PI / 8)} pathLength={1} />
+        <path className="milestone__star-line" d={starPath(100, 94)} pathLength={1} />
+      </svg>
+      <span className="milestone__star-in done__check">
+        <IconCheck />
+      </span>
+    </span>
+  )
 }
 
 /** The milestone mark: a fine-line star stitched on around a rose numeral or a check. */
@@ -108,6 +103,7 @@ export function CompleteScreen() {
     if (!result || played.current) return
     played.current = true
     sfx.complete()
+    if (result.streakIncreased || result.levelUp) sfx.streak(1.75)
   }, [result])
 
   if (!result) return null
@@ -130,7 +126,7 @@ export function CompleteScreen() {
         <div className="gv-shevitsa done__band" aria-hidden="true" />
 
         <motion.header className="done__hero" {...fade(0)}>
-          <DrawnCheck className="done__mark" />
+          <DoneMark className="done__mark" />
           <h1 className="t-title1 done__title">{title.en}</h1>
           <p className="done__bg" lang="bg">
             {result.perfect ? 'Перфектно!' : title.bg}

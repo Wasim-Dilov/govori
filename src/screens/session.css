@@ -1,4 +1,4 @@
-/* Lesson player, native iOS. */
+/* Lesson player. */
 .session { background: var(--linen); }
 
 /* Top bar: close button, thin progress, quiet counter */
@@ -36,7 +36,8 @@
 /* Conversations run edge to edge: the dock meets the bottom of the screen. */
 .session__body--flush { padding-bottom: 0; }
 .session__stage { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.session__progress .gv-progress__fill { transition: width 300ms var(--ease-out); }
+/* A lesson always shows its first stitch, so the row never looks empty. */
+.session__progress .gv-progress__fill { min-width: var(--stitch); }
 
 .session__retry {
   display: inline-flex; align-items: center; gap: 6px; margin: var(--space-2) 0 0;

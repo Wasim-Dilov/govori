@@ -7,7 +7,7 @@ import { MISSION_XP } from '../lib/missions.ts'
 import { markWeekShown, weekCardDue, weekSummary, type WeekSummary } from '../lib/milestones.ts'
 import { db, getKV, localDay, setKV } from '../lib/db.ts'
 import { dialogueById, maxLevel, study, tracks, unitById, type LessonView, type TrackView } from '../content/index.ts'
-import { planStatus } from '../content/plan.ts'
+import { PLAN, planStatus } from '../content/plan.ts'
 import { TopBar, LargeTitle, StreakStatusBlock } from '../components/TopBar.tsx'
 import { ShareWeek } from '../components/ShareProgress.tsx'
 import { BottomSheet, FocusSheet, TrackBadge, lessonsDone } from '../components/FocusSheet.tsx'
@@ -313,6 +313,14 @@ function TodayCard({ onChangeFocus, primary = true }: { onChangeFocus: () => voi
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
     >
+      {plan && (
+        // The 12-week plan as a row of twelve stitches: the weeks behind you and this one are sewn in.
+        <div className="home-today__weeks" role="img" aria-label={`Week ${week.week} of ${PLAN.length}`}>
+          {PLAN.map((w) => (
+            <i key={w.week} className={w.week < week.week ? 'is-done' : w.week === week.week ? 'is-now' : ''} />
+          ))}
+        </div>
+      )}
       <div className="home-today__text">
         <p className="home-today__eyebrow">{eyebrow}</p>
         <h2 id="today-title" className="home-today__title">
@@ -567,7 +575,7 @@ function PracticeRow() {
           >
             <span className="gv-statcell__label">{label}</span>
             <span className="gv-statcell__value">
-              {disabled ? '–' : key === 'review' && value === 0 ? <IconCheck className="home-pcell__done" /> : value > 99 ? '99+' : value}
+              {disabled ? <IconLock className="home-pcell__lock" aria-hidden="true" /> : key === 'review' && value === 0 ? <IconCheck className="home-pcell__done" /> : value > 99 ? '99+' : value}
               {!disabled && !(key === 'review' && value === 0) && <span className="gv-statcell__unit">{unit}</span>}
             </span>
           </button>
@@ -665,8 +673,9 @@ function Path({ track, onOpen }: { track: TrackView; onOpen: (l: LessonView) => 
           </span>
           <span className="home-trackhead__cap">lessons</span>
         </div>
-        <div className="gv-progress home-trackhead__bar" aria-hidden="true">
-          <div className="gv-progress__fill" style={{ width: `${completion.ratio * 100}%` }} />
+        <div className="gv-progress gv-progress--stitch home-trackhead__bar" aria-hidden="true">
+          {/* Any progress at all shows at least one stitch. */}
+          <div className="gv-progress__fill" style={{ ['--p' as string]: completion.ratio > 0 ? Math.max(completion.ratio, 0.04) : 0 }} />
         </div>
       </div>
 

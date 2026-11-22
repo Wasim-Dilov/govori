@@ -1,5 +1,6 @@
-/* Govori components: native iOS look. Every colour comes from tokens.css.
-   Flat cells on a grouped background, one rose accent, quiet motion. See design/README.md. */
+/* Govori components. Every colour comes from tokens.css.
+   Paper cards on a warm page, a book serif for titles and Bulgarian, one rose accent, and the
+   шевица stitch as the app's own mark of progress. See design/README.md. */
 
 :root {
   --motif-band: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'8'%20viewBox%3D'0%200%2016%208'%3E%3Cpath%20d%3D'M0.5%204%204%200.5%207.5%204%204%207.5Z%20M8.5%204%2012%200.5%2015.5%204%2012%207.5Z'%20fill%3D'none'%20stroke%3D'%23000'%20stroke-width%3D'1'%2F%3E%3Crect%20x%3D'3.4'%20y%3D'3.4'%20width%3D'1.2'%20height%3D'1.2'%2F%3E%3Crect%20x%3D'11.4'%20y%3D'3.4'%20width%3D'1.2'%20height%3D'1.2'%2F%3E%3C%2Fsvg%3E");
@@ -7,6 +8,8 @@
   --mask-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'8'%20height%3D'14'%20viewBox%3D'0%200%208%2014'%3E%3Cpath%20d%3D'M1%201l6%206-6%206'%20fill%3D'none'%20stroke%3D'%23000'%20stroke-width%3D'2'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%2F%3E%3C%2Fsvg%3E");
   /* The eight-pointed star of Bulgarian embroidery, outline. */
   --mask-star8: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'24'%20height%3D'24'%20viewBox%3D'0%200%2024%2024'%3E%3Cg%20fill%3D'none'%20stroke%3D'%23000'%20stroke-width%3D'1.75'%20stroke-linejoin%3D'round'%3E%3Crect%20x%3D'6'%20y%3D'6'%20width%3D'12'%20height%3D'12'%20rx%3D'1'%2F%3E%3Crect%20x%3D'6'%20y%3D'6'%20width%3D'12'%20height%3D'12'%20rx%3D'1'%20transform%3D'rotate(45%2012%2012)'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  /* A row of solid stitches (one diamond per 10px), for the stitched progress bar. */
+  --motif-stitch: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'10'%20height%3D'10'%20viewBox%3D'0%200%2010%2010'%3E%3Cpath%20d%3D'M5%200.6%209.4%205%205%209.4%200.6%205Z'%2F%3E%3C%2Fsvg%3E");
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* High damping, no overshoot. Kept under the old name so existing styles resolve. */
   --ease-spring: cubic-bezier(0.25, 1, 0.5, 1);
@@ -27,12 +30,14 @@
   background: var(--tone); color: var(--on-tone);
   font: 600 17px/22px var(--font-text); letter-spacing: -0.01em; text-transform: none;
   cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+  /* A lit top edge and a short warm shadow: the button sits on the paper instead of being printed on it. */
+  box-shadow: inset 0 1px 0 #ffffff29, 0 1px 2px #3b2a1a26;
   transition: transform 120ms var(--ease-out), background-color 120ms var(--ease-out), opacity 120ms var(--ease-out);
 }
 .gv-btn svg { width: 20px; height: 20px; flex: none; }
 .gv-btn:active:not(:disabled) { transform: scale(var(--press)); background: var(--tone-deep); }
 .gv-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.gv-btn:disabled { background: var(--linen-sunk); color: var(--ink-muted); cursor: default; }
+.gv-btn:disabled { background: var(--linen-sunk); color: var(--ink-muted); cursor: default; box-shadow: none; }
 .gv-btn--block { width: 100%; }
 /* Gray: a secondary action that sits next to a primary one. */
 .gv-btn--quiet { --tone: var(--fill-secondary); --tone-deep: var(--line-strong); --on-tone: var(--ink); }
@@ -40,6 +45,7 @@
 .gv-btn--tinted { background: var(--tone-soft, var(--rose-soft)); color: var(--tone-ink, var(--rose-ink)); }
 .gv-btn--tinted:active:not(:disabled) { background: var(--tone-soft, var(--rose-soft)); opacity: 0.7; }
 /* Plain: text only. */
+.gv-btn--quiet, .gv-btn--tinted, .gv-btn--ghost, .gv-btn--plain, .gv-btn--link { box-shadow: none; }
 .gv-btn--ghost, .gv-btn--plain { background: transparent; color: var(--tone-text, var(--rose)); }
 .gv-btn--ghost:active:not(:disabled), .gv-btn--plain:active:not(:disabled) { background: transparent; opacity: 0.5; transform: none; }
 .gv-btn--ghost:disabled, .gv-btn--plain:disabled { background: transparent; }
@@ -146,6 +152,29 @@
   transition: width 300ms var(--ease-out);
 }
 
+/* Stitched: progress as a row of шевица being embroidered, one diamond at a time.
+   The track is the row still to stitch; the fill is the thread, in the track's colour. */
+.gv-progress--stitch {
+  height: 10px; border-radius: 0; overflow: visible; background: none;
+  /* Whole stitches only: the bar is trimmed to a multiple of one diamond. */
+  --stitch: 10px;
+}
+.gv-progress--stitch::before {
+  content: ""; position: absolute; inset: 0; background: var(--line-strong);
+  -webkit-mask: var(--motif-stitch) left center / var(--stitch) 100% repeat-x; mask: var(--motif-stitch) left center / var(--stitch) 100% repeat-x;
+  opacity: 0.55;
+}
+.gv-progress--stitch { container-type: inline-size; }
+/* Set --p (0..1) on the fill. The thread advances by whole stitches. */
+.gv-progress--stitch .gv-progress__fill {
+  position: relative; min-width: 0; border-radius: 0;
+  width: round(down, calc(var(--p, 0) * 100cqw), var(--stitch)); transition: width 320ms var(--ease-out);
+  -webkit-mask: var(--motif-stitch) left center / var(--stitch) 100% repeat-x; mask: var(--motif-stitch) left center / var(--stitch) 100% repeat-x;
+}
+@supports not (width: round(down, 10px, 1px)) {
+  .gv-progress--stitch .gv-progress__fill { width: calc(var(--p, 0) * 100%); }
+}
+
 /* ---------- Feedback panel (after Check) */
 .gv-feedback {
   display: grid; gap: var(--space-3);
@@ -161,7 +190,7 @@
 .gv-feedback__head { display: flex; align-items: center; gap: var(--space-3); }
 .gv-feedback__badge { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--tone); color: var(--on-tone); }
 .gv-feedback__badge svg { width: 18px; height: 18px; }
-.gv-feedback__title { font: 600 20px/25px var(--font-display); }
+.gv-feedback__title { font: 600 21px/26px var(--font-display); letter-spacing: -0.005em; }
 .gv-feedback__answer { font: 400 17px/22px var(--font-text); }
 .gv-feedback__tr { font: 400 15px/20px var(--font-text); opacity: 0.85; }
 
@@ -354,7 +383,7 @@
 .gv-navbar__leading, .gv-navbar__trailing { position: absolute; bottom: 0; height: 44px; display: flex; align-items: center; gap: var(--space-2); }
 .gv-navbar__leading { left: var(--space-4); }
 .gv-navbar__trailing { right: var(--space-4); }
-.gv-largetitle { font: 700 34px/41px var(--font-display); letter-spacing: -0.015em; margin: var(--space-1) 0 var(--space-3); color: var(--ink); }
+.gv-largetitle { font: 600 36px/42px var(--font-display); letter-spacing: -0.02em; margin: var(--space-1) 0 var(--space-3); color: var(--ink); }
 
 /* ---------- Inset grouped list
    <div class="gv-list"> <button class="gv-row"> …                          */
@@ -446,7 +475,7 @@ button.gv-row:active, a.gv-row:active { background: var(--fill-secondary); }
 /* ---------- Stat cell */
 .gv-statcell { display: grid; gap: 2px; padding: var(--space-3) var(--space-4); background: var(--linen-raised); border-radius: var(--radius-md); box-shadow: var(--shadow-card); min-width: 0; }
 .gv-statcell__label { font: 500 13px/18px var(--font-text); color: var(--ink-muted); }
-.gv-statcell__value { font: 700 22px/28px var(--font-display); font-variant-numeric: tabular-nums; color: var(--ink); }
+.gv-statcell__value { font: 600 24px/28px var(--font-display); font-variant-numeric: lining-nums tabular-nums; letter-spacing: -0.01em; color: var(--ink); }
 .gv-statcell__unit { font: 400 15px/20px var(--font-text); color: var(--ink-muted); margin-left: 2px; }
 .gv-statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: var(--space-2); }
 

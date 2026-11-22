@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import type { StudyItem } from '../content/index.ts'
-import { speak } from '../lib/audio.ts'
+import { sfx, speak } from '../lib/audio.ts'
 import { Bg, Cue, Prompt, SpeakButton, curly, fadeIn } from './common.tsx'
 import { EmojiTile } from '../components/EmojiTile.tsx'
 import type { ExerciseProps } from './types.ts'
@@ -19,7 +19,9 @@ export function ChoiceExercise({ ex, setAnswer, checked, translit }: ExercisePro
     setPicked(opt.id)
     // Hearing the Bulgarian option when tapped helps the sound stick.
     if (ex.type === 'mc_en_bg' || ex.type === 'listen_mc') void speak(opt.bg, { itemId: opt.id })
-    if (ex.type === 'sound_letter' && opt.letter) void speak(opt.letter.example.bg)
+    else if (ex.type === 'sound_letter' && opt.letter) void speak(opt.letter.example.bg)
+    // Otherwise the tap is silent, so it gets a soft pluck of its own.
+    else sfx.select()
     const correct = opt.id === item.id
     setAnswer({
       correct,

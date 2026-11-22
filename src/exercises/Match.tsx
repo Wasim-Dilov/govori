@@ -27,13 +27,14 @@ export function MatchExercise({ ex, complete }: ExerciseProps<'match'>) {
     if (done.has(id)) return
     const item = ex.items.find((i) => i.id === id)!
     if (side === 'l') void speak(ex.letters ? item.letter!.example.bg : item.bg, { itemId: ex.letters ? undefined : id })
-    else sfx.tap()
     if (!sel || sel.side === side) {
+      // The Bulgarian side speaks; the English side gets a soft pluck.
+      if (side === 'r') sfx.select()
       setSel({ side, id })
       return
     }
     if (sel.id === id) {
-      sfx.correct()
+      sfx.correct(done.size)
       setDone((d) => new Set(d).add(id))
     } else {
       mistakes.current++

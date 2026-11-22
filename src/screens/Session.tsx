@@ -56,6 +56,11 @@ export function SessionScreen() {
   const finishing = useRef(false)
 
   const step = steps[idx]
+  // The step on screen right now, for anything that fires a moment later.
+  const current = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    current.current = step?.key
+  }, [step?.key])
   const trackTone = session ? `gv-tone-${session.trackId}` : ''
   const isSpeed = session?.plan.kind === 'speed'
 
@@ -113,12 +118,20 @@ export function SessionScreen() {
       if (pending.correct) score.current.correct++
     }
     if (pending.correct) {
-      sfx.correct()
+      // Each right answer in a row plays a step higher; every fifth one rings the bell.
+      sfx.correct(combo)
       const nextCombo = combo + 1
       setCombo(nextCombo)
-      if (nextCombo > 0 && nextCombo % 5 === 0) setTimeout(() => sfx.combo(), 250)
+      const bell = nextCombo % 5 === 0
+      if (bell) sfx.combo(0.18)
       const it = 'item' in step.ex ? step.ex.item : null
-      if (it && it.kind !== 'letter' && step.ex.type !== 'listen_mc' && step.ex.type !== 'listen_type') void speak(it.bg, { itemId: it.id })
+      // The word follows the pluck rather than talking over it.
+      if (it && it.kind !== 'letter' && step.ex.type !== 'listen_mc' && step.ex.type !== 'listen_type') {
+        const key = step.key
+        setTimeout(() => {
+          if (current.current === key) void speak(it.bg, { itemId: it.id })
+        }, bell ? 560 : 340)
+      }
     } else {
       sfx.wrong()
       setCombo(0)
@@ -194,8 +207,8 @@ export function SessionScreen() {
         {session.plan.kind === 'story' ? (
           <p className="session__storytitle">{session.plan.lesson?.title}</p>
         ) : (
-          <div className="gv-progress session__progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
-            <div className="gv-progress__fill" style={{ width: `${Math.max(3, progress * 100)}%` }} />
+          <div className="gv-progress gv-progress--stitch session__progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+            <div className="gv-progress__fill" style={{ ['--p' as string]: progress }} />
           </div>
         )}
         <span className="session__trailing">

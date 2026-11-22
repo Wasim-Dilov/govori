@@ -1,6 +1,6 @@
 # Govori design system
 
-Native iOS, clean and professional. Calm, precise, content first. One rose accent, everything else neutral. No mascot, no chunky 3D ledges, no bouncing, no confetti.
+A Bulgarian phrasebook, not a system app. Warm paper, a book serif for titles and for every Bulgarian word, one rose accent, and the шевица stitch as the mark of progress. It keeps the iPhone's navigation habits (tab bar, sheets, grouped lists) so nothing has to be learned. Calm, precise, content first. No mascot, no chunky 3D ledges, no bouncing, no confetti.
 
 - **Tokens:** `design/tokens.json` is the single source. `npm run tokens` (or `node scripts/build-tokens.mjs`) writes `src/styles/tokens.css` and checks every text and background pair for WCAG contrast in light and dark. It must report 0 issues.
 - **Components:** `src/styles/components.css` (classes prefixed `gv-`). Base layout is in `src/styles/base.css`.
@@ -9,25 +9,26 @@ Native iOS, clean and professional. Calm, precise, content first. One rose accen
 ## Principles
 
 1. **Hierarchy:** comes from type size and weight, spacing and grouping, not from colour or decoration.
-2. **Layout:** flat white cells on a grey grouped background (black in dark mode), like Settings or Fitness.
+2. **Layout:** paper cards on a warm page (a warm near-black at night). Cards have a hairline edge and a soft, warm lift; nothing is pure white, pure black or cool grey.
 3. **Colour:** the accent (rose) is for the primary action, selection, the active tab and the streak. Nothing else is coloured, except feedback (green is correct, amber is not quite) and small track badges.
 4. **Case:** sentence case everywhere, buttons included. No uppercase labels.
 5. **Emoji:** only where they teach meaning, such as picture cards and the intro card. Keep them modest in size, and never use them as decoration.
-6. **Шевица:** the fine-line embroidery accent appears in three places only: the app icon, the top of the completion sheet and the onboarding welcome. The eight-pointed star (`IconStar`, `--mask-star8`) is the one other folk detail.
+6. **Шевица:** embroidery is how Govori shows progress, not decoration. Progress through a lesson and through a track is a row of stitches being embroidered (`.gv-progress--stitch`); finishing a lesson stitches the eight-pointed star. Beyond that the fine-line band appears only on the app icon, the today card, the top of the completion sheet and the onboarding welcome.
+7. **Two voices:** Bulgarian is always set in the serif and English reading text in the system font, so the language being learned is recognisable at a glance on every screen.
 
 ## Colour tokens
 
 | Token | Role |
 |---|---|
-| `linen` | Grouped background (`#f2f2f7` / `#000`) |
-| `linen-raised` | Cells, cards, choices, sheets (`#fff` / `#1c1c1e`) |
+| `linen` | Paper: the page (`#f5f0e6` / `#151210`) |
+| `linen-raised` | Cells, cards, choices, sheets (`#fffdf8` / `#221e1a`) |
 | `linen-sunk` | Tertiary fill: wells, disabled buttons, progress tracks |
 | `fill-secondary` | Pressed cells, ring and progress tracks, keyboard |
 | `segment-thumb` | Segmented control thumb |
 | `material`, `material-thick` | Translucent bars and sheets (with backdrop blur) |
 | `separator` | Hairline list separators |
 | `line`, `line-strong` | Quiet borders; resting border of tiles, inputs and choice keys |
-| `ink` | Primary label |
+| `ink` | Primary label: a warm near-black (`#1f1b17`), never pure black |
 | `ink-muted` | Secondary label: subtitles, transliteration, metadata (≥4.5:1) |
 | `label-tertiary` | Placeholders and disabled glyphs only |
 | `accent`, `accent-pressed`, `on-accent` | Filled primary button and selection fills (white label in both themes) |
@@ -37,28 +38,28 @@ Native iOS, clean and professional. Calm, precise, content first. One rose accen
 | `warn`, `warn-deep`, `warn-soft`, `warn-ink`, `on-warn` | Not quite (amber, never red) |
 | `gold`, `gold-deep`, `gold-soft`, `gold-ink`, `on-gold` | Rewards as icons and numbers only |
 | `trk-<track>`, `-deep`, `-soft`, `on-track` | Muted track hues for badges and rings, never large fills behind text |
-| `shadow-card`, `shadow-float`, `focus-ring` | Optional lift (light only); floating things; keyboard focus |
+| `shadow-card`, `shadow-float`, `focus-ring` | The hairline edge and warm lift of every card; floating things; keyboard focus |
 
 In dark mode, `pine`, `warn` and `rose` are bright, and their `on-*` labels are dark. `accent` stays a deep rose with a white label.
 
 ## Type
 
-The font is the system font: SF Pro on iPhone, with Inter as the fallback elsewhere. Sofia Sans is used only for the "Bulgarian style" alternate letter. Tag Bulgarian text with `lang="bg"`.
+Two families. **Literata** (`--font-display`, the optical-size cut) sets titles, headline numbers and every Bulgarian word: tag Bulgarian with `lang="bg"` and it switches by itself (base.css). Literata draws the standard Cyrillic letter shapes, the ones the iPhone keyboard and Messages show. The **system font** (`--font-text`: SF Pro on iPhone, Inter elsewhere) sets English reading text, buttons and controls. Sofia Sans is used only for the "Bulgarian print" alternate letter: it switches to the Bulgarian letter shapes whenever text is tagged `lang="bg"`, which is exactly why it cannot be the main face.
 
 | Class | Size / line / weight | Use |
 |---|---|---|
-| `.t-large-title` | 34/41 700 | Tab screen title, once |
-| `.t-title1` | 28/34 700 | Flow titles |
-| `.t-title2` | 22/28 700 | Exercise prompts, sheet titles |
-| `.t-title3` | 20/25 600 | Card and unit titles |
+| `.t-large-title` | 36/42 600 | Tab screen title, once |
+| `.t-title1` | 29/35 600 | Flow titles |
+| `.t-title2` | 23/29 600 | Exercise prompts, sheet titles |
+| `.t-title3` | 20/26 600 | Card and unit titles |
 | `.t-headline` | 17/22 600 | Row titles, emphasis |
 | `.t-body` | 17/22 400 | Reading text |
 | `.t-callout` | 16/21 400 | Supporting text |
 | `.t-subhead` | 15/20 400 | Row subtitles |
 | `.t-footnote` | 13/18 400 | Section headers, transliteration |
 | `.t-caption` | 12/16 400 | Tiny metadata |
-| `.t-bg-word` | 30/36 600 | The Bulgarian being taught |
-| `.t-letter` | 96/100 600 | A letter on a letter card |
+| `.t-bg-word` | 36/42 600 | The Bulgarian being taught |
+| `.t-letter` | 120/124 500 | A letter on a letter card |
 
 Older names still work as aliases:
 - `.t-hero` → large-title
@@ -84,7 +85,7 @@ Older names still work as aliases:
 | `.gv-iconbtn` | 44px round, tinted. Modifiers: `--lg` (88px, filled; the listening play button), `--sm` (36px). `.is-playing` pulses the icon. |
 | `.gv-choice` | A white cell with a 2px transparent border. States: `.is-selected` (rose border; the key badge fills rose), `.is-correct` (green), `.is-wrong` (amber, small shake), `.is-dim`. Parts: `__key`, `__text`, `__sub`, `__emoji`. Modifier: `--card` (2×2 picture cell). |
 | `.gv-tile` | Word-bank tile with a hairline border; `__tr` for transliteration; `.is-used` for a placeholder. |
-| `.gv-progress` > `.gv-progress__fill` | 6px, rounded; fill is `--tone` or the accent. |
+| `.gv-progress` > `.gv-progress__fill` | 6px, rounded; fill is `--tone` or the accent. `--stitch` turns it into a row of шевица: set `--p` (0 to 1) on the fill and it advances one whole diamond at a time. Used for lesson and track progress. |
 | `.gv-feedback` (`--wrong`) | Result panel: green tint (amber when wrong). Parts: `__head`, `__badge`, `__title`, `__answer`, `__tr`. A `.gv-btn` inside takes the result colour automatically. |
 | `.gv-node` | 64px circle with a progress ring; set `style="--progress: 0.66"`. States: `.is-current` (filled centre plus a soft halo), `.is-locked`. `__stars` > `i(.on)` shows level dots. |
 | `.gv-bubble` | Small accent capsule callout. |
@@ -125,5 +126,29 @@ Older names still work as aliases:
 - Use uppercase labels.
 - Add gradients (the app icon is the one exception).
 - Add confetti or mascot characters.
+- Use pure white, pure black or a cool grey.
+- Set Bulgarian in the system font, or English body text in the serif.
 - Use coloured fills behind body text.
 - Put a red error colour anywhere (amber means "not quite").
+
+## Sound
+
+Govori sounds like a small Bulgarian folk band, not like an app. Every sound is synthesised in `src/lib/sfx-dsp.ts` (no audio files) and played by `sfx` in `src/lib/audio.ts`.
+
+| Sound | Instrument | When |
+|---|---|---|
+| `tap` | A knuckle on the tambura's wooden body | Moving around: tabs, chips, rows |
+| `select` | A damped tambura string | Choosing an answer that does not speak |
+| `correct` | Tambura: a grace note into a ringing string over the open D | A right answer. Each one in a row is a step higher (eight steps) |
+| `wrong` | Tapan drum, soft, with the strings stopped | Not quite. Neutral, never a buzzer |
+| `combo` | Chan, the cast shepherd's bell | Every fifth right answer in a row |
+| `complete` | Tambura, tapan and bell: one bar of ръченица, the 7/8 dance (2+2+3) | A finished session |
+| `streak` | Kaval, the shepherd's flute | The streak grew or a level was reached |
+| `welcome` | Open tambura strings | Setup finished |
+
+Rules:
+- Sounds sit well under the voice: peaks between -22 and -8 dBFS against speech at about -2 dBFS.
+- The spoken word follows the pluck by a third of a second; it never talks over it.
+- An answer that already speaks Bulgarian makes no extra sound.
+- Everything is tuned around D so any two sounds can overlap.
+- `npm run sfx` writes each sound as a WAV file to `sfx-preview/`, with a demo lesson, and fails if a sound clips, clicks, drifts out of tune or would vanish on a phone speaker.

@@ -94,7 +94,10 @@
 /* ---------- focus sheet */
 .focus-body { display: grid; gap: var(--space-5); }
 .focus-check { flex: none; width: 20px; height: 20px; color: var(--rose); }
-.focus-row-sub { display: flex; align-items: center; gap: 6px; }
+.focus-row-sub { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+/* The Bulgarian name gives way first; the count never breaks. */
+.focus-row-sub > [lang] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.focus-row-sub > :not([lang]) { flex: none; white-space: nowrap; }
 .focus-mini { display: inline-block; width: 36px; height: 4px; border-radius: var(--radius-full); background: var(--fill-secondary); overflow: hidden; }
 .focus-mini > span { display: block; height: 100%; border-radius: inherit; background: var(--tone); }
 .focus-plan-toggle .gv-row__chevron { transition: transform 200ms var(--ease-out); }

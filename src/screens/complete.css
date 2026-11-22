@@ -1,17 +1,21 @@
-/* Completion summary, native iOS: calm, tidy, no confetti. */
+/* Completion summary: calm and tidy. The celebration is the stitched star and the tune, not confetti. */
 .done { min-height: 100dvh; display: grid; grid-template-rows: 1fr auto; background: var(--linen); padding-top: env(safe-area-inset-top, 0px); }
 .done__body { display: grid; align-content: start; gap: var(--space-5); padding-block: var(--space-3) var(--space-6); }
 .done__band { --tone: var(--rose); margin-inline: auto; width: 100%; max-width: 280px; }
 
 .done__hero { display: grid; justify-items: center; gap: var(--space-1); text-align: center; padding-top: var(--space-2); }
-.done__mark { margin-bottom: var(--space-3); }
-.done__check { color: var(--pine); opacity: 0; transform: scale(0.7); transition: opacity 200ms 320ms var(--ease-out), transform 260ms 320ms cubic-bezier(0.2, 0.8, 0.2, 1); }
-.done__check.is-on { opacity: 1; transform: none; }
-.done__check svg { width: 32px; height: 32px; stroke-width: 2.5; }
-/* The ring draws itself closed. */
-.done__ring .gv-ring__value { transition: stroke-dashoffset var(--draw-ms, 500ms) cubic-bezier(0.2, 0.8, 0.2, 1); }
+.done__mark { margin-bottom: var(--space-2); }
+/* The star from the milestone sheet, smaller: it stitches itself on in time with the tune (the last
+   stroke lands with the downbeat, about 0.8s in), then the check arrives in the middle. */
+.milestone__star.done__star { width: 124px; height: 124px; margin: 0; }
+.done__star .milestone__star-line { stroke-width: 2.6; animation-duration: 820ms; animation-delay: 60ms; }
+.done__star .milestone__star-back { stroke-width: 1.4; animation-duration: 820ms; animation-delay: 200ms; }
+.done__check { color: var(--rose); animation: done-check 300ms cubic-bezier(0.2, 0.8, 0.2, 1) 780ms both; }
+.done__star .done__check svg { position: static; width: 40px; height: 40px; stroke-width: 2.25; }
+.done__star .done__check path { stroke-dasharray: none; }
+@keyframes done-check { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
 .done__title { margin: 0; }
-.done__bg { margin: 0; font: 400 17px/22px var(--font-text); color: var(--ink-muted); }
+.done__bg { margin: 2px 0 0; font: 500 21px/27px var(--font-display); color: var(--rose-ink); }
 
 .done__stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .done__stats .gv-statcell { text-align: left; }
@@ -92,7 +96,6 @@
 .milestone__proverb figcaption { display: grid; gap: 2px; font: 400 15px/20px var(--font-text); color: var(--ink-muted); }
 
 @media (prefers-reduced-motion: reduce) {
-  .done__check { transition: none; opacity: 1; transform: none; }
-  .done__ring .gv-ring__value { transition: none; }
+  .done__check { animation: none; }
   .milestone__star-line, .milestone__star-back { animation: none; stroke-dashoffset: 0; }
 }

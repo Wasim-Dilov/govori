@@ -1,6 +1,6 @@
-/* Stats screen (st-). Native iOS: large title, inset grouped sections, quiet charts.
+/* Stats screen (st-). Large title, grouped sections, quiet charts.
    Chart colour: one hue (rose, the accent) for accuracy marks; a four-step rose ramp for the calendar.
-   Light ramp sits on the white card (dark end = accent); dark ramp runs dim to bright on #1c1c1e. */
+   Light ramp sits on the paper card (dark end = accent); dark ramp runs dim to bright on the dark card. */
 
 .st-root {
   --heat-0: var(--fill-secondary);

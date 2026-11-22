@@ -217,21 +217,25 @@ export function cardText(d: CardData): string {
 export const CARD_W = 1080
 export const CARD_H = 1350
 
+// The app's light palette (design/tokens.json): the card is always drawn on warm paper.
 const C = {
-  ground: '#f2f2f7',
-  card: '#ffffff',
-  ink: '#000000',
-  muted: '#69696e',
-  tertiary: '#aeaeb2',
-  line: '#e3e3e8',
-  panel: '#f2f2f7',
+  ground: '#f5f0e6',
+  card: '#fffdf8',
+  ink: '#1f1b17',
+  muted: '#655c51',
+  tertiary: '#b4aa99',
+  line: '#e7e0d2',
+  panel: '#f5f0e6',
   rose: '#c8234f',
-  roseSoft: '#fbe8ee',
+  roseSoft: '#f9e3e6',
   roseInk: '#a51b40',
 }
 
 const FONT = '-apple-system, "SF Pro Display", "SF Pro Text", "Inter Variable", system-ui, sans-serif'
 const font = (weight: number, size: number) => `${weight} ${size}px ${FONT}`
+// Headlines and the Bulgarian lines use the app's display serif, like the app itself.
+const DISPLAY = '"Literata Variable", "Literata", "Iowan Old Style", Georgia, serif'
+const display = (size: number) => `600 ${size}px ${DISPLAY}`
 
 // The Г monogram from BrandMark.tsx (viewBox 0 0 1024 1024).
 const GAMMA = 'M332 236 H688 Q706 236 706 254 V354 Q706 372 688 372 H450 V770 Q450 788 432 788 H332 Q314 788 314 770 V254 Q314 236 332 236 Z'
@@ -358,6 +362,8 @@ function drawBand(ctx: CanvasRenderingContext2D, x: number, y: number, w: number
 /** Draw the card and return it as a PNG blob. */
 export async function renderCard(d: CardData): Promise<Blob> {
   await document.fonts?.ready.catch(() => undefined)
+  // Canvas only draws a web font once it has loaded for the characters asked of it.
+  await document.fonts?.load(display(72), `${d.headline} ${d.closing.bg}`).catch(() => undefined)
   const img = await loadMark()
   try {
     return await draw(d, img)
@@ -415,14 +421,14 @@ async function draw(d: CardData, img: HTMLImageElement | null): Promise<Blob> {
       ctx.fillText(d.eyebrow, left, ey)
     })
   }
-  ctx.font = font(700, 62)
+  ctx.font = display(62)
   setSpacing(ctx, -1.5)
   for (const line of balance(ctx, d.headline, width)) {
     y += 72
     const ly = y
     op(() => {
       ctx.fillStyle = C.ink
-      ctx.font = font(700, 62)
+      ctx.font = display(62)
       setSpacing(ctx, -1.5)
       ctx.fillText(line, left, ly)
       setSpacing(ctx, 0)
@@ -501,14 +507,14 @@ async function draw(d: CardData, img: HTMLImageElement | null): Promise<Blob> {
       ctx.font = font(600, 24)
       ctx.fillText(label, left, fy)
     })
-    ctx.font = font(700, 72)
+    ctx.font = display(72)
     const big = balance(ctx, feature.bg, width).slice(0, 2)
     for (const line of big) {
       y += 84
       const ly = y
       op(() => {
         ctx.fillStyle = C.rose
-        ctx.font = font(700, 72)
+        ctx.font = display(72)
         setSpacing(ctx, -1)
         ctx.fillText(line, left, ly)
         setSpacing(ctx, 0)
@@ -594,7 +600,7 @@ async function draw(d: CardData, img: HTMLImageElement | null): Promise<Blob> {
   if (!closingFeatured) {
     const closing = d.partnerName ? `${d.closing.bg.replace(/[.!]$/, '')}, ${d.partnerName}.` : d.closing.bg
     ctx.fillStyle = C.rose
-    ctx.font = font(700, 46)
+    ctx.font = display(46)
     ctx.fillText(ellipsis(ctx, closing, width - sigW), left, closingBgY)
     ctx.fillStyle = C.muted
     ctx.font = font(400, 27)

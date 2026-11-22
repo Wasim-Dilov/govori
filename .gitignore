@@ -8,3 +8,4 @@ dev-dist
 
 # Local ElevenLabs voice samples (published from CI to the voice-samples branch)
 sample-voices/
+sfx-preview

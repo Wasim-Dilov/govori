@@ -1,5 +1,5 @@
 // Generates the iOS launch images (apple-touch-startup-image) for the installed app:
-// the grouped-background ground with the Г brand tile, light and dark, for each iPhone size.
+// the paper ground with the Г brand tile, light and dark, for each iPhone size.
 // The tile is 120pt with a 27pt radius, centred in the area below the status bar, which is
 // exactly where App.tsx draws its loader, so launch hands over to the app without a jump.
 //
@@ -22,7 +22,7 @@ const DEVICES = [
   [430, 932, 3, 59], // iPhone 14 Pro Max, 15 Plus, 15 Pro Max, 16 Plus
   [440, 956, 3, 62], // iPhone 16 Pro Max
 ]
-const THEMES = { light: '#f2f2f7', dark: '#000000' }
+const THEMES = { light: '#f5f0e6', dark: '#151210' }
 const BRAND = '#c8234f'
 const TILE = 120
 const GAMMA = 'M332 236 H688 Q706 236 706 254 V354 Q706 372 688 372 H450 V770 Q450 788 432 788 H332 Q314 788 314 770 V254 Q314 236 332 236 Z'

@@ -1,5 +1,6 @@
-// Speech, recordings and little sound effects.
+// Speech, recordings and sound effects.
 import { db } from './db.ts'
+import { CORRECT_STEPS, renderSfx, type SfxName } from './sfx-dsp.ts'
 
 // ------------------------------------------------------------- text to speech
 let voice: SpeechSynthesisVoice | null = null
@@ -302,6 +303,7 @@ export function unlockAudio() {
     src.buffer = buf
     src.connect(c.destination)
     src.start(0)
+    warmSfx()
   } catch {
     /* no WebAudio */
   }
@@ -366,7 +368,10 @@ export function playBlob(blob: Blob): Promise<void> {
 }
 
 // ------------------------------------------------------------- sound effects (synthesised, no files)
+// The sounds themselves are in sfx-dsp.ts: a tambura, a tapan drum, a shepherd's bell and a kaval,
+// worked out sample by sample. Here they are rendered once into buffers and played through one bus.
 let ctx: AudioContext | null = null
+let bus: AudioNode | null = null
 let sfxOn = true
 export const setSfx = (on: boolean) => (sfxOn = on)
 
@@ -379,42 +384,88 @@ function ac() {
   return ctx
 }
 
-function tone(freq: number, start: number, dur: number, type: OscillatorType = 'sine', gain = 0.18) {
-  const c = ac()
-  const o = c.createOscillator()
-  const g = c.createGain()
-  o.type = type
-  o.frequency.setValueAtTime(freq, c.currentTime + start)
-  g.gain.setValueAtTime(0, c.currentTime + start)
-  g.gain.linearRampToValueAtTime(gain, c.currentTime + start + 0.015)
-  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + start + dur)
-  o.connect(g).connect(c.destination)
-  o.start(c.currentTime + start)
-  o.stop(c.currentTime + start + dur + 0.05)
+/** Everything goes through one gentle limiter, so two sounds landing together never clip. */
+function output(c: AudioContext): AudioNode {
+  if (bus) return bus
+  const limiter = c.createDynamicsCompressor()
+  limiter.threshold.value = -9
+  limiter.knee.value = 6
+  limiter.ratio.value = 12
+  limiter.attack.value = 0.003
+  limiter.release.value = 0.12
+  limiter.connect(c.destination)
+  bus = limiter
+  return bus
+}
+
+const buffers = new Map<string, AudioBuffer>()
+function bufferFor(c: AudioContext, name: SfxName, step: number, variant: number): AudioBuffer {
+  const key = `${name}:${step}:${variant}`
+  let buf = buffers.get(key)
+  if (!buf) {
+    const samples = renderSfx(name, c.sampleRate, step, variant)
+    buf = c.createBuffer(1, samples.length, c.sampleRate)
+    buf.getChannelData(0).set(samples)
+    buffers.set(key, buf)
+  }
+  return buf
+}
+
+/** Short sounds come in two takes so the same one never plays twice in a row sample for sample. */
+const TAKES: Partial<Record<SfxName, number>> = { tap: 2, select: 2, correct: 2, wrong: 2 }
+
+function play(name: SfxName, step = 0, delay = 0) {
+  if (!sfxOn || typeof window === 'undefined') return
+  try {
+    const c = ac()
+    const takes = TAKES[name] ?? 1
+    const src = c.createBufferSource()
+    src.buffer = bufferFor(c, name, step, takes > 1 ? Math.floor(Math.random() * takes) : 0)
+    // A hair of drift in pitch and level, as between any two strokes by a real player.
+    src.playbackRate.value = 1 + (Math.random() - 0.5) * 0.006
+    const gain = c.createGain()
+    gain.gain.value = 0.9 + Math.random() * 0.1
+    src.connect(gain).connect(output(c))
+    src.start(c.currentTime + delay)
+  } catch {
+    /* no WebAudio: stay silent */
+  }
+}
+
+let warmed = false
+/** Render the everyday sounds ahead of time, one per idle moment, so the first play is instant. */
+function warmSfx() {
+  if (warmed || typeof window === 'undefined') return
+  warmed = true
+  const jobs: [SfxName, number][] = [['select', 0], ['correct', 0], ['wrong', 0], ['tap', 0], ['correct', 1], ['correct', 2], ['combo', 0], ['complete', 0], ['correct', 3], ['correct', 4]]
+  const next = () => {
+    const job = jobs.shift()
+    if (!job) return
+    try {
+      if (sfxOn) bufferFor(ac(), job[0], job[1], 0)
+    } catch {
+      return
+    }
+    setTimeout(next, 120)
+  }
+  setTimeout(next, 400)
 }
 
 export const sfx = {
-  correct() {
-    if (!sfxOn) return
-    tone(784, 0, 0.18, 'triangle')
-    tone(1175, 0.09, 0.28, 'triangle')
-  },
-  wrong() {
-    if (!sfxOn) return
-    tone(220, 0, 0.22, 'sawtooth', 0.07)
-    tone(196, 0.12, 0.3, 'sawtooth', 0.06)
-  },
-  tap() {
-    if (!sfxOn) return
-    tone(660, 0, 0.06, 'sine', 0.08)
-  },
-  complete() {
-    if (!sfxOn) return
-    ;[523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.11, 0.35, 'triangle', 0.16))
-  },
-  combo() {
-    if (!sfxOn) return
-    tone(988, 0, 0.12, 'triangle', 0.12)
-    tone(1319, 0.07, 0.2, 'triangle', 0.12)
-  },
+  /** Moving around the app: a knuckle on wood. */
+  tap: () => play('tap'),
+  /** Choosing an answer: a damped string. */
+  select: () => play('select'),
+  /** A right answer. `run` is how many were right in a row before it: each one plays a step higher. */
+  correct: (run = 0) => play('correct', Math.max(0, Math.min(CORRECT_STEPS - 1, run))),
+  /** Not quite: a soft drum and stopped strings. */
+  wrong: () => play('wrong'),
+  /** A run of right answers: the shepherd's bell. */
+  combo: (delay = 0) => play('combo', 0, delay),
+  /** Lesson complete: a bar of ръченица. */
+  complete: () => play('complete'),
+  /** The streak grew or a level was reached: the kaval. */
+  streak: (delay = 0) => play('streak', 0, delay),
+  /** Setup finished: open strings. */
+  welcome: () => play('welcome'),
 }
